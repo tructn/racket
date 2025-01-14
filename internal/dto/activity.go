@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/truc9/racket/internal/domain"
+	"github.com/tructn/racket/internal/domain"
 )
 
 type ActivityDto struct {

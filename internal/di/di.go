@@ -1,10 +1,10 @@
 package di
 
 import (
-	"github.com/truc9/racket/internal/db"
-	"github.com/truc9/racket/internal/handler"
-	"github.com/truc9/racket/internal/service"
-	"github.com/truc9/racket/pkg/logger"
+	"github.com/tructn/racket/internal/db"
+	"github.com/tructn/racket/internal/handler"
+	"github.com/tructn/racket/internal/service"
+	"github.com/tructn/racket/pkg/logger"
 	"go.uber.org/dig"
 )
 

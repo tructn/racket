@@ -1,4 +1,4 @@
-module github.com/truc9/racket
+module github.com/tructn/racket
 
 go 1.22
 

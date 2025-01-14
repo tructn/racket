@@ -8,8 +8,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/truc9/racket/internal/di"
-	"github.com/truc9/racket/internal/handler"
+	"github.com/tructn/racket/internal/di"
+	"github.com/tructn/racket/internal/handler"
 
 	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
 	"github.com/auth0/go-jwt-middleware/v2/jwks"

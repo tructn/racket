@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/truc9/racket/internal/dto"
-	"github.com/truc9/racket/internal/service"
-	"github.com/truc9/racket/pkg/param"
+	"github.com/tructn/racket/internal/dto"
+	"github.com/tructn/racket/internal/service"
+	"github.com/tructn/racket/pkg/param"
 )
 
 type SportCenterHandler struct {

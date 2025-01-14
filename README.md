@@ -2,7 +2,7 @@
   <img height="130" src="art/logo.svg" alt="LOGO" />
 </div>
 
-[![Go](https://github.com/truc9/racket/actions/workflows/go.yml/badge.svg)](https://github.com/truc9/racket/actions/workflows/go.yml) [![CodeQL Advanced](https://github.com/truc9/racket/actions/workflows/codeql.yml/badge.svg)](https://github.com/truc9/racket/actions/workflows/codeql.yml)
+[![Go](https://github.com/tructn/racket/actions/workflows/go.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/go.yml) [![CodeQL Advanced](https://github.com/tructn/racket/actions/workflows/codeql.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/codeql.yml)
 
 ## Overview
 An app for amature badminton player self-organized group, manage players, courts, costs

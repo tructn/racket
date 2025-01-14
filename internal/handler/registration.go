@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/truc9/racket/internal/domain"
-	"github.com/truc9/racket/internal/dto"
-	"github.com/truc9/racket/internal/service"
+	"github.com/tructn/racket/internal/domain"
+	"github.com/tructn/racket/internal/dto"
+	"github.com/tructn/racket/internal/service"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
