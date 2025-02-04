@@ -97,7 +97,6 @@ export default function Page() {
         size="md"
         placeholder="Search player..."
         onChange={handleSearch}
-        disabled={filterPlayers?.length === 0}
       />
       {isFetching ? (
         Array.from({ length: 3 }).map((_, index) => (
