@@ -104,7 +104,7 @@ export default function Page() {
         ))
       ) : filterPlayers?.length === 0 ? (
         <div className="rounded-lg border border-dashed border-green-500 bg-green-50 px-5 py-12 text-center text-xl font-bold text-green-500 shadow">
-          No more unpaid 🥰
+          No Data
         </div>
       ) : (
         filterPlayers?.map((item) => (
