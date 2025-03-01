@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tructn/racket/internal/dto"
 	"github.com/tructn/racket/internal/service"
-	"github.com/tructn/racket/pkg/param"
+	"github.com/tructn/racket/pkg/util"
 )
 
 type SportCenterHandler struct {
@@ -61,7 +61,7 @@ func (h *SportCenterHandler) Create(c *gin.Context) {
 
 func (h *SportCenterHandler) Update(c *gin.Context) {
 	dto := dto.SportCenterDto{}
-	id := param.FromRoute(c, "sportCenterId")
+	id := util.GetRouteString(c, "sportCenterId")
 
 	if err := c.BindJSON(&dto); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)

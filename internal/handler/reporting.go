@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/tructn/racket/internal/domain"
 	"github.com/tructn/racket/internal/service"
-	"github.com/tructn/racket/pkg/param"
+	"github.com/tructn/racket/pkg/util"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -36,7 +36,7 @@ func (h *ReportingHandler) GetUnpaidReport(c *gin.Context) {
 }
 
 func (h *ReportingHandler) GetUnpaidReportForPublic(c *gin.Context) {
-	shareCode := param.FromQuery(c, "shareCode")
+	shareCode := util.GetQueryString(c, "shareCode")
 
 	var count int64
 	if err := h.db.Model(&domain.ShareCode{}).Where("code = ?", shareCode).Count(&count).Error; err != nil {

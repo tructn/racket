@@ -1,8 +1,12 @@
 package main
 
 import (
-	"net/url"
+	"context"
+	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -10,21 +14,16 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/tructn/racket/internal/di"
 	"github.com/tructn/racket/internal/handler"
-
-	jwtmiddleware "github.com/auth0/go-jwt-middleware/v2"
-	"github.com/auth0/go-jwt-middleware/v2/jwks"
-	"github.com/auth0/go-jwt-middleware/v2/validator"
-	adapter "github.com/gwatts/gin-adapter"
+	"github.com/tructn/racket/pkg/middleware"
 )
 
 func main() {
 	godotenv.Load()
-
-	container := di.Register()
-
-	app := gin.Default()
-
-	app.Use(cors.New(cors.Config{
+	reg := di.Register()
+	router := gin.Default()
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:5173",
 			"https://getracket.vercel.app",
@@ -35,38 +34,21 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-
-	app.GET("/health", func(ctx *gin.Context) {
+	router.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(200, gin.H{
 			"message": "ok",
 		})
 	})
 
-	public := app.Group("/api/v1/public")
-	container.Invoke(func(handler *handler.ReportingHandler) {
+	public := router.Group("/api/v1/public")
+	reg.Invoke(func(handler *handler.ReportingHandler) {
 		public.GET("/reports/unpaid", handler.GetUnpaidReportForPublic)
 	})
 
-	issuerURL, _ := url.Parse(os.Getenv("AUTH0_ISSUER_URL"))
-	audience := os.Getenv("AUTH0_AUDIENCE")
-	provider := jwks.NewCachingProvider(issuerURL, time.Duration(5*time.Minute))
+	v1 := router.Group("/api/v1")
+	v1.Use(middleware.AuthRequired())
 
-	jwtValidator, _ := validator.New(provider.KeyFunc,
-		validator.RS256,
-		issuerURL.String(),
-		[]string{audience},
-	)
-
-	jwtMiddleware := jwtmiddleware.New(jwtValidator.ValidateToken)
-	app.Use(adapter.Wrap(jwtMiddleware.CheckJWT))
-
-	app.GET("/health/origins", func(ctx *gin.Context) {
-		ctx.JSON(200, ctx.Request.Header.Get("Origin"))
-	})
-
-	v1 := app.Group("/api/v1")
-
-	container.Invoke(func(handler *handler.MatchHandler) {
+	reg.Invoke(func(handler *handler.MatchHandler) {
 		v1.POST("/matches", handler.Create)
 		v1.GET("/matches", handler.GetAll)
 		v1.GET("/matches/archived", handler.GetArchivedMatches)
@@ -83,7 +65,7 @@ func main() {
 		v1.DELETE("/matches/:matchId", handler.Delete)
 	})
 
-	container.Invoke(func(handler *handler.PlayerHandler) {
+	reg.Invoke(func(handler *handler.PlayerHandler) {
 		v1.GET("/players", handler.GetAll)
 		v1.GET("/players/external-users/:externalUserId/attendant-requests", handler.GetExternalUserAttendantRequests)
 		v1.POST("/players", handler.Create)
@@ -93,7 +75,7 @@ func main() {
 		v1.POST("/players/:playerId/accounts", handler.OpenAccount)
 	})
 
-	container.Invoke(func(handler *handler.RegistrationHandler) {
+	reg.Invoke(func(handler *handler.RegistrationHandler) {
 		v1.GET("/registrations", handler.GetAll)
 		v1.POST("/registrations", handler.Register)
 		v1.POST("/registrations/attendant-requests", handler.AttendantRequest)
@@ -102,31 +84,63 @@ func main() {
 		v1.DELETE("/registrations/:registrationId", handler.Unregister)
 	})
 
-	container.Invoke(func(handler *handler.SportCenterHandler) {
+	reg.Invoke(func(handler *handler.SportCenterHandler) {
 		v1.GET("/sportcenters", handler.GetAll)
 		v1.GET("/sportcenters/options", handler.GetOptions)
 		v1.POST("/sportcenters", handler.Create)
 		v1.PUT("/sportcenters/:sportCenterId", handler.Update)
 	})
 
-	container.Invoke(func(handler *handler.SettingsHandler) {
+	reg.Invoke(func(handler *handler.SettingsHandler) {
 		v1.GET("/settings/message-template", handler.GetMessageTemplate)
 		v1.POST("/settings/message-template", handler.CreateMessageTemplate)
 	})
 
-	container.Invoke(func(handler *handler.ReportingHandler) {
+	reg.Invoke(func(handler *handler.ReportingHandler) {
 		v1.GET("/reports/unpaid", handler.GetUnpaidReport)
 	})
 
-	container.Invoke(func(handler *handler.ActivityHandler) {
+	reg.Invoke(func(handler *handler.ActivityHandler) {
 		v1.GET("/activities", handler.GetAll)
 	})
 
-	container.Invoke(func(handler *handler.ShareCodeHandler) {
+	reg.Invoke(func(handler *handler.ShareCodeHandler) {
 		v1.GET("/share-codes/urls", handler.GetShareUrls)
 		v1.POST("/share-codes/urls", handler.CreateShareUrl)
 		v1.DELETE("/share-codes/urls/:shareCodeId", handler.DeleteShareCodeUrl)
 	})
 
-	app.Run()
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: router.Handler(),
+	}
+
+	// Serve HTTP server in goroutine
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	// Channel to listen for OS signals
+	quit := make(chan os.Signal, 1)
+
+	// kill (no param) default send syscall.SIGTERM
+	// kill -2 is syscall.SIGINT
+	// kill -9 is syscall.SIGKILL but can"t be catch, so don't need add it
+	// Catch Ctrl + C or kill -15
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	// Block until signal is receveid
+	<-quit
+	log.Println("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
 }

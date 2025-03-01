@@ -1,5 +1,4 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import React from "react";
 
 function Landing() {
   const { loginWithRedirect } = useAuth0();
@@ -17,7 +16,7 @@ function Landing() {
             className="rounded-lg bg-blue-600 px-6 py-2 text-white transition duration-300 hover:bg-blue-700"
             onClick={() => loginWithRedirect()}
           >
-            Sign Up
+            Register
           </button>
         </div>
       </nav>
@@ -36,7 +35,7 @@ function Landing() {
             className="rounded-lg bg-white px-8 py-3 font-semibold text-blue-600 transition duration-300 hover:bg-gray-100"
             onClick={() => loginWithRedirect()}
           >
-            Get Started
+            Login
           </button>
         </div>
       </section>
