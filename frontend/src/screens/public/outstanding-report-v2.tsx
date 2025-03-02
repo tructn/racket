@@ -200,11 +200,10 @@ export default function Page() {
                   </div>
                   <div>{match.playerCount} players</div>
                   <div className="text-violet-500">
-                    <span>Total: </span>
                     <Currency value={match.totalCost} />
                   </div>
                   <div className="text-end text-pink-500">
-                    <Currency value={match.individualCost} /> / each
+                    <Currency value={match.individualCost} />
                   </div>
                 </div>
               ))}
