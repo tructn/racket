@@ -58,7 +58,29 @@ func (h *ReportingHandler) GetUnpaidReportForPublic(c *gin.Context) {
 		return
 	}
 
-	// res, err := h.reportingSvc.GetUnpaidReport()
+	res, err := h.reportingSvc.GetUnpaidReport()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, res)
+}
+
+func (h *ReportingHandler) GetUnpaidReportForPublicV2(c *gin.Context) {
+	shareCode := util.GetQueryString(c, "shareCode")
+
+	var count int64
+	if err := h.db.Model(&domain.ShareCode{}).Where("code = ?", shareCode).Count(&count).Error; err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	if count == 0 {
+		c.AbortWithError(http.StatusForbidden, errors.New("access denied"))
+		return
+	}
+
 	res, err := h.reportingSvc.GetUnpaidReportV2()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

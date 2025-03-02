@@ -40,9 +40,14 @@ func main() {
 		})
 	})
 
-	public := router.Group("/api/v1/public")
+	publicV1 := router.Group("/api/v1/public")
 	reg.Invoke(func(handler *handler.ReportingHandler) {
-		public.GET("/reports/unpaid", handler.GetUnpaidReportForPublic)
+		publicV1.GET("/reports/unpaid", handler.GetUnpaidReportForPublic)
+	})
+
+	publicV2 := router.Group("/api/v2/public")
+	reg.Invoke(func(handler *handler.ReportingHandler) {
+		publicV2.GET("/reports/unpaid", handler.GetUnpaidReportForPublicV2)
 	})
 
 	v1 := router.Group("/api/v1")

@@ -51,10 +51,10 @@ export default function Page() {
   const shareCode = searchParams.get("share-code");
   const { isFetching, data, isError } = useQuery({
     retry: false,
-    queryKey: ["getPublicUnpaidReport"],
+    queryKey: ["getPublicUnpaidReportV2"],
     queryFn: () =>
       get<UnpaidModelV2[]>(
-        `api/v1/public/reports/unpaid?shareCode=${shareCode}`,
+        `api/v2/public/reports/unpaid?shareCode=${shareCode}`,
       ),
   });
 
@@ -190,23 +190,21 @@ export default function Page() {
             </div>
             <div className="mt-2">
               {player.matches.map((match, i) => (
-                <div>
-                  <div
-                    key={i}
-                    className="grid grid-cols-4 justify-between gap-3 text-sm"
-                  >
-                    <div className="flex items-center gap-1">
-                      <IoCalendarOutline />
-                      {dayjs(match.date).format("DD/MM/YYYY")}
-                    </div>
-                    <div>{match.playerCount} players</div>
-                    <div className="text-violet-500">
-                      <span>Total: </span>
-                      <Currency value={match.totalCost} />
-                    </div>
-                    <div className="text-end text-pink-500">
-                      <Currency value={match.individualCost} /> / each
-                    </div>
+                <div
+                  key={i}
+                  className="grid grid-cols-4 justify-between gap-3 text-sm"
+                >
+                  <div className="flex items-center gap-1">
+                    <IoCalendarOutline />
+                    {dayjs(match.date).format("DD/MM/YYYY")}
+                  </div>
+                  <div>{match.playerCount} players</div>
+                  <div className="text-violet-500">
+                    <span>Total: </span>
+                    <Currency value={match.totalCost} />
+                  </div>
+                  <div className="text-end text-pink-500">
+                    <Currency value={match.individualCost} /> / each
                   </div>
                 </div>
               ))}
