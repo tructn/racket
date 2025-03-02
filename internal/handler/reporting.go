@@ -35,6 +35,15 @@ func (h *ReportingHandler) GetUnpaidReport(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+func (h *ReportingHandler) GetUnpaidReportV2(c *gin.Context) {
+	res, err := h.reportingSvc.GetUnpaidReportV2()
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, res)
+}
+
 func (h *ReportingHandler) GetUnpaidReportForPublic(c *gin.Context) {
 	shareCode := util.GetQueryString(c, "shareCode")
 
@@ -49,7 +58,8 @@ func (h *ReportingHandler) GetUnpaidReportForPublic(c *gin.Context) {
 		return
 	}
 
-	res, err := h.reportingSvc.GetUnpaidReport()
+	// res, err := h.reportingSvc.GetUnpaidReport()
+	res, err := h.reportingSvc.GetUnpaidReportV2()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

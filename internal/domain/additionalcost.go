@@ -4,7 +4,7 @@ import "errors"
 
 type AdditionalCost struct {
 	BaseModel
-	MatchId     uint    `json:"matchId"`
+	MatchId     uint    `gorm:"index" json:"matchId"`
 	Match       Match   `gorm:"foreignKey:MatchId" json:"match"`
 	Description string  `json:"description"`
 	Amount      float64 `json:"amount"`

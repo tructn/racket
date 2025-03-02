@@ -2,8 +2,8 @@ package domain
 
 type Registration struct {
 	BaseModel
-	PlayerId uint   `json:"playerId"`
-	MatchId  uint   `json:"matchId"`
+	PlayerId uint   `gorm:"index" json:"playerId"`
+	MatchId  uint   `gorm:"index" json:"matchId"`
 	IsPaid   bool   `json:"isPaid"`
 	Comment  string `json:"comment"`
 }

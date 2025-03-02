@@ -1,6 +1,10 @@
 package service
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type UnpaidByPlayer struct {
 	PlayerId            uint    `json:"playerId"`
@@ -8,6 +12,15 @@ type UnpaidByPlayer struct {
 	MatchCount          uint    `json:"matchCount"`
 	UnpaidAmount        float64 `json:"unpaidAmount"`
 	RegistrationSummary string  `json:"registrationSummary"`
+}
+
+type UnpaidByPlayerV2 struct {
+	PlayerId            uint      `json:"playerId"`
+	PlayerName          string    `json:"playerName"`
+	MatchDate           time.Time `json:"matchDate"`
+	MatchCost           float64   `json:"matchCost"`
+	MatchAdditionalCost float64   `json:"matchAdditionalCost"`
+	MatchPlayerCount    uint      `json:"matchPlayerCount"`
 }
 
 type ReportingService struct {
@@ -64,6 +77,31 @@ func (s *ReportingService) GetUnpaidReport() ([]UnpaidByPlayer, error) {
 	GROUP BY p.id, cte2.registration_summary
 	ORDER by player_name
 	`).Scan(&result).Error; err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (s *ReportingService) GetUnpaidReportV2() ([]UnpaidByPlayerV2, error) {
+	result := []UnpaidByPlayerV2{}
+	if err := s.db.Raw(`with 
+cte_addtional_costs as (
+	select ac.match_id, sum(ac.amount) as total
+	from public.additional_costs ac 
+	group by ac.match_id
+),
+cte_player_counts as (
+	select m.id as match_id, m."cost" as match_cost, ac.total as match_additional_cost, m."start" as match_date,  COUNT(r.id) as match_player_count
+	from public.registrations r
+	join public.matches m  on r.match_id = m.id
+	left join cte_addtional_costs ac on ac.match_id = m.id
+	group by m.id, m."cost", m.start, ac.total
+)
+select p.id as player_id, CONCAT(p.first_name, ' ', p.last_name) as player_name, pc.match_id, pc.match_date, pc.match_cost, pc.match_additional_cost, pc.match_player_count
+from public.registrations r
+join public.players p on p.id = r.player_id
+join cte_player_counts pc on pc.match_id  = r.match_id
+`).Scan(&result).Error; err != nil {
 		return nil, err
 	}
 	return result, nil

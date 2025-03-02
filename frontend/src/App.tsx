@@ -18,6 +18,9 @@ const ReportingScreen = lazy(() => import("./screens/reporting"));
 const PublicOutstandingReport = lazy(
   () => import("./screens/public/outstanding-report"),
 );
+const PublicOutstandingReportV2 = lazy(
+  () => import("./screens/public/outstanding-report-v2"),
+);
 
 function App() {
   const { isAdmin } = useClaims();
@@ -45,6 +48,10 @@ function App() {
       <Route
         path="/public/outstanding-report"
         element={<PublicOutstandingReport />}
+      />
+      <Route
+        path="/public/outstanding-report/v2"
+        element={<PublicOutstandingReportV2 />}
       />
     </Routes>
   );
