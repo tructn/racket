@@ -8,7 +8,6 @@ import Landing from "./screens/landing";
 const DashboardScreen = lazy(() => import("./screens/dashboard"));
 const MatchesScreen = lazy(() => import("./screens/matches"));
 const PlayerScreen = lazy(() => import("./screens/players"));
-const HealthScreen = lazy(() => import("./screens/health"));
 const SportCentersScreen = lazy(() => import("./screens/sportcenter"));
 const SettingsScreen = lazy(() => import("./screens/settings"));
 const PageNotFoundScreen = lazy(() => import("./screens/page-not-found"));
@@ -35,7 +34,6 @@ function App() {
           <Route path="matches" element={<MatchesScreen />} />
           <Route path="sportcenters" element={<SportCentersScreen />} />
           <Route path="reports" element={<ReportingScreen />} />
-          <Route path="health" element={<HealthScreen />} />
           <Route path="settings" element={<SettingsScreen />} />
           <Route path="*" element={<PageNotFoundScreen />} />
         </Route>

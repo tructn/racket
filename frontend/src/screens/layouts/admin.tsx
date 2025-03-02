@@ -45,7 +45,7 @@ const NavItem: FC<NavItemProps> = ({ label, path, icon, showLabel = true }) => {
 };
 
 function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
 
   const { user, isAuthenticated, isLoading } = useAuth0();
 
@@ -113,12 +113,6 @@ function AdminLayout() {
               path="/sportcenters"
               label="Sport Centers"
               icon={<IoStorefront />}
-            />
-            <NavItem
-              showLabel={!collapsed}
-              path="/health"
-              label="Health"
-              icon={<IoHeart />}
             />
             <NavItem
               showLabel={!collapsed}

@@ -133,3 +133,43 @@ func (h *PlayerHandler) OpenAccount(c *gin.Context) {
 
 	c.JSON(http.StatusOK, acc.ID)
 }
+
+func (h *PlayerHandler) Credit(c *gin.Context) {
+	playerId := util.GetIntRouteParam(c, "playerId")
+	model := dto.TransactionDto{}
+	if err := c.BindJSON(&model); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	acc := domain.Account{}
+	if err := h.db.Where("player_id = ?", playerId).Scan(&acc).Error; err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	acc.Credit(model.Amount, model.Description)
+	h.db.Save(&acc)
+
+	c.JSON(http.StatusOK, acc.ID)
+}
+
+func (h *PlayerHandler) Debit(c *gin.Context) {
+	playerId := util.GetIntRouteParam(c, "playerId")
+	model := dto.TransactionDto{}
+	if err := c.BindJSON(&model); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	acc := domain.Account{}
+	if err := h.db.Where("player_id = ?", playerId).Scan(&acc).Error; err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	acc.Debit(model.Amount, model.Description)
+	h.db.Save(&acc)
+
+	c.JSON(http.StatusOK, acc.ID)
+}
