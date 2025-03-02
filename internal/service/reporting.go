@@ -95,7 +95,6 @@ cte_player_counts as (
 	from public.registrations r
 	join public.matches m  on r.match_id = m.id
 	left join cte_addtional_costs ac on ac.match_id = m.id
-	where r.is_paid = false
 	group by m.id, m."cost", m.start, ac.total
 )
 select p.id as player_id, CONCAT(p.first_name, ' ', p.last_name) as player_name, pc.match_id, pc.match_date, pc.match_cost, pc.match_additional_cost, pc.match_player_count
