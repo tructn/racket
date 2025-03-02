@@ -14,7 +14,6 @@ import {
   IoCafe,
   IoChevronBackCircle,
   IoDocumentText,
-  IoHeart,
   IoPersonAdd,
   IoSettings,
   IoStorefront,

@@ -152,8 +152,8 @@ export default function Page() {
           </a>
         </p>
         <h3 className="text-2xl font-bold text-violet-500">
-          Oops! This URL is invalidated! Please contact admin to publish a new
-          one.
+          Something went wrong! Please drop an email to
+          truc.nguyentrung@hotmail.com to report the issue.
         </h3>
       </div>
     );
@@ -179,7 +179,7 @@ export default function Page() {
         filterPlayers?.map((player) => (
           <div
             key={player.playerName}
-            className="rounded bg-slate-50 p-4 shadow-sm"
+            className="rounded bg-slate-50 p-2 shadow-sm"
           >
             <div className="flex items-center justify-between gap-3 text-lg">
               <div className="font-semibold">{player.playerName}</div>
@@ -196,7 +196,7 @@ export default function Page() {
                 >
                   <div className="flex items-center gap-1">
                     <IoCalendarOutline />
-                    {dayjs(match.date).format("DD/MM/YYYY")}
+                    {dayjs(match.date).format("DD-MMM")}
                   </div>
                   <div>{match.playerCount} players</div>
                   <div className="text-violet-500">
