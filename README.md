@@ -2,7 +2,11 @@
   <img height="130" src="art/logo.svg" alt="LOGO" />
 </div>
 
-[![Go](https://github.com/tructn/racket/actions/workflows/go.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/go.yml) [![CodeQL Advanced](https://github.com/tructn/racket/actions/workflows/codeql.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/codeql.yml)
+[![Go](https://github.com/tructn/racket/actions/workflows/go.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/go.yml) 
+
+[![CodeQL Advanced](https://github.com/tructn/racket/actions/workflows/codeql.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/codeql.yml)
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?name=racket&repository=truc9%2Fracket&branch=main&builder=dockerfile&instance_type=free&instances_min=0&env%5BAUTH0_AUDIENCE%5D=%7B%7B+secret.AUTH0_AUDIENCE+%7D%7D&env%5BAUTH0_DOMAIN%5D=%7B%7B+secret.AUTH0_DOMAIN+%7D%7D&env%5BDB%5D=%7B%7B+secret.DB+%7D%7D)
 
 ## Overview
 An app for amature badminton player self-organized group, manage players, courts, costs
