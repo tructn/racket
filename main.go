@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -19,10 +20,15 @@ import (
 
 func main() {
 	godotenv.Load()
+
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8000"
+	}
+
 	reg := di.Register()
 	router := gin.Default()
-	router.Use(gin.Logger())
-	router.Use(gin.Recovery())
 	router.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
 			"http://localhost:5173",
@@ -34,15 +40,13 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
 	router.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "ok",
-		})
+		ctx.Status(200)
 	})
+
 	router.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "ok",
-		})
+		ctx.Status(200)
 	})
 
 	publicV1 := router.Group("/api/v1/public")
@@ -121,7 +125,7 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    fmt.Sprintf(":%s", port),
 		Handler: router.Handler(),
 	}
 
