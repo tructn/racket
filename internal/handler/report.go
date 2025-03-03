@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -140,6 +141,10 @@ func (h *ReportHandler) GetUnpaidDetailsByPlayer(c *gin.Context) {
 	})
 
 	result := lo.Values(aggregation)
+
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].PlayerName < result[j].PlayerName
+	})
 
 	c.JSON(http.StatusOK, result)
 }
