@@ -1,40 +1,22 @@
 package service
 
 import (
-	"time"
-
+	"github.com/tructn/racket/internal/dto"
 	"gorm.io/gorm"
 )
 
-type UnpaidByPlayer struct {
-	PlayerId            uint    `json:"playerId"`
-	PlayerName          string  `json:"playerName"`
-	MatchCount          uint    `json:"matchCount"`
-	UnpaidAmount        float64 `json:"unpaidAmount"`
-	RegistrationSummary string  `json:"registrationSummary"`
-}
-
-type UnpaidByPlayerV2 struct {
-	PlayerId            uint      `json:"playerId"`
-	PlayerName          string    `json:"playerName"`
-	MatchDate           time.Time `json:"matchDate"`
-	MatchCost           float64   `json:"matchCost"`
-	MatchAdditionalCost float64   `json:"matchAdditionalCost"`
-	MatchPlayerCount    uint      `json:"matchPlayerCount"`
-}
-
-type ReportingService struct {
+type PaymentService struct {
 	db *gorm.DB
 }
 
-func NewReportingService(db *gorm.DB) *ReportingService {
-	return &ReportingService{
+func NewPaymentService(db *gorm.DB) *PaymentService {
+	return &PaymentService{
 		db: db,
 	}
 }
 
-func (s *ReportingService) GetUnpaidReport() ([]UnpaidByPlayer, error) {
-	result := []UnpaidByPlayer{}
+func (s *PaymentService) GetUnpaidConcatByPlayer() ([]dto.RegistrationSummaryByPlayerDto, error) {
+	result := []dto.RegistrationSummaryByPlayerDto{}
 	if err := s.db.Raw(`
 	WITH cte_match_costs AS (
 		SELECT 
@@ -82,8 +64,8 @@ func (s *ReportingService) GetUnpaidReport() ([]UnpaidByPlayer, error) {
 	return result, nil
 }
 
-func (s *ReportingService) GetUnpaidReportV2() ([]UnpaidByPlayerV2, error) {
-	result := []UnpaidByPlayerV2{}
+func (s *PaymentService) GetUnpaidDetails() ([]dto.MatchCostDetailsDto, error) {
+	result := []dto.MatchCostDetailsDto{}
 	if err := s.db.Raw(`with 
 cte_addtional_costs as (
 	select ac.match_id, sum(ac.amount) as total

@@ -21,13 +21,13 @@ func Register() *dig.Container {
 	c.Provide(handler.NewRegHandler)
 	c.Provide(handler.NewSportCenterHandler)
 	c.Provide(handler.NewSettingsHandler)
-	c.Provide(handler.NewReportingHandler)
+	c.Provide(handler.NewReportHandler)
 	c.Provide(handler.NewActivityHandler)
 	c.Provide(handler.NewShareCodeHandler)
 
 	// Services
 	c.Provide(service.NewSportCenterService)
-	c.Provide(service.NewReportingService)
+	c.Provide(service.NewPaymentService)
 	c.Provide(service.NewMatchService)
 	c.Provide(service.NewPlayerService)
 	c.Provide(service.NewActivityService)

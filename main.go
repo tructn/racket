@@ -50,13 +50,13 @@ func main() {
 	})
 
 	publicV1 := router.Group("/api/v1/public")
-	reg.Invoke(func(handler *handler.ReportingHandler) {
+	reg.Invoke(func(handler *handler.ReportHandler) {
 		publicV1.GET("/reports/unpaid", handler.GetUnpaidReportForPublic)
 	})
 
 	publicV2 := router.Group("/api/v2/public")
-	reg.Invoke(func(handler *handler.ReportingHandler) {
-		publicV2.GET("/reports/unpaid", handler.GetUnpaidReportForPublicV2)
+	reg.Invoke(func(handler *handler.ReportHandler) {
+		publicV2.GET("/reports/unpaid", handler.GetUnpaidDetailsByPlayer)
 	})
 
 	v1 := router.Group("/api/v1")
@@ -110,7 +110,7 @@ func main() {
 		v1.POST("/settings/message-template", handler.CreateMessageTemplate)
 	})
 
-	reg.Invoke(func(handler *handler.ReportingHandler) {
+	reg.Invoke(func(handler *handler.ReportHandler) {
 		v1.GET("/reports/unpaid", handler.GetUnpaidReport)
 	})
 
