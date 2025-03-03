@@ -88,18 +88,19 @@ func (h *ReportHandler) GetUnpaidReportForPublic(c *gin.Context) {
 }
 
 func (h *ReportHandler) GetUnpaidDetailsByPlayer(c *gin.Context) {
-	shareCode := util.GetQueryString(c, "shareCode")
+	// TODO: find other solution for perf enhancement and temporary turn off sharecode check
+	// shareCode := util.GetQueryString(c, "shareCode")
 
-	var count int64
-	if err := h.db.Model(&domain.ShareCode{}).Where("code = ?", shareCode).Count(&count).Error; err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
+	// var count int64
+	// if err := h.db.Model(&domain.ShareCode{}).Where("code = ?", shareCode).Count(&count).Error; err != nil {
+	// 	c.AbortWithError(http.StatusBadRequest, err)
+	// 	return
+	// }
 
-	if count == 0 {
-		c.AbortWithError(http.StatusForbidden, errors.New("access denied"))
-		return
-	}
+	// if count == 0 {
+	// 	c.AbortWithError(http.StatusForbidden, errors.New("access denied"))
+	// 	return
+	// }
 
 	// getting raw unpaid details with duplicated player rows
 	data, err := h.paymentservice.GetUnpaidDetails()

@@ -9,7 +9,7 @@ import (
 
 type ShareCode struct {
 	BaseModel
-	Code      string    `json:"code"`
+	Code      string    `gorm:"index" json:"code"`
 	ExpiredAt time.Time `json:"expiredAt"`
 	Url       string    `json:"url"`
 	FullUrl   string    `json:"fullUrl"`
