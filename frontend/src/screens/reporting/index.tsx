@@ -2,7 +2,7 @@ import { rem, Tabs } from "@mantine/core";
 import { IconMoneybag, IconTimeline } from "@tabler/icons-react";
 import { lazy, Suspense, useState } from "react";
 import Page from "../../components/page";
-import SectionLoading from "../../components/section-loading";
+import SectionLoading from "../../components/loading/section-loading";
 import { IoQrCodeOutline } from "react-icons/io5";
 
 type TabType = "unpaid" | "activity-log" | "share-codes";

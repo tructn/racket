@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { FiTrash } from "react-icons/fi";
 import { useApi } from "../../hooks/useApi";
 import { ShareUrlModel } from "./models";
-import DataTableSkeleton from "../../components/skeleton/data-table-skeleton";
+import DataTableSkeleton from "../../components/loading/skeleton/data-table-skeleton";
 import { QRCodeSVG } from "qrcode.react";
 import { IoLinkOutline } from "react-icons/io5";
 import { IconTrash } from "@tabler/icons-react";

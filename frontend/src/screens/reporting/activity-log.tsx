@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import formatter from "../../common/formatter";
 import httpService from "../../common/httpservice";
-import DataTableSkeleton from "../../components/skeleton/data-table-skeleton";
+import DataTableSkeleton from "../../components/loading/skeleton/data-table-skeleton";
 import { ActivityModel } from "../../models/reports/activity";
 
 dayjs.extend(relativeTime);

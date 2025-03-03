@@ -22,7 +22,7 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import formatter from "../../common/formatter";
 import httpService from "../../common/httpservice";
-import ToggleButton from "../../components/toggle-button";
+import ToggleButton from "../../components/toggle";
 import {
   useMesssageTemplateQuery,
   useRegistrationsByMatchQuery,

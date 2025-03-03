@@ -3,8 +3,8 @@ import { Menu, rem } from "@mantine/core";
 import { IconLogout } from "@tabler/icons-react";
 import { Suspense } from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
-import AppLoading from "../../components/app-loading";
-import SectionLoading from "../../components/section-loading";
+import AppLoading from "../../components/loading/app-loading";
+import SectionLoading from "../../components/loading/section-loading";
 
 function PublicLayout() {
   const { user, isAuthenticated, isLoading, logout } = useAuth0();

@@ -24,7 +24,7 @@ import Page from "../../components/page";
 import { useSportCenterValueLabelQuery } from "../../hooks/useQueries";
 import { CreateOrUpdateMatchModel } from "../../models";
 import { MatchModel } from "./models";
-import DataTableSkeleton from "../../components/skeleton/data-table-skeleton";
+import DataTableSkeleton from "../../components/loading/skeleton/data-table-skeleton";
 
 const schema = z.object({
   matchId: z.number().nullable(),

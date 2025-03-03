@@ -3,9 +3,9 @@ import { Tooltip } from "@mantine/core";
 import cx from "clsx";
 import { FC, ReactNode, Suspense, useState } from "react";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
-import AppLoading from "../../components/app-loading";
-import SectionLoading from "../../components/section-loading";
-import LogoutButton from "../../components/logout-button";
+import AppLoading from "../../components/loading/app-loading";
+import SectionLoading from "../../components/loading/section-loading";
+import LogoutButton from "../../components/auth/logout-button";
 import UserProfile from "../../components/profile";
 
 import {

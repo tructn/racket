@@ -17,7 +17,7 @@ import { useMemo, useState } from "react";
 import { FiCheckCircle, FiShare } from "react-icons/fi";
 import httpService from "../../common/httpservice";
 import Currency from "../../components/currency";
-import DataTableSkeleton from "../../components/skeleton/data-table-skeleton";
+import DataTableSkeleton from "../../components/loading/skeleton/data-table-skeleton";
 import { useApi } from "../../hooks/useApi";
 import { UnpaidModel } from "../../models/reports/unpaid";
 

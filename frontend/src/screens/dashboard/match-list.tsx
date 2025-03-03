@@ -4,7 +4,7 @@ import React, { Suspense } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { IoBeerOutline } from "react-icons/io5";
 import formatter from "../../common/formatter";
-import SectionLoading from "../../components/section-loading";
+import SectionLoading from "../../components/loading/section-loading";
 import { MatchSummaryModel } from "../../models";
 import MatchListContent from "./match-list-content";
 

@@ -23,7 +23,7 @@ import { z } from "zod";
 import formatter from "../../common/formatter";
 import httpService from "../../common/httpservice";
 import Page from "../../components/page";
-import DataTableSkeleton from "../../components/skeleton/data-table-skeleton";
+import DataTableSkeleton from "../../components/loading/skeleton/data-table-skeleton";
 import { PlayerSummaryModel, UpdatePlayerModel } from "./models";
 
 const schema = z.object({
