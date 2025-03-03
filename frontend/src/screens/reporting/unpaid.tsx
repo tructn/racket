@@ -14,7 +14,7 @@ import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
-import { FiCheckCircle, FiShare } from "react-icons/fi";
+import { IoCheckmarkCircle, IoShareSocial } from "react-icons/io5";
 import httpService from "../../common/httpservice";
 import Currency from "../../components/currency";
 import DataTableSkeleton from "../../components/loading/skeleton/data-table-skeleton";
@@ -94,14 +94,14 @@ export default function UnpaidReport() {
         </div>
       </Modal>
       <div className="flex flex-col gap-2 py-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end gap-2 px-2">
           <Tooltip label="Anyone with this link can access to this report">
             <Button
-              leftSection={<FiShare />}
-              variant="default"
+              leftSection={<IoShareSocial size={20} />}
               onClick={shareToEveryOne}
+              variant="outline"
             >
-              Publish
+              Share
             </Button>
           </Tooltip>
         </div>
@@ -136,11 +136,11 @@ export default function UnpaidReport() {
                   <Table.Td>{item.registrationSummary}</Table.Td>
                   <Table.Td className="flex-end flex justify-end space-x-2 text-right">
                     <Button
-                      leftSection={<FiCheckCircle size={18} />}
-                      color="green"
+                      leftSection={<IoCheckmarkCircle size={20} />}
                       onClick={() => markPaid(item)}
+                      variant="outline"
                     >
-                      Mark Paid
+                      Paid
                     </Button>
                   </Table.Td>
                 </Table.Tr>
