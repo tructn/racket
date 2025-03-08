@@ -32,9 +32,9 @@ func NewActivityService(
 	}
 }
 
-func (s *ActivityService) GetAll() []dto.ActivityDto {
+func (s *ActivityService) Get() []dto.ActivityDto {
 	activities := []domain.Activity{}
-	if err := s.db.Order("created_at desc").Find(&activities).Error; err != nil {
+	if err := s.db.Limit(50).Order("created_at desc").Find(&activities).Error; err != nil {
 		return []dto.ActivityDto{}
 	}
 

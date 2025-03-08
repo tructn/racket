@@ -18,6 +18,6 @@ func NewActivityHandler(activitysvc *service.ActivityService) *ActivityHandler {
 }
 
 func (h *ActivityHandler) GetAll(c *gin.Context) {
-	res := h.activitysvc.GetAll()
+	res := h.activitysvc.Get()
 	c.JSON(http.StatusOK, res)
 }

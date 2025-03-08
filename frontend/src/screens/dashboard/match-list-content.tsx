@@ -173,31 +173,33 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
               </Button>
             </Alert>
 
-            <Alert
-              className="relative"
-              variant="light"
-              color="green"
-              title="Message"
-              icon={<IoNotificationsCircleOutline />}
-            >
-              <div ref={clipboardRef}>
-                <Markdown
-                  rehypePlugins={[rehypeRaw]}
-                  remarkPlugins={[remarkGfm]}
-                >
-                  {costMessage}
-                </Markdown>
-              </div>
-              <Button
-                className="absolute right-2 top-2"
+            {costMessage && (
+              <Alert
+                className="relative"
                 variant="light"
-                leftSection={<IoCopy />}
-                color={clipboard.copied ? "red" : "green"}
-                onClick={() => clipboard.copy(clipboardRef.current.innerText)}
+                color="green"
+                title="Message"
+                icon={<IoNotificationsCircleOutline />}
               >
-                {clipboard.copied ? "Copied" : "Copy"}
-              </Button>
-            </Alert>
+                <div ref={clipboardRef}>
+                  <Markdown
+                    rehypePlugins={[rehypeRaw]}
+                    remarkPlugins={[remarkGfm]}
+                  >
+                    {costMessage}
+                  </Markdown>
+                </div>
+                <Button
+                  className="absolute right-2 top-2"
+                  variant="light"
+                  leftSection={<IoCopy />}
+                  color={clipboard.copied ? "red" : "green"}
+                  onClick={() => clipboard.copy(clipboardRef.current.innerText)}
+                >
+                  {clipboard.copied ? "Copied" : "Copy"}
+                </Button>
+              </Alert>
+            )}
           </div>
 
           <div className="grid grid-cols-1 justify-between gap-3 md:grid-cols-2 xl:grid-cols-3">

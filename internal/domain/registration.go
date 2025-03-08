@@ -4,7 +4,7 @@ type Registration struct {
 	BaseModel
 	PlayerId uint   `gorm:"index" json:"playerId"`
 	MatchId  uint   `gorm:"index" json:"matchId"`
-	IsPaid   bool   `json:"isPaid"`
+	IsPaid   bool   `gorm:"index" json:"isPaid"`
 	Comment  string `json:"comment"`
 }
 

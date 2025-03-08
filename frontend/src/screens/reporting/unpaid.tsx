@@ -94,7 +94,7 @@ export default function UnpaidReport() {
         </div>
       </Modal>
       <div className="flex flex-col gap-2 py-3">
-        <div className="flex items-center justify-end gap-2 px-2">
+        <div className="flex items-center gap-2 px-2">
           <Tooltip label="Anyone with this link can access to this report">
             <Button
               leftSection={<IoShareSocial size={20} />}
@@ -109,10 +109,9 @@ export default function UnpaidReport() {
         <Table striped highlightOnHover withRowBorders={false}>
           <Table.Thead>
             <Table.Tr>
-              <Table.Th>Name</Table.Th>
+              <Table.Th>Player Name</Table.Th>
               <Table.Th>Unpaid Amount</Table.Th>
-              <Table.Th>Attendant Count</Table.Th>
-              <Table.Th>Synthetic Costs</Table.Th>
+              <Table.Th>Match Count</Table.Th>
               <Table.Th></Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -133,7 +132,6 @@ export default function UnpaidReport() {
                     <Currency value={item.unpaidAmount} />
                   </Table.Td>
                   <Table.Td>{item.matchCount}</Table.Td>
-                  <Table.Td>{item.registrationSummary}</Table.Td>
                   <Table.Td className="flex-end flex justify-end space-x-2 text-right">
                     <Button
                       leftSection={<IoCheckmarkCircle size={20} />}
@@ -152,7 +150,6 @@ export default function UnpaidReport() {
                 <Table.Td>
                   <Currency value={totalUnpaid} />
                 </Table.Td>
-                <Table.Td></Table.Td>
                 <Table.Td></Table.Td>
                 <Table.Td></Table.Td>
               </Table.Tr>
