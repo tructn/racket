@@ -48,7 +48,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         audience: import.meta.env.VITE_AUTH0_AUDIENCE,
         redirect_uri: window.location.origin,
       }}
-      cacheLocation="memory"
+      cacheLocation="localstorage"
+      useRefreshTokens={true}
+      useCookiesForTransactions={true}
     >
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
