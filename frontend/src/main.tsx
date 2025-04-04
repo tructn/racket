@@ -36,7 +36,7 @@ const theme = createTheme({
   colors: {
     myColor,
   },
-  fontFamily: "Lexend",
+  fontFamily: "Inter",
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
