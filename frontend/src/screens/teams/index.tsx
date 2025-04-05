@@ -1,19 +1,31 @@
 import {
   ActionIcon,
   Button,
+  Card,
+  Grid,
+  Group,
   Modal,
   Skeleton,
-  Table,
+  Stack,
+  Text,
   TextInput,
   Textarea,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { IoAdd, IoPencil, IoSave } from "react-icons/io5";
+import {
+  IoAdd,
+  IoPencil,
+  IoSave,
+  IoTrash,
+  IoPeople,
+  IoPerson,
+} from "react-icons/io5";
 import { z } from "zod";
 import httpService from "../../common/httpservice";
 import Page from "../../components/page";
+import { useState } from "react";
 
 interface Team {
   id: number;
@@ -23,6 +35,10 @@ interface Team {
   createdAt: string;
   updatedAt: string;
   members: any[];
+  owner?: {
+    name: string;
+    email: string;
+  };
 }
 
 const schema = z.object({
@@ -33,6 +49,12 @@ const schema = z.object({
 
 export default function TeamScreen() {
   const [opened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [
+    deleteModalOpened,
+    { open: openDeleteModal, close: closeDeleteModal },
+  ] = useDisclosure(false);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -45,13 +67,13 @@ export default function TeamScreen() {
 
   const {
     isPending,
-    data: teams,
+    data: teams = [],
     refetch,
   } = useQuery<Team[]>({
     queryKey: ["teams"],
     queryFn: async () => {
-      const response = await httpService.get("api/v1/teams");
-      return response.data;
+      const result = await httpService.get("api/v1/teams");
+      return result ?? [];
     },
     initialData: [],
   });
@@ -66,98 +88,190 @@ export default function TeamScreen() {
     },
   });
 
-  return (
-    <Page title="Team Management">
-      <div>
-        <Button leftSection={<IoAdd />} variant="default" onClick={openModal}>
-          Create Team
-        </Button>
-      </div>
-      <Table striped withRowBorders={false}>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Name</Table.Th>
-            <Table.Th>Description</Table.Th>
-            <Table.Th>Members</Table.Th>
-            <Table.Th
-              align="center"
-              className="flex items-center justify-center"
-            >
-              Action
-            </Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {isPending
-            ? // Loading skeleton rows
-              Array.from({ length: 5 }).map((_, index) => (
-                <Table.Tr key={index}>
-                  <Table.Td>
-                    <Skeleton height={20} />
-                  </Table.Td>
-                  <Table.Td>
-                    <Skeleton height={20} />
-                  </Table.Td>
-                  <Table.Td>
-                    <Skeleton height={20} />
-                  </Table.Td>
-                  <Table.Td>
-                    <div className="flex items-center justify-center">
-                      <Skeleton height={20} width={20} radius="xl" />
-                    </div>
-                  </Table.Td>
-                </Table.Tr>
-              ))
-            : teams.map((team) => (
-                <Table.Tr key={team.id}>
-                  <Table.Td>{team.name}</Table.Td>
-                  <Table.Td>{team.description}</Table.Td>
-                  <Table.Td>{team.members.length}</Table.Td>
-                  <Table.Td>
-                    <div className="flex items-center justify-center gap-2">
-                      <ActionIcon
-                        variant="subtle"
-                        color="blue"
-                        onClick={() => {
-                          form.setValues(team);
-                          openModal();
-                        }}
-                      >
-                        <IoPencil />
-                      </ActionIcon>
-                    </div>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-        </Table.Tbody>
-      </Table>
+  const deleteMutation = useMutation({
+    mutationFn: (teamId: number) => httpService.del(`api/v1/teams/${teamId}`),
+    onSuccess: () => {
+      refetch();
+      closeDeleteModal();
+      setSelectedTeam(null);
+    },
+  });
 
-      <Modal opened={opened} onClose={closeModal} title="Create Team">
-        <form
-          onSubmit={form.onSubmit((values) => createMutation.mutate(values))}
+  const handleDelete = (team: Team) => {
+    setSelectedTeam(team);
+    openDeleteModal();
+  };
+
+  return (
+    <Page title="Teams Management">
+      <Stack gap="lg">
+        <Card padding="xs">
+          <Grid>
+            {isPending
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <Grid.Col span={{ base: 12, sm: 6, md: 4 }} key={index}>
+                    <Card withBorder>
+                      <Stack>
+                        <Skeleton height={24} width="60%" />
+                        <Skeleton height={20} width="80%" />
+                        <Skeleton height={20} width="40%" />
+                      </Stack>
+                    </Card>
+                  </Grid.Col>
+                ))
+              : [
+                  ...teams.map((team) => (
+                    <Grid.Col span={{ base: 12, sm: 6, md: 4 }} key={team.id}>
+                      <Card withBorder>
+                        <Stack>
+                          <Group justify="space-between">
+                            <Text fw={500} size="lg">
+                              {team.name}
+                            </Text>
+                            <Group gap="xs">
+                              <ActionIcon
+                                variant="light"
+                                color="blue"
+                                onClick={() => {
+                                  form.setValues(team);
+                                  openModal();
+                                }}
+                              >
+                                <IoPencil size={18} />
+                              </ActionIcon>
+                              <ActionIcon
+                                variant="light"
+                                color="red"
+                                onClick={() => handleDelete(team)}
+                              >
+                                <IoTrash size={18} />
+                              </ActionIcon>
+                            </Group>
+                          </Group>
+                          <Text size="sm" c="dimmed">
+                            {team.description || "No description"}
+                          </Text>
+                          <Group gap="xs">
+                            <Group gap={4}>
+                              <IoPeople size={14} />
+                              <Text size="sm">
+                                {team.members?.length || 0} members
+                              </Text>
+                            </Group>
+                            <Group gap={4}>
+                              <IoPerson size={14} />
+                              <Text size="sm" c="dimmed">
+                                Created by:{" "}
+                                {team.owner?.name ||
+                                  team.owner?.email ||
+                                  "Unknown"}
+                              </Text>
+                            </Group>
+                          </Group>
+                        </Stack>
+                      </Card>
+                    </Grid.Col>
+                  )),
+                  <Grid.Col span={{ base: 12, sm: 6, md: 4 }} key="new-team">
+                    <Card
+                      withBorder
+                      style={{
+                        borderStyle: "dashed",
+                        cursor: "pointer",
+                        height: "100%",
+                      }}
+                      onClick={openModal}
+                    >
+                      <Stack
+                        align="center"
+                        justify="center"
+                        style={{ height: "100%" }}
+                      >
+                        <IoAdd size={32} />
+                        <Text size="sm" fw={500}>
+                          Create New Team
+                        </Text>
+                      </Stack>
+                    </Card>
+                  </Grid.Col>,
+                ]}
+          </Grid>
+        </Card>
+
+        <Modal
+          opened={opened}
+          onClose={closeModal}
+          title={form.values.id ? "Edit Team" : "Create Team"}
+          size="md"
         >
-          <TextInput
-            label="Team Name"
-            placeholder="Enter team name"
-            {...form.getInputProps("name")}
-            required
-          />
-          <Textarea
-            label="Description"
-            placeholder="Enter team description"
-            {...form.getInputProps("description")}
-          />
-          <div className="mt-4 flex justify-end">
-            <Button
-              type="submit"
-              leftSection={<IoSave />}
-              loading={createMutation.isPending}
-            >
-              Save
-            </Button>
-          </div>
-        </form>
-      </Modal>
+          <form
+            onSubmit={form.onSubmit((values) => createMutation.mutate(values))}
+          >
+            <Stack gap="md">
+              <TextInput
+                label="Team Name"
+                placeholder="Enter team name"
+                {...form.getInputProps("name")}
+                required
+              />
+              <Textarea
+                label="Description"
+                placeholder="Enter team description"
+                minRows={3}
+                {...form.getInputProps("description")}
+              />
+              <Group justify="flex-end" mt="md">
+                <Button
+                  variant="light"
+                  onClick={closeModal}
+                  disabled={createMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  leftSection={<IoSave size={18} />}
+                  loading={createMutation.isPending}
+                >
+                  {form.values.id ? "Update" : "Create"}
+                </Button>
+              </Group>
+            </Stack>
+          </form>
+        </Modal>
+
+        <Modal
+          opened={deleteModalOpened}
+          onClose={closeDeleteModal}
+          title="Delete Team"
+          size="md"
+        >
+          <Stack gap="md">
+            <Text>
+              Are you sure you want to delete team "{selectedTeam?.name}"? This
+              action cannot be undone.
+            </Text>
+            <Group justify="flex-end" mt="md">
+              <Button
+                variant="light"
+                onClick={closeDeleteModal}
+                disabled={deleteMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                color="red"
+                onClick={() =>
+                  selectedTeam && deleteMutation.mutate(selectedTeam.id)
+                }
+                loading={deleteMutation.isPending}
+              >
+                Delete
+              </Button>
+            </Group>
+          </Stack>
+        </Modal>
+      </Stack>
     </Page>
   );
 }

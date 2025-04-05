@@ -184,7 +184,7 @@ func (h *TeamHandler) Update(c *gin.Context) {
 // Delete deletes a team
 func (h *TeamHandler) Delete(c *gin.Context) {
 	// Get the team ID from the URL
-	teamID, err := strconv.ParseUint(c.Param("teamId"), 10, 32)
+	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
 		return

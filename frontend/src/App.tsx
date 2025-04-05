@@ -25,6 +25,8 @@ const TeamsScreen = lazy(() => import("./screens/teams"));
 function App() {
   const { isAdmin } = useClaims();
 
+  console.log("Admin: ", isAdmin);
+
   return (
     <Routes>
       {isAdmin ? (
