@@ -28,12 +28,12 @@ function Landing() {
   };
 
   return (
-    <div className="font-inter min-h-screen bg-black">
+    <div className="font-inter min-h-screen bg-white">
       {/* Navbar */}
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed z-50 w-full bg-black/80 backdrop-blur-lg"
+        className="fixed z-50 w-full bg-white/80 shadow-sm backdrop-blur-lg"
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-6">
           <motion.div
@@ -49,14 +49,14 @@ function Landing() {
               rel="noopener noreferrer"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-600 hover:text-green-500"
             >
               <FaGithub className="text-2xl" />
             </motion.a>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="rounded-full bg-white px-8 py-3 text-sm font-medium text-black transition-all duration-300"
+              className="rounded-full bg-green-500 px-8 py-3 text-sm font-medium text-white transition-all duration-300 hover:bg-green-600"
               onClick={() => loginWithRedirect()}
             >
               Sign In
@@ -66,7 +66,7 @@ function Landing() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-black pb-32 pt-40 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-b from-green-50 to-white pb-32 pt-40">
         <motion.div
           className="relative z-10 mx-auto max-w-5xl text-center"
           initial="initial"
@@ -74,17 +74,17 @@ function Landing() {
           variants={staggerContainer}
         >
           <motion.h1
-            className="mb-6 text-8xl font-medium leading-tight tracking-tight"
+            className="mb-6 text-8xl font-medium leading-tight tracking-tight text-gray-900"
             variants={fadeInUp}
           >
             Racket.
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
               Reimagined.
             </span>
           </motion.h1>
           <motion.p
-            className="mb-12 text-2xl text-gray-400"
+            className="mb-12 text-2xl text-gray-600"
             variants={fadeInUp}
           >
             Experience the future of badminton team management.
@@ -92,7 +92,7 @@ function Landing() {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="rounded-full bg-blue-500 px-10 py-4 text-lg font-medium text-white transition-all duration-300"
+            className="rounded-full bg-green-500 px-10 py-4 text-lg font-medium text-white transition-all duration-300 hover:bg-green-600"
             onClick={() => loginWithRedirect()}
             variants={fadeInUp}
           >
@@ -105,14 +105,14 @@ function Landing() {
       <section className="py-32">
         <div className="mx-auto max-w-7xl px-8">
           <motion.h2
-            className="mb-20 text-center text-5xl font-medium text-white"
+            className="mb-20 text-center text-5xl font-medium text-gray-900"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
             Everything you need.
             <br />
-            <span className="text-gray-400">All in one place.</span>
+            <span className="text-gray-600">All in one place.</span>
           </motion.h2>
           <motion.div
             className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3"
@@ -150,17 +150,17 @@ function Landing() {
             ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="group rounded-3xl bg-zinc-900 p-10 text-left transition-all duration-300"
+                className="group rounded-3xl bg-white p-10 text-left shadow-lg transition-all duration-300 hover:shadow-xl"
                 variants={fadeInUp}
                 whileHover={{ y: -10 }}
               >
-                <div className="mb-8 text-4xl text-blue-400 group-hover:text-blue-300">
+                <div className="mb-8 text-4xl text-green-500 group-hover:text-green-600">
                   {feature.icon}
                 </div>
-                <h3 className="mb-4 text-2xl font-medium text-white">
+                <h3 className="mb-4 text-2xl font-medium text-gray-900">
                   {feature.title}
                 </h3>
-                <p className="text-gray-400">{feature.description}</p>
+                <p className="text-gray-600">{feature.description}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -168,10 +168,10 @@ function Landing() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-32">
+      <section className="bg-green-50 py-32">
         <div className="mx-auto max-w-7xl px-8">
           <motion.h2
-            className="mb-20 text-center text-5xl font-medium text-white"
+            className="mb-20 text-center text-5xl font-medium text-gray-900"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -199,13 +199,15 @@ function Landing() {
             ].map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="rounded-3xl bg-zinc-900 p-10 text-left transition-all duration-300"
+                className="rounded-3xl bg-white p-10 text-left shadow-lg transition-all duration-300"
                 variants={fadeInUp}
               >
-                <p className="mb-6 text-xl text-gray-300">
+                <p className="mb-6 text-xl text-gray-600">
                   "{testimonial.quote}"
                 </p>
-                <p className="font-medium text-white">– {testimonial.author}</p>
+                <p className="font-medium text-gray-900">
+                  – {testimonial.author}
+                </p>
               </motion.div>
             ))}
           </motion.div>
@@ -213,20 +215,20 @@ function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800 bg-black py-12">
+      <footer className="border-t border-gray-200 bg-white py-12">
         <div className="mx-auto max-w-7xl px-8">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-            <p className="text-gray-400">
+            <p className="text-gray-600">
               © 2024 Racket. All rights reserved.
             </p>
             <div className="flex gap-8">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-gray-600 hover:text-green-500">
                 Privacy
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-gray-600 hover:text-green-500">
                 Terms
               </a>
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="#" className="text-gray-600 hover:text-green-500">
                 Contact
               </a>
             </div>

@@ -1,17 +1,12 @@
-import { lazy } from "react";
-import { Route, Routes } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import ClubOwnerLayout from "./screens/layouts/club-owner";
-import Landing from "./screens/landing";
-
-const ClubOwnerDashboard = lazy(() => import("./screens/club-owner/dashboard"));
-const TeamsPage = lazy(() => import("./screens/club-owner/teams"));
-const PlayersPage = lazy(() => import("./screens/club-owner/players"));
-const BookingsPage = lazy(() => import("./screens/club-owner/bookings"));
-const CostsPage = lazy(() => import("./screens/club-owner/costs"));
-const SettingsPage = lazy(() => import("./screens/club-owner/settings"));
-const PageNotFoundScreen = lazy(() => import("./screens/page-not-found"));
+import ClubOwnerDashboard from "./screens/club-owner/dashboard";
+import TeamsPage from "./screens/club-owner/teams";
+import PlayersPage from "./screens/club-owner/players";
+import BookingsPage from "./screens/club-owner/bookings";
+import CostsPage from "./screens/club-owner/costs";
+import SettingsPage from "./screens/club-owner/settings";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth0();
@@ -27,7 +22,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function App() {
+export default function Router() {
   const { isAuthenticated } = useAuth0();
 
   return (
@@ -38,11 +33,10 @@ function App() {
           isAuthenticated ? (
             <Navigate to="/club-owner/dashboard" replace />
           ) : (
-            <Landing />
+            <div>Welcome to Racket</div>
           )
         }
       />
-
       <Route
         path="/club-owner"
         element={
@@ -58,10 +52,6 @@ function App() {
         <Route path="costs" element={<CostsPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
-
-      <Route path="*" element={<PageNotFoundScreen />} />
     </Routes>
   );
 }
-
-export default App;
