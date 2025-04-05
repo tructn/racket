@@ -19,7 +19,7 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
   }
 
   return (
-    <div className="flex items-center justify-start gap-2">
+    <div className="flex items-center justify-start gap-2 text-white">
       <img
         className="rounded-full"
         src={user!.picture}

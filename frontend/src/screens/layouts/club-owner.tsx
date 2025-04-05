@@ -1,11 +1,16 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Tooltip, Divider } from "@mantine/core";
+import { Tooltip, Divider, Menu } from "@mantine/core";
 import cx from "clsx";
 import { FC, ReactNode, Suspense, useState } from "react";
-import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
+import {
+  Navigate,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import AppLoading from "../../components/loading/app-loading";
 import SectionLoading from "../../components/loading/section-loading";
-import LogoutButton from "../../components/auth/logout-button";
 import UserProfile from "../../components/profile";
 
 import {
@@ -16,6 +21,7 @@ import {
   IoPeople,
   IoCalendar,
   IoWallet,
+  IoLogOut,
 } from "react-icons/io5";
 
 interface NavItemProps {
@@ -33,21 +39,55 @@ const NavItem: FC<NavItemProps> = ({ label, path, icon, showLabel }) => {
     <NavLink
       to={path}
       className={cx(
-        "flex items-center gap-3 rounded-lg px-4 py-3 text-white transition-all duration-200",
-        "hover:translate-x-1 hover:bg-blue-600/80",
-        isActive && "translate-x-1 bg-blue-800/90 shadow-lg",
-        !isActive && "opacity-80 hover:opacity-100",
+        "flex items-center gap-3 rounded-md px-4 py-2.5 transition-all duration-200",
+        "hover:bg-blue-600",
+        isActive && "bg-blue-600 font-medium text-white",
+        !isActive && "text-white/80 hover:text-white",
       )}
     >
-      <div className="flex w-6 items-center justify-center">{icon}</div>
-      {showLabel && <span className="font-medium">{label}</span>}
+      <div className="flex w-5 items-center justify-center">{icon}</div>
+      {showLabel && <span>{label}</span>}
     </NavLink>
   );
 };
 
+const NAV_ITEMS = [
+  {
+    path: "/club-owner/dashboard",
+    icon: <IoBarChart className="text-lg" />,
+    label: "Dashboard",
+  },
+  {
+    path: "/club-owner/teams",
+    icon: <IoPeople className="text-lg" />,
+    label: "Teams",
+  },
+  {
+    path: "/club-owner/players",
+    icon: <IoPersonAdd className="text-lg" />,
+    label: "Players",
+  },
+  {
+    path: "/club-owner/bookings",
+    icon: <IoCalendar className="text-lg" />,
+    label: "Bookings",
+  },
+  {
+    path: "/club-owner/costs",
+    icon: <IoWallet className="text-lg" />,
+    label: "Costs",
+  },
+  {
+    path: "/club-owner/settings",
+    icon: <IoSettings className="text-lg" />,
+    label: "Settings",
+  },
+] as const;
+
 function ClubOwnerLayout() {
   const [collapsed, setCollapsed] = useState(false);
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { user, isAuthenticated, isLoading, logout } = useAuth0();
+  const navigate = useNavigate();
 
   function toggleSideNav() {
     setCollapsed(!collapsed);
@@ -65,72 +105,79 @@ function ClubOwnerLayout() {
     <div className="flex h-screen w-screen">
       <div
         className={cx(
-          "group relative flex h-full flex-shrink-0 flex-grow-0 flex-col bg-gradient-to-b from-blue-800 to-blue-900 text-white transition-all duration-300",
+          "group relative flex h-full flex-shrink-0 flex-grow-0 flex-col border-r border-white/10 bg-blue-700 transition-all duration-300",
           !collapsed && "w-[280px]",
-          collapsed && "w-20",
+          collapsed && "w-16",
         )}
       >
         <div className="flex flex-1 flex-col">
-          <div className="flex justify-center p-4">
+          <div className="flex flex-col items-center justify-center border-b border-white/10 p-4">
             <img
               src="/logo.svg"
               alt="LOGO"
               className={cx(
                 "transition-all duration-300",
-                collapsed ? "h-12 w-12" : "h-24 w-24",
+                collapsed ? "h-8 w-8" : "h-20 w-20",
               )}
             />
+            <span
+              className={cx(
+                "mt-2 font-bold text-white transition-all duration-300",
+                collapsed ? "text-xs" : "text-xl",
+              )}
+            >
+              RACKET
+            </span>
           </div>
 
           <div className={cx("flex flex-col p-4", collapsed && "items-center")}>
-            <UserProfile showLabel={!collapsed} />
+            <Menu position="right" withArrow>
+              <Menu.Target>
+                <div className="cursor-pointer rounded-lg bg-blue-600 p-2 hover:bg-blue-500">
+                  <UserProfile showLabel={!collapsed} />
+                </div>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item
+                  leftSection={<IoSettings className="text-lg" />}
+                  component={NavLink}
+                  to="/club-owner/settings"
+                >
+                  Settings
+                </Menu.Item>
+                <Menu.Item
+                  leftSection={<IoLogOut className="text-lg" />}
+                  onClick={() => {
+                    navigate("/login", { replace: true });
+                    logout({
+                      logoutParams: { returnTo: "/login" },
+                    });
+                  }}
+                >
+                  Logout
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           </div>
 
-          <Divider className="my-2 opacity-20" />
+          <Divider className="my-2 border-white/10" />
 
-          <div
+          <nav
             className={cx(
-              "flex flex-col gap-1 px-3 py-2",
+              "flex flex-col gap-1 px-2 py-2",
               collapsed && "items-center",
             )}
           >
-            <NavItem
-              path="/club-owner/dashboard"
-              icon={<IoBarChart className="text-xl" />}
-              label="Dashboard"
-              showLabel={!collapsed}
-            />
-            <NavItem
-              path="/club-owner/teams"
-              icon={<IoPeople className="text-xl" />}
-              label="Teams"
-              showLabel={!collapsed}
-            />
-            <NavItem
-              path="/club-owner/players"
-              icon={<IoPersonAdd className="text-xl" />}
-              label="Players"
-              showLabel={!collapsed}
-            />
-            <NavItem
-              path="/club-owner/bookings"
-              icon={<IoCalendar className="text-xl" />}
-              label="Bookings"
-              showLabel={!collapsed}
-            />
-            <NavItem
-              path="/club-owner/costs"
-              icon={<IoWallet className="text-xl" />}
-              label="Costs"
-              showLabel={!collapsed}
-            />
-            <NavItem
-              path="/club-owner/settings"
-              icon={<IoSettings className="text-xl" />}
-              label="Settings"
-              showLabel={!collapsed}
-            />
-          </div>
+            {NAV_ITEMS.map((item) => (
+              <NavItem
+                key={item.path}
+                path={item.path}
+                icon={item.icon}
+                label={item.label}
+                showLabel={!collapsed}
+              />
+            ))}
+          </nav>
         </div>
 
         <Tooltip
@@ -140,11 +187,11 @@ function ClubOwnerLayout() {
         >
           <button
             onClick={toggleSideNav}
-            className="absolute bottom-0 left-0 right-0 flex items-center justify-center p-3 text-white transition-all hover:bg-blue-700/50"
+            className="absolute bottom-0 left-0 right-0 flex items-center justify-center border-t border-white/10 p-2 text-white/80 transition-all hover:bg-blue-600 hover:text-white"
           >
             <IoChevronBackCircle
               className={cx(
-                "text-2xl transition-transform duration-300",
+                "text-xl transition-transform duration-300",
                 collapsed && "rotate-180",
               )}
             />
