@@ -24,6 +24,7 @@ func Register() *dig.Container {
 	c.Provide(handler.NewReportHandler)
 	c.Provide(handler.NewActivityHandler)
 	c.Provide(handler.NewShareCodeHandler)
+	c.Provide(handler.NewTeamHandler)
 
 	// Services
 	c.Provide(service.NewSportCenterService)

@@ -11,6 +11,7 @@ import {
 } from "../../hooks/useQueries";
 import { MatchSummaryModel } from "../../models";
 import { useApi } from "../../hooks/useApi";
+import { notifications } from "@mantine/notifications";
 
 export default function Requests() {
   const api = useApi();
@@ -25,16 +26,29 @@ export default function Requests() {
   } = useUpcomingMatches();
 
   const toggleAttendantClick = async (match: MatchSummaryModel) => {
-    await api.post("api/v1/registrations/attendant-requests", {
-      externalUserId: user?.sub,
-      lastName: user?.family_name,
-      firstName: user?.given_name,
-      email: user?.email,
-      matchId: match.matchId,
-    });
+    try {
+      await api.post("api/v1/registrations/attendant-requests", {
+        externalUserId: user?.sub,
+        lastName: user?.family_name,
+        firstName: user?.given_name,
+        email: user?.email,
+        matchId: match.matchId,
+      });
 
-    refetchAttendants();
-    refetchMatches();
+      await Promise.all([refetchAttendants(), refetchMatches()]);
+
+      notifications.show({
+        title: "Success",
+        message: "Successfully joined the match!",
+        color: "green",
+      });
+    } catch (error) {
+      notifications.show({
+        title: "Error",
+        message: "Failed to join the match. Please try again.",
+        color: "red",
+      });
+    }
   };
 
   return (

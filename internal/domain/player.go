@@ -7,4 +7,5 @@ type Player struct {
 	ExternalUserId string `json:"externalUserId"`
 	Email          string `json:"email"`
 	Rank           uint   `json:"rank"`
+	Teams          []Team `json:"teams" gorm:"many2many:team_members;"`
 }

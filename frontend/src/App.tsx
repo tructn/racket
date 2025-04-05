@@ -20,6 +20,7 @@ const PublicOutstandingReport = lazy(
 const PublicOutstandingReportV2 = lazy(
   () => import("./screens/public/outstanding-report-v2"),
 );
+const TeamsScreen = lazy(() => import("./screens/teams"));
 
 function App() {
   const { isAdmin } = useClaims();
@@ -29,12 +30,13 @@ function App() {
       {isAdmin ? (
         <Route element={<AdminLayout />}>
           <Route index={true} path="/" element={<DashboardScreen />} />
-          <Route path="requests" element={<AdminRequestScreen />} />
-          <Route path="players" element={<PlayerScreen />} />
-          <Route path="matches" element={<MatchesScreen />} />
-          <Route path="sportcenters" element={<SportCentersScreen />} />
-          <Route path="reports" element={<ReportingScreen />} />
-          <Route path="settings" element={<SettingsScreen />} />
+          <Route path="/requests" element={<AdminRequestScreen />} />
+          <Route path="/players" element={<PlayerScreen />} />
+          <Route path="/teams" element={<TeamsScreen />} />
+          <Route path="/matches" element={<MatchesScreen />} />
+          <Route path="/sportcenters" element={<SportCentersScreen />} />
+          <Route path="/reports" element={<ReportingScreen />} />
+          <Route path="/settings" element={<SettingsScreen />} />
           <Route path="*" element={<PageNotFoundScreen />} />
         </Route>
       ) : (

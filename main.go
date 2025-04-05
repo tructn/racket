@@ -124,6 +124,16 @@ func main() {
 		v1.DELETE("/share-codes/urls/:shareCodeId", handler.DeleteShareCodeUrl)
 	})
 
+	reg.Invoke(func(handler *handler.TeamHandler) {
+		v1.POST("/teams", handler.Create)
+		v1.GET("/teams", handler.GetAll)
+		v1.GET("/teams/:id", handler.GetByID)
+		v1.PUT("/teams/:id", handler.Update)
+		v1.DELETE("/teams/:id", handler.Delete)
+		v1.POST("/teams/:id/members", handler.AddMember)
+		v1.DELETE("/teams/:id/members/:playerId", handler.RemoveMember)
+	})
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", port),
 		Handler: router.Handler(),

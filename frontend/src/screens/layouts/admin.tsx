@@ -15,6 +15,7 @@ import {
   IoChevronBackCircle,
   IoDocumentText,
   IoPersonAdd,
+  IoPeople,
   IoSettings,
   IoStorefront,
 } from "react-icons/io5";
@@ -94,6 +95,12 @@ function AdminLayout() {
               path="/players"
               label="Players"
               icon={<IoPersonAdd />}
+            />
+            <NavItem
+              showLabel={!collapsed}
+              path="/teams"
+              label="Teams"
+              icon={<IoPeople />}
             />
             <NavItem
               showLabel={!collapsed}

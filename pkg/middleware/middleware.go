@@ -13,7 +13,6 @@ import (
 	"github.com/auth0/go-jwt-middleware/v2/jwks"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/gin-gonic/gin"
-	adapter "github.com/gwatts/gin-adapter"
 )
 
 // CustomClaims contains custom data we want from the token.
@@ -90,5 +89,52 @@ func AuthRequired() gin.HandlerFunc {
 		jwtmiddleware.WithErrorHandler(errorHandler),
 	)
 
-	return adapter.Wrap(middleware.CheckJWT)
+	return func(c *gin.Context) {
+		// Convert Gin context to http.Handler
+		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// Copy headers from Gin to http.Request
+			for k, v := range c.Request.Header {
+				r.Header[k] = v
+			}
+
+			// Run JWT validation
+			middleware.CheckJWT(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Extract token from Authorization header
+				authHeader := r.Header.Get("Authorization")
+				if authHeader == "" {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No authorization header"})
+					return
+				}
+
+				// Remove "Bearer " prefix and parse token
+				token, err := jwtValidator.ValidateToken(r.Context(), strings.TrimPrefix(authHeader, "Bearer "))
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+					return
+				}
+
+				// Extract claims
+				validatedClaims, ok := token.(*validator.ValidatedClaims)
+				if !ok {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid claims"})
+					return
+				}
+
+				// Get custom claims
+				customClaims, ok := validatedClaims.CustomClaims.(*CustomClaims)
+				if !ok {
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid custom claims"})
+					return
+				}
+
+				// Store user ID and roles in Gin context
+				c.Set("user_id", validatedClaims.RegisteredClaims.Subject)
+				c.Set("user_roles", customClaims.Roles)
+
+				c.Next()
+			})).ServeHTTP(w, r)
+		})
+
+		handler.ServeHTTP(c.Writer, c.Request)
+	}
 }
