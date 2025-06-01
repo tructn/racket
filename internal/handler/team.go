@@ -1,374 +1,261 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tructn/racket/internal/domain"
 	"github.com/tructn/racket/internal/dto"
-	"go.uber.org/zap"
-	"gorm.io/gorm"
+	"github.com/tructn/racket/internal/service"
 )
 
 type TeamHandler struct {
-	db     *gorm.DB
-	logger *zap.SugaredLogger
+	teamService *service.TeamService
 }
 
-func NewTeamHandler(db *gorm.DB, logger *zap.SugaredLogger) *TeamHandler {
-	return &TeamHandler{
-		db:     db,
-		logger: logger,
+func NewTeamHandler(teamService *service.TeamService) *TeamHandler {
+	return &TeamHandler{teamService: teamService}
+}
+
+// RegisterTeamRouters registers all team-related routes
+func (h *TeamHandler) RegisterTeamRouters(router *gin.RouterGroup) {
+	teams := router.Group("/teams")
+	{
+		teams.GET("", h.GetTeams)
+		teams.POST("", h.CreateTeam)
+		teams.GET("/:id", h.GetTeam)
+		teams.PUT("/:id", h.UpdateTeam)
+		teams.DELETE("/:id", h.DeleteTeam)
+
+		// Team members
+		teams.POST("/:id/members", h.AddPlayer)
+		teams.DELETE("/:id/members/:playerId", h.RemovePlayer)
+
+		// Team bookings
+		teams.POST("/:id/bookings", h.CreateBooking)
+		teams.GET("/:id/bookings", h.GetTeamBookings)
+
+		// Team costs
+		teams.POST("/:id/costs", h.CreateCost)
+		teams.GET("/:id/costs", h.GetTeamCosts)
 	}
 }
 
-// Create creates a new team
-func (h *TeamHandler) Create(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-
-	log.Printf("User ID: %v", userID)
-
-	if !exists {
-		h.logger.Error("Claims not found in token")
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized access"})
+// GetTeams retrieves all teams for a user
+func (h *TeamHandler) GetTeams(c *gin.Context) {
+	ownerID := c.GetString("user_id")
+	teams, err := h.teamService.GetTeams(ownerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Parse the request body
-	var teamDto dto.TeamCreateDto
-	if err := c.ShouldBindJSON(&teamDto); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Create the team
-	team := domain.NewTeam(teamDto.Name, teamDto.Description, userID.(string))
-	if err := h.db.Create(team).Error; err != nil {
-		h.logger.Errorf("Failed to create team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create team"})
-		return
-	}
-
-	// Return the created team
-	c.JSON(http.StatusCreated, team)
-}
-
-// GetAll returns all teams for the current user
-func (h *TeamHandler) GetAll(c *gin.Context) {
-	// Get the user ID from the JWT token
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
-		return
-	}
-
-	// Get all teams owned by the user
-	var teams []domain.Team
-	if err := h.db.Where("owner_id = ?", userID).Find(&teams).Error; err != nil {
-		h.logger.Errorf("Failed to get teams: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get teams"})
-		return
-	}
-
-	// Get all teams where the user is a member
-	var player domain.Player
-	if err := h.db.Where("external_user_id = ?", userID).First(&player).Error; err != nil {
-		if err != gorm.ErrRecordNotFound {
-			h.logger.Errorf("Failed to get player: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get player"})
-			return
-		}
-	} else {
-		// Get teams where the player is a member
-		var memberTeams []domain.Team
-		if err := h.db.Model(&player).Association("Teams").Find(&memberTeams); err != nil {
-			h.logger.Errorf("Failed to get member teams: %v", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get member teams"})
-			return
-		}
-		teams = append(teams, memberTeams...)
-	}
-
-	// Return the teams
 	c.JSON(http.StatusOK, teams)
 }
 
-// GetByID returns a team by ID
-func (h *TeamHandler) GetByID(c *gin.Context) {
-	// Get the team ID from the URL
-	teamID, err := strconv.ParseUint(c.Param("teamId"), 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
-		return
-	}
-
-	// Get the team
-	var team domain.Team
-	if err := h.db.Preload("Members").First(&team, teamID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get team"})
-		return
-	}
-
-	// Return the team
-	c.JSON(http.StatusOK, team)
-}
-
-// Update updates a team
-func (h *TeamHandler) Update(c *gin.Context) {
-	// Get the team ID from the URL
-	teamID, err := strconv.ParseUint(c.Param("teamId"), 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
-		return
-	}
-
-	// Get the user ID from the JWT token
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
-		return
-	}
-
-	// Get the team
-	var team domain.Team
-	if err := h.db.First(&team, teamID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get team"})
-		return
-	}
-
-	// Check if the user is the owner of the team
-	if team.OwnerID != userID.(string) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You are not the owner of this team"})
-		return
-	}
-
-	// Parse the request body
-	var teamDto dto.TeamUpdateDto
-	if err := c.ShouldBindJSON(&teamDto); err != nil {
+// CreateTeam creates a new team
+func (h *TeamHandler) CreateTeam(c *gin.Context) {
+	var req dto.CreateTeamRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Update the team
-	if teamDto.Name != "" {
-		team.Name = teamDto.Name
-	}
-	if teamDto.Description != "" {
-		team.Description = teamDto.Description
-	}
-	team.UpdatedAt = time.Now().UTC()
+	ownerID := c.GetString("user_id")
 
-	if err := h.db.Save(&team).Error; err != nil {
-		h.logger.Errorf("Failed to update team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update team"})
+	team, err := h.teamService.CreateTeam(req, ownerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Return the updated team
+	c.JSON(http.StatusCreated, team)
+}
+
+// GetTeam retrieves a team by ID
+func (h *TeamHandler) GetTeam(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
+		return
+	}
+
+	ownerID := c.GetString("user_id")
+	team, err := h.teamService.GetTeam(uint(id), ownerID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
+		return
+	}
+
 	c.JSON(http.StatusOK, team)
 }
 
-// Delete deletes a team
-func (h *TeamHandler) Delete(c *gin.Context) {
-	// Get the team ID from the URL
+// UpdateTeam updates a team's information
+func (h *TeamHandler) UpdateTeam(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
+		return
+	}
+
+	var req dto.UpdateTeamRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ownerID := c.GetString("user_id")
+	if err := h.teamService.UpdateTeam(uint(id), req, ownerID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+// DeleteTeam deletes a team
+func (h *TeamHandler) DeleteTeam(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
+		return
+	}
+
+	ownerID := c.GetString("user_id")
+	if err := h.teamService.DeleteTeam(uint(id), ownerID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+// AddPlayer adds a player to a team
+func (h *TeamHandler) AddPlayer(c *gin.Context) {
 	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
 		return
 	}
 
-	// Get the user ID from the JWT token
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
-		return
-	}
-
-	// Get the team
-	var team domain.Team
-	if err := h.db.First(&team, teamID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get team"})
-		return
-	}
-
-	// Check if the user is the owner of the team
-	if team.OwnerID != userID.(string) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You are not the owner of this team"})
-		return
-	}
-
-	// Delete the team
-	if err := h.db.Delete(&team).Error; err != nil {
-		h.logger.Errorf("Failed to delete team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete team"})
-		return
-	}
-
-	// Return success
-	c.JSON(http.StatusOK, gin.H{"message": "Team deleted successfully"})
-}
-
-// AddMember adds a member to a team
-func (h *TeamHandler) AddMember(c *gin.Context) {
-	// Get the team ID from the URL
-	teamID, err := strconv.ParseUint(c.Param("teamId"), 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
-		return
-	}
-
-	// Get the user ID from the JWT token
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
-		return
-	}
-
-	// Get the team
-	var team domain.Team
-	if err := h.db.First(&team, teamID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get team"})
-		return
-	}
-
-	// Check if the user is the owner of the team
-	if team.OwnerID != userID.(string) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You are not the owner of this team"})
-		return
-	}
-
-	// Parse the request body
-	var memberDto dto.TeamMemberDto
-	if err := c.ShouldBindJSON(&memberDto); err != nil {
+	var req dto.TeamMemberDto
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Get the player
-	var player domain.Player
-	if err := h.db.First(&player, memberDto.PlayerID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Player not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get player: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get player"})
+	ownerID := c.GetString("user_id")
+	if err := h.teamService.AddPlayer(uint(teamID), req.PlayerID, req.Role, ownerID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Add the player to the team
-	if err := h.db.Model(&team).Association("Members").Append(&player); err != nil {
-		h.logger.Errorf("Failed to add member to team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add member to team"})
-		return
-	}
-
-	// Create the team member relationship
-	teamMember := domain.TeamMember{
-		TeamID:   uint(teamID),
-		PlayerID: memberDto.PlayerID,
-		Role:     memberDto.Role,
-	}
-	if err := h.db.Create(&teamMember).Error; err != nil {
-		h.logger.Errorf("Failed to create team member: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create team member"})
-		return
-	}
-
-	// Return success
-	c.JSON(http.StatusOK, gin.H{"message": "Member added successfully"})
+	c.Status(http.StatusOK)
 }
 
-// RemoveMember removes a member from a team
-func (h *TeamHandler) RemoveMember(c *gin.Context) {
-	// Get the team ID from the URL
-	teamID, err := strconv.ParseUint(c.Param("teamId"), 10, 32)
+// RemovePlayer removes a player from a team
+func (h *TeamHandler) RemovePlayer(c *gin.Context) {
+	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
 		return
 	}
 
-	// Get the player ID from the URL
 	playerID, err := strconv.ParseUint(c.Param("playerId"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid player ID"})
 		return
 	}
 
-	// Get the user ID from the JWT token
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User ID not found in token"})
+	ownerID := c.GetString("user_id")
+	if err := h.teamService.RemovePlayer(uint(teamID), uint(playerID), ownerID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Get the team
-	var team domain.Team
-	if err := h.db.First(&team, teamID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get team"})
+	c.Status(http.StatusOK)
+}
+
+// CreateBooking creates a new booking for a team
+func (h *TeamHandler) CreateBooking(c *gin.Context) {
+	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
 		return
 	}
 
-	// Check if the user is the owner of the team
-	if team.OwnerID != userID.(string) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You are not the owner of this team"})
+	var req dto.CreateBookingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Get the player
-	var player domain.Player
-	if err := h.db.First(&player, playerID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Player not found"})
-			return
-		}
-		h.logger.Errorf("Failed to get player: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get player"})
+	ownerID := c.GetString("user_id")
+	booking, err := h.teamService.CreateBooking(uint(teamID), req, ownerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Remove the player from the team
-	if err := h.db.Model(&team).Association("Members").Delete(&player); err != nil {
-		h.logger.Errorf("Failed to remove member from team: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove member from team"})
+	c.JSON(http.StatusCreated, booking)
+}
+
+// GetTeamBookings retrieves all bookings for a team
+func (h *TeamHandler) GetTeamBookings(c *gin.Context) {
+	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
 		return
 	}
 
-	// Delete the team member relationship
-	if err := h.db.Where("team_id = ? AND player_id = ?", teamID, playerID).Delete(&domain.TeamMember{}).Error; err != nil {
-		h.logger.Errorf("Failed to delete team member: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete team member"})
+	ownerID := c.GetString("user_id")
+	bookings, err := h.teamService.GetTeamBookings(uint(teamID), ownerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Return success
-	c.JSON(http.StatusOK, gin.H{"message": "Member removed successfully"})
+	c.JSON(http.StatusOK, bookings)
+}
+
+// CreateCost creates a new cost for a team
+func (h *TeamHandler) CreateCost(c *gin.Context) {
+	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
+		return
+	}
+
+	var req dto.CreateCostRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ownerID := c.GetString("user_id")
+	cost, err := h.teamService.CreateCost(uint(teamID), req, ownerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, cost)
+}
+
+// GetTeamCosts retrieves all costs for a team
+func (h *TeamHandler) GetTeamCosts(c *gin.Context) {
+	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
+		return
+	}
+
+	ownerID := c.GetString("user_id")
+	costs, err := h.teamService.GetTeamCosts(uint(teamID), ownerID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, costs)
 }

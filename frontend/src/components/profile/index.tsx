@@ -1,7 +1,10 @@
 import React from "react";
 import SectionLoading from "../loading/section-loading";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { ActionIcon, Avatar, Menu, Text, UnstyledButton } from "@mantine/core";
+import { IoPerson, IoLogOut } from "react-icons/io5";
+import LogoutButton from "../auth/logout-button";
 
 interface UserProfileProp {
   showLabel: boolean;
@@ -9,6 +12,7 @@ interface UserProfileProp {
 
 const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
   const { user, isAuthenticated, isLoading } = useAuth0();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <SectionLoading />;
@@ -20,19 +24,56 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
 
   return (
     <div className="flex items-center justify-start gap-2">
-      <img
-        className="rounded-full"
-        src={user!.picture}
-        alt={user!.name}
-        height={40}
-        width={40}
-      />
-      {showLabel && (
-        <div className="flex flex-col items-start justify-start">
-          <h2 className="font-bold">{user!.name}</h2>
-          {user?.email && <small>{user?.email}</small>}
-        </div>
-      )}
+      <Menu shadow="md" width={200}>
+        <Menu.Target>
+          <UnstyledButton className="flex items-center gap-2">
+            <Avatar
+              src={user?.picture || ""}
+              alt={user?.name || "User"}
+              size="md"
+              radius="xl"
+            />
+            {showLabel && (
+              <div className="flex flex-col items-start justify-start">
+                <Text size="sm" fw={500}>
+                  {user?.name || "User"}
+                </Text>
+                {user?.email && (
+                  <Text size="xs" c="dimmed">
+                    {user.email}
+                  </Text>
+                )}
+              </div>
+            )}
+          </UnstyledButton>
+        </Menu.Target>
+
+        <Menu.Dropdown>
+          <Menu.Label>Account</Menu.Label>
+          <Menu.Item
+            leftSection={<IoPerson size={14} />}
+            onClick={() => navigate("/admin/profile")}
+          >
+            Profile
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item
+            leftSection={<IoLogOut size={14} />}
+            color="red"
+            onClick={() => {
+              // Trigger logout
+              const logoutButton = document.querySelector(
+                "[data-logout-button]",
+              );
+              if (logoutButton instanceof HTMLElement) {
+                logoutButton.click();
+              }
+            }}
+          >
+            Logout
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
     </div>
   );
 };

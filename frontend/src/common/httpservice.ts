@@ -14,7 +14,7 @@ const auth0 = new Auth0Client({
 });
 
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_HOST
+    baseURL: import.meta.env.VITE_API_URL
 });
 
 async function getAuthHeaders() {

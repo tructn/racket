@@ -14,19 +14,22 @@ export const useMatchesQuery = () => useQuery({
     queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches"),
 });
 
-export const useArchivedMatchesQuery = () => useQuery({
+export const useArchivedMatchesQuery = (enabled = false) => useQuery({
     queryKey: ['getArchivedMatches'],
-    queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches/archived")
+    queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches/archived"),
+    enabled
 });
 
-export const useFutureMatchesQuery = () => useQuery({
+export const useFutureMatchesQuery = (enabled = false) => useQuery({
     queryKey: ['getFutureMatchesQuery'],
-    queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches/future")
+    queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches/future"),
+    enabled
 });
 
-export const useTodayMatchesQuery = () => useQuery({
+export const useTodayMatchesQuery = (enabled = false) => useQuery({
     queryKey: ['getTodayMatchesQuery'],
-    queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches/today")
+    queryFn: () => httpService.get<MatchSummaryModel[]>("api/v1/matches/today"),
+    enabled
 });
 
 // TODO: refactor

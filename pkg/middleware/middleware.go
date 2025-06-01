@@ -127,8 +127,13 @@ func AuthRequired() gin.HandlerFunc {
 					return
 				}
 
-				// Store user ID and roles in Gin context
-				c.Set("user_id", validatedClaims.RegisteredClaims.Subject)
+				// Store user info in Gin context
+				c.Set("user", map[string]interface{}{
+					"sub":     validatedClaims.RegisteredClaims.Subject,
+					"email":   validatedClaims.RegisteredClaims.Subject,
+					"name":    validatedClaims.RegisteredClaims.Subject,
+					"picture": "",
+				})
 				c.Set("user_roles", customClaims.Roles)
 
 				c.Next()

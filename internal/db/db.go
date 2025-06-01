@@ -42,6 +42,7 @@ func NewDatabase() *gorm.DB {
 			&domain.ShareCode{},
 			&domain.Team{},
 			&domain.TeamMember{},
+			&domain.User{},
 		)
 
 		db = dbCtx.Debug()
