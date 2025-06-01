@@ -28,22 +28,34 @@ function Dashboard() {
     useTodayMatchesQuery(activeTab === "today");
 
   return (
-    <Page title="Dashboard">
+    <Page title="Matches">
       <Tabs
         value={activeTab}
         onChange={(value) => setActiveTab(value || "today")}
       >
         <Tabs.List>
+          <Tabs.Tab value="future" leftSection={<IoCalendarClearOutline />}>
+            Upcoming
+          </Tabs.Tab>
           <Tabs.Tab value="today" leftSection={<IoTodayOutline />}>
             Today
           </Tabs.Tab>
-          <Tabs.Tab value="future" leftSection={<IoCalendarClearOutline />}>
-            Future
-          </Tabs.Tab>
           <Tabs.Tab value="archived" leftSection={<IoArchiveOutline />}>
-            Archived
+            History
           </Tabs.Tab>
         </Tabs.List>
+
+        <Tabs.Panel value="future" pt="md">
+          <Suspense fallback={<SectionLoading />}>
+            <MatchSection
+              icon={<IoCalendarClearOutline />}
+              title="Upcoming"
+              isLoading={futureMatchesLoading}
+              matches={futureMatches}
+              expandFirstItem={true}
+            />
+          </Suspense>
+        </Tabs.Panel>
 
         <Tabs.Panel value="today" pt="md">
           <Suspense fallback={<SectionLoading />}>
@@ -57,23 +69,11 @@ function Dashboard() {
           </Suspense>
         </Tabs.Panel>
 
-        <Tabs.Panel value="future" pt="md">
-          <Suspense fallback={<SectionLoading />}>
-            <MatchSection
-              icon={<IoCalendarClearOutline />}
-              title="Future"
-              isLoading={futureMatchesLoading}
-              matches={futureMatches}
-              expandFirstItem={true}
-            />
-          </Suspense>
-        </Tabs.Panel>
-
         <Tabs.Panel value="archived" pt="md">
           <Suspense fallback={<SectionLoading />}>
             <MatchSection
               icon={<IoArchiveOutline />}
-              title="Archived"
+              title="History"
               isLoading={archivedMatchesLoading}
               matches={archivedMatches}
             />

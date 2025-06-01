@@ -41,7 +41,7 @@ interface Match {
 function MeDashboard() {
   const { user } = useAuth0();
   const navigate = useNavigate();
-  const { isAdmin } = useClaims();
+  const { isAdmin, isLoading: isClaimsLoading } = useClaims();
 
   // Mock data - replace with actual API call
   const availableMatches: Match[] = [
@@ -83,7 +83,7 @@ function MeDashboard() {
     },
   ];
 
-  const getStatusColor = (status: Match["status"]) => {
+  const getStatusColor = (status: Match["status"]): string => {
     switch (status) {
       case "available":
         return "green";
@@ -96,11 +96,27 @@ function MeDashboard() {
     }
   };
 
+  const handleViewDetails = (matchId: string) => {
+    navigate(`/me/matches/${matchId}`);
+  };
+
+  const handleBookNow = (matchId: string) => {
+    navigate(`/me/bookings/new?matchId=${matchId}`);
+  };
+
+  const handleNotInterested = () => {
+    navigate("/me/bookings");
+  };
+
+  if (isClaimsLoading) {
+    return null; // Or return a loading spinner
+  }
+
   return (
     <Container size="lg" className="py-8">
       {/* Dashboard Tiles Section */}
       <div className="mb-8">
-        <Title order={2}>Welcome, {user?.name}!</Title>
+        <Title order={2}>Welcome, {user?.name || "User"}!</Title>
         <Text c="dimmed">Your activity overview</Text>
       </div>
 
@@ -182,7 +198,7 @@ function MeDashboard() {
             color="red"
             variant="light"
             leftSection={<IoThumbsDown />}
-            onClick={() => navigate("/me/bookings")}
+            onClick={handleNotInterested}
           >
             Not interested
           </Button>
@@ -234,16 +250,11 @@ function MeDashboard() {
                   <Button
                     variant="light"
                     color="blue"
-                    onClick={() => navigate(`/me/matches/${match.id}`)}
+                    onClick={() => handleViewDetails(match.id)}
                   >
                     View Details
                   </Button>
-                  <Button
-                    color="blue"
-                    onClick={() =>
-                      navigate(`/me/bookings/new?matchId=${match.id}`)
-                    }
-                  >
+                  <Button color="blue" onClick={() => handleBookNow(match.id)}>
                     Book Now
                   </Button>
                 </div>

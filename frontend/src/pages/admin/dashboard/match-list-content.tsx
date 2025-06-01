@@ -58,57 +58,75 @@ const RegistrationRow = React.memo(
     isUnregisterLoading: boolean;
     isPaidLoading: boolean;
   }) => (
-    <div className="grid grid-cols-3 items-center justify-center gap-x-2 rounded from-green-300 to-green-50 px-2 py-2 align-middle transition-all odd:bg-slate-50 hover:bg-gradient-to-r">
-      <span className={cx("truncate", { "font-bold": !!reg.registrationId })}>
-        {reg.playerName || reg.email}
-      </span>
-      <div>
+    <div
+      className={cx(
+        "group relative flex items-center justify-between gap-4 rounded-lg border border-slate-100 bg-white p-4 transition-all hover:border-slate-200 hover:shadow-md",
+        { "bg-emerald-50/30": !!reg.registrationId },
+      )}
+    >
+      <div className="flex flex-1 items-center gap-4">
+        <div
+          className={cx(
+            "flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all",
+            reg.registrationId
+              ? "bg-emerald-500"
+              : "bg-slate-200 text-slate-400",
+          )}
+        >
+          {(reg.playerName || reg.email || "?").charAt(0).toUpperCase()}
+        </div>
+        <div className="flex flex-col">
+          <span
+            className={cx("font-medium text-slate-800", {
+              "font-bold": !!reg.registrationId,
+            })}
+          >
+            {reg.playerName || reg.email}
+          </span>
+          {reg.registrationId && (
+            <span className="text-xs text-slate-500">Registered Player</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
         {!!reg.registrationId ? (
-          <Tooltip label="Unregister">
-            <ToggleButton
-              isActive={true}
-              isLoading={isUnregisterLoading}
-              activeColor="pink"
-              onClick={() =>
-                reg.registrationId && onUnregister(reg.registrationId)
-              }
-              icon={<IoHeartCircle />}
-            />
-          </Tooltip>
+          <>
+            <Tooltip label={reg.isPaid ? "Mark as unpaid" : "Mark as paid"}>
+              <ToggleButton
+                activeColor={reg.isPaid ? "green" : "red"}
+                isActive={reg.isPaid}
+                isLoading={isPaidLoading}
+                onClick={() =>
+                  reg.registrationId && onTogglePaid(reg.registrationId)
+                }
+                icon={<IconCurrencyPound />}
+              />
+            </Tooltip>
+            <Tooltip label="Unregister">
+              <ToggleButton
+                isActive={true}
+                isLoading={isUnregisterLoading}
+                activeColor="red"
+                onClick={() =>
+                  reg.registrationId && onUnregister(reg.registrationId)
+                }
+                icon={<IoHeartCircle />}
+              />
+            </Tooltip>
+          </>
         ) : (
           <Tooltip label="Register">
             <ToggleButton
               isActive={false}
               isLoading={isRegisterLoading}
-              activeColor="pink"
-              onClick={() =>
-                onRegister({
-                  matchId,
-                  playerId: reg.playerId,
-                })
-              }
+              activeColor="green"
+              onClick={() => onRegister({ matchId, playerId: reg.playerId })}
               icon={<IoHeartCircle />}
             />
           </Tooltip>
         )}
       </div>
-      {!!reg.registrationId ? (
-        <div>
-          <Tooltip label={reg.isPaid ? "Mark as unpaid" : "Mark as paid"}>
-            <ToggleButton
-              activeColor="green"
-              isActive={reg.isPaid}
-              isLoading={isPaidLoading}
-              onClick={() =>
-                reg.registrationId && onTogglePaid(reg.registrationId)
-              }
-              icon={<IconCurrencyPound />}
-            />
-          </Tooltip>
-        </div>
-      ) : (
-        <ToggleButton disabled={true} />
-      )}
     </div>
   ),
 );
@@ -118,7 +136,7 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
   const clipboardRefLoc = useRef<HTMLDivElement>(null!);
   const clipboard = useClipboard({ timeout: 500 });
   const clipboardRef = useRef<HTMLDivElement>(null!);
-  const [showAttendantOnly, setShowAttendantOnly] = useState(true);
+  const [showAttendantOnly, setShowAttendantOnly] = useState(false);
 
   const [
     additionalCostOpened,
@@ -318,36 +336,42 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
               icon={<IoTime />}
               label="Duration"
               figure={formatter.duration(match.start, match.end)}
+              color="indigo"
             />
 
             <MatchFigure
               icon={<IoPersonSharp />}
               label="Total players"
               figure={stats.totalPlayers?.toString()}
+              color="violet"
             />
 
             <MatchFigure
               icon={<IoCash />}
               label="Paid"
               figure={stats.paid?.toString()}
+              color="emerald"
             />
 
             <MatchFigure
               icon={<IoBan />}
               label="Unpaid"
               figure={stats.unpaid?.toString()}
+              color="rose"
             />
 
             <MatchFigure
               icon={<IoBaseball />}
               label="Attendant percent"
               figure={`${stats.percentage}%`}
+              color="amber"
             />
 
             <MatchFigure
               icon={<FiDollarSign />}
               label="Cost"
               figure={formatter.currency(match.cost ?? 0)}
+              color="cyan"
             />
 
             <MatchFigure
@@ -355,36 +379,60 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
               label="Additional cost"
               figure={formatter.currency(match.additionalCost ?? 0)}
               onActionClick={openAdditionalCost}
+              color="fuchsia"
             />
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
-          <Switch
-            checked={showAttendantOnly}
-            offLabel="All"
-            onChange={(event) =>
-              setShowAttendantOnly(event.currentTarget.checked)
-            }
-            label="Show attendant only"
-          />
-
-          {isLoadingRegistrations ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} height={40} />
-              ))}
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-lg">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-slate-100 p-2">
+                  <IoPersonSharp className="text-xl text-slate-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    Registrations
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    Manage player registrations and payments
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-slate-600">
+                  Show attendant only
+                </span>
+                <Switch
+                  checked={showAttendantOnly}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    setShowAttendantOnly(event.currentTarget.checked)
+                  }
+                  size="md"
+                />
+              </div>
             </div>
-          ) : (
-            <List
-              height={400}
-              itemCount={filteredRegistrations.length}
-              itemSize={50}
-              width="100%"
-            >
-              {renderRegistrationRow}
-            </List>
-          )}
+
+            {isLoadingRegistrations ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} height={72} radius="md" />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-4">
+                <List
+                  height={400}
+                  itemCount={filteredRegistrations.length}
+                  itemSize={72}
+                  width="100%"
+                >
+                  {renderRegistrationRow}
+                </List>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

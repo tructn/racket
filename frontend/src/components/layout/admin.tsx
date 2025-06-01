@@ -21,6 +21,7 @@ import {
   IoBusiness,
   IoSpeedometer,
 } from "react-icons/io5";
+import { FaCircleDot } from "react-icons/fa6";
 import { Text } from "@mantine/core";
 
 interface MenuItem {
@@ -64,7 +65,7 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
         className={cx(
           "flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
           "hover:bg-blue-600/80 hover:shadow-lg",
-          (isActive(item.path) || hasActiveChild) && "bg-blue-600 shadow-lg",
+          isActive(item.path) && "bg-blue-600 shadow-lg",
           level > 0 && "ml-4",
           !showLabel && "justify-center px-2",
         )}
@@ -96,7 +97,11 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
               cx("flex w-full items-center gap-3", isActive && "text-white")
             }
           >
-            <span className="text-xl text-blue-100">{item.icon}</span>
+            <span
+              className={cx("text-blue-100", level > 0 ? "text-lg" : "text-xl")}
+            >
+              {level > 0 ? <FaCircleDot className="text-[10px]" /> : item.icon}
+            </span>
             {item.label && showLabel && (
               <span className="font-medium">{item.label}</span>
             )}
@@ -104,7 +109,7 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
         )}
       </div>
       {hasChildren && showLabel && expanded && (
-        <div className="mt-1 space-y-1">
+        <div className="relative mt-1 space-y-0.5">
           {item.childItems?.map((child, index) => (
             <NavItem
               key={index}
