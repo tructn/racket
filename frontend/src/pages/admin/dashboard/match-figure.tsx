@@ -11,14 +11,7 @@ interface Prop {
   icon?: React.ReactNode;
   onActionClick?: () => void;
   actionIcon?: React.ReactNode;
-  color?:
-    | "indigo"
-    | "violet"
-    | "emerald"
-    | "rose"
-    | "amber"
-    | "cyan"
-    | "fuchsia";
+  color?: "blue" | "sky" | "cyan";
 }
 
 const MatchFigure: React.FC<Prop> = ({
@@ -28,68 +21,44 @@ const MatchFigure: React.FC<Prop> = ({
   icon,
   onActionClick,
   actionIcon,
-  color = "indigo",
+  color = "blue",
 }) => {
   const getGradientColors = (color: Prop["color"]) => {
     switch (color) {
-      case "indigo":
-        return "from-indigo-50 to-indigo-100";
-      case "violet":
-        return "from-violet-50 to-violet-100";
-      case "emerald":
-        return "from-emerald-50 to-emerald-100";
-      case "rose":
-        return "from-rose-50 to-rose-100";
-      case "amber":
-        return "from-amber-50 to-amber-100";
+      case "blue":
+        return "from-blue-50 to-blue-100";
+      case "sky":
+        return "from-sky-50 to-sky-100";
       case "cyan":
         return "from-cyan-50 to-cyan-100";
-      case "fuchsia":
-        return "from-fuchsia-50 to-fuchsia-100";
       default:
-        return "from-indigo-50 to-indigo-100";
+        return "from-blue-50 to-blue-100";
     }
   };
 
   const getTextColor = (color: Prop["color"]) => {
     switch (color) {
-      case "indigo":
-        return "text-indigo-700";
-      case "violet":
-        return "text-violet-700";
-      case "emerald":
-        return "text-emerald-700";
-      case "rose":
-        return "text-rose-700";
-      case "amber":
-        return "text-amber-700";
+      case "blue":
+        return "text-blue-700";
+      case "sky":
+        return "text-sky-700";
       case "cyan":
         return "text-cyan-700";
-      case "fuchsia":
-        return "text-fuchsia-700";
       default:
-        return "text-indigo-700";
+        return "text-blue-700";
     }
   };
 
   const getIconColor = (color: Prop["color"]) => {
     switch (color) {
-      case "indigo":
-        return "text-indigo-600";
-      case "violet":
-        return "text-violet-600";
-      case "emerald":
-        return "text-emerald-600";
-      case "rose":
-        return "text-rose-600";
-      case "amber":
-        return "text-amber-600";
+      case "blue":
+        return "text-blue-600";
+      case "sky":
+        return "text-sky-600";
       case "cyan":
         return "text-cyan-600";
-      case "fuchsia":
-        return "text-fuchsia-600";
       default:
-        return "text-indigo-600";
+        return "text-blue-600";
     }
   };
 

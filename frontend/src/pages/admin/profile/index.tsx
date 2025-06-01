@@ -15,11 +15,12 @@ import {
   Loader,
   Center,
 } from "@mantine/core";
-import { userService, UserProfile } from "@/services/userService";
+import { useUserService, UserProfile } from "@/services/userService";
 import Page from "@/components/page";
 
 const ProfilePage: React.FC = () => {
   const { user: auth0User, isLoading: isAuth0Loading } = useAuth0();
+  const userService = useUserService();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState("");

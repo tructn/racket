@@ -1,4 +1,4 @@
-import { useApi } from "../hooks/useApi";
+import httpService from '@/common/httpservice';
 
 export interface UserProfile {
     id: number;
@@ -15,14 +15,14 @@ export interface UpdateProfileRequest {
     picture?: string;
 }
 
-export const userService = {
-    getCurrentUser: async (): Promise<UserProfile> => {
-        const api = useApi();
-        return await api.get<UserProfile>('/api/v1/users/me');
-    },
+export const useUserService = () => {
+    return {
+        getCurrentUser: async (): Promise<UserProfile> => {
+            return await httpService.get<UserProfile>('/api/v1/users/me');
+        },
 
-    updateProfile: async (data: UpdateProfileRequest): Promise<UserProfile> => {
-        const api = useApi();
-        return await api.put<UserProfile>('/api/v1/users/me', data as UserProfile);
-    },
-}; 
+        updateProfile: async (data: UpdateProfileRequest): Promise<UserProfile> => {
+            return await httpService.put<UserProfile>('/api/v1/users/me', data as UserProfile);
+        },
+    };
+};

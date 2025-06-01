@@ -16,7 +16,7 @@ import SectionLoading from "@/components/loading/section-loading";
 const MatchSection = lazy(() => import("./match-section"));
 
 function Dashboard() {
-  const [activeTab, setActiveTab] = useState("today");
+  const [activeTab, setActiveTab] = useState("future");
 
   const { data: archivedMatches, isPending: archivedMatchesLoading } =
     useArchivedMatchesQuery(activeTab === "archived");

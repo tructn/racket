@@ -210,18 +210,18 @@ function AdminLayout() {
             collapsed ? "items-center" : "",
           )}
         >
-          <div className="flex items-center gap-2 p-2">
+          <div className="flex items-center justify-center gap-2 p-2">
             <img
               src="/logo.svg"
               alt="Racket"
               className={cx(
                 "transition-transform duration-300 hover:scale-110",
-                collapsed ? "h-12 w-12" : "h-16 w-16",
+                collapsed ? "h-16 w-16" : "h-20 w-20",
               )}
             />
             {!collapsed && (
               <Text size="xl" fw={700} className="text-white">
-                RACKET Console
+                Administration Console
               </Text>
             )}
           </div>

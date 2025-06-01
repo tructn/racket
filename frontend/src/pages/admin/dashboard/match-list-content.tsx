@@ -107,7 +107,7 @@ const RegistrationRow = React.memo(
               <ToggleButton
                 isActive={true}
                 isLoading={isUnregisterLoading}
-                activeColor="red"
+                activeColor="pink"
                 onClick={() =>
                   reg.registrationId && onUnregister(reg.registrationId)
                 }
@@ -336,42 +336,42 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
               icon={<IoTime />}
               label="Duration"
               figure={formatter.duration(match.start, match.end)}
-              color="indigo"
+              color="blue"
             />
 
             <MatchFigure
               icon={<IoPersonSharp />}
               label="Total players"
               figure={stats.totalPlayers?.toString()}
-              color="violet"
+              color="sky"
             />
 
             <MatchFigure
               icon={<IoCash />}
               label="Paid"
               figure={stats.paid?.toString()}
-              color="emerald"
+              color="blue"
             />
 
             <MatchFigure
               icon={<IoBan />}
               label="Unpaid"
               figure={stats.unpaid?.toString()}
-              color="rose"
+              color="sky"
             />
 
             <MatchFigure
               icon={<IoBaseball />}
               label="Attendant percent"
               figure={`${stats.percentage}%`}
-              color="amber"
+              color="blue"
             />
 
             <MatchFigure
               icon={<FiDollarSign />}
               label="Cost"
               figure={formatter.currency(match.cost ?? 0)}
-              color="cyan"
+              color="sky"
             />
 
             <MatchFigure
@@ -379,7 +379,7 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
               label="Additional cost"
               figure={formatter.currency(match.additionalCost ?? 0)}
               onActionClick={openAdditionalCost}
-              color="fuchsia"
+              color="blue"
             />
           </div>
         </div>
