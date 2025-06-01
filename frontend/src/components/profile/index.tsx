@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { ActionIcon, Avatar, Menu, Text, UnstyledButton } from "@mantine/core";
 import { IoPerson, IoLogOut } from "react-icons/io5";
 import LogoutButton from "../auth/logout-button";
+import cx from "clsx";
 
 interface UserProfileProp {
   showLabel: boolean;
@@ -22,24 +23,46 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
     return <Navigate to="/login" replace={true} />;
   }
 
+  const getInitials = (name?: string) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <div className="flex items-center justify-start gap-2">
       <Menu shadow="md" width={200}>
         <Menu.Target>
           <UnstyledButton className="flex items-center gap-2">
             <Avatar
-              src={user?.picture || ""}
+              src={user?.picture}
               alt={user?.name || "User"}
               size="md"
               radius="xl"
-            />
+              className="border-2 border-lime-400/50"
+              styles={{
+                root: {
+                  backgroundColor: "#84cc16", // lime-500
+                },
+                placeholder: {
+                  color: "#fff",
+                  fontWeight: 500,
+                },
+              }}
+            >
+              {getInitials(user?.name)}
+            </Avatar>
             {showLabel && (
               <div className="flex flex-col items-start justify-start">
-                <Text size="sm" fw={500}>
+                <Text size="sm" fw={500} className="text-white">
                   {user?.name || "User"}
                 </Text>
                 {user?.email && (
-                  <Text size="xs" c="dimmed">
+                  <Text size="xs" className="text-white/70">
                     {user.email}
                   </Text>
                 )}

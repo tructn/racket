@@ -1,10 +1,24 @@
-import { Alert, Button, Tabs } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Container,
+  Group,
+  Paper,
+  Stack,
+  Tabs,
+  Text,
+  Title,
+} from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { Link, RichTextEditor } from "@mantine/tiptap";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useState } from "react";
-import { IoChatboxOutline, IoNotificationsCircle } from "react-icons/io5";
+import {
+  IoChatboxOutline,
+  IoNotificationsCircle,
+  IoSave,
+} from "react-icons/io5";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import httpService from "@/common/httpservice";
@@ -47,77 +61,127 @@ export default function Setting() {
 
   return (
     <Page>
-      <Tabs defaultValue="alert">
-        <Tabs.List>
-          <Tabs.Tab value="alert" leftSection={<IoChatboxOutline />}>
-            Message Template
-          </Tabs.Tab>
-        </Tabs.List>
-
-        <Tabs.Panel value="alert" className="py-5">
-          <Alert icon={<IoNotificationsCircle />} title="Message template">
-            <Markdown rehypePlugins={[rehypeRaw]}>{messageTemplate}</Markdown>
-          </Alert>
-          <div className="grid grid-cols-2 gap-3 py-5">
-            <div className="flex flex-col gap-2">
-              <RichTextEditor editor={editor}>
-                <RichTextEditor.Toolbar sticky stickyOffset={60}>
-                  <RichTextEditor.ControlsGroup>
-                    <RichTextEditor.Bold />
-                    <RichTextEditor.Italic />
-                    <RichTextEditor.Underline />
-                    <RichTextEditor.Strikethrough />
-                    <RichTextEditor.ClearFormatting />
-                    <RichTextEditor.Highlight />
-                    <RichTextEditor.Code />
-                  </RichTextEditor.ControlsGroup>
-
-                  <RichTextEditor.ControlsGroup>
-                    <RichTextEditor.H1 />
-                    <RichTextEditor.H2 />
-                    <RichTextEditor.H3 />
-                    <RichTextEditor.H4 />
-                  </RichTextEditor.ControlsGroup>
-
-                  <RichTextEditor.ControlsGroup>
-                    <RichTextEditor.Blockquote />
-                    <RichTextEditor.Hr />
-                    <RichTextEditor.BulletList />
-                    <RichTextEditor.OrderedList />
-                    <RichTextEditor.Subscript />
-                    <RichTextEditor.Superscript />
-                  </RichTextEditor.ControlsGroup>
-
-                  <RichTextEditor.ControlsGroup>
-                    <RichTextEditor.Link />
-                    <RichTextEditor.Unlink />
-                  </RichTextEditor.ControlsGroup>
-
-                  <RichTextEditor.ControlsGroup>
-                    <RichTextEditor.AlignLeft />
-                    <RichTextEditor.AlignCenter />
-                    <RichTextEditor.AlignJustify />
-                    <RichTextEditor.AlignRight />
-                  </RichTextEditor.ControlsGroup>
-
-                  <RichTextEditor.ControlsGroup>
-                    <RichTextEditor.Undo />
-                    <RichTextEditor.Redo />
-                  </RichTextEditor.ControlsGroup>
-                </RichTextEditor.Toolbar>
-
-                <RichTextEditor.Content className="min-h-[300px]" />
-              </RichTextEditor>
-            </div>
-            <div className="rounded border border-emerald-100 bg-emerald-50 p-3 text-sm">
-              <Markdown rehypePlugins={[rehypeRaw]}>{template}</Markdown>
-            </div>
+      <Container size="lg" className="py-8">
+        <Stack gap="xl">
+          <div>
+            <Title order={2}>Settings</Title>
+            <Text c="dimmed">Manage your application settings</Text>
           </div>
-          <Button variant="outline" onClick={saveMessageTemplate}>
-            Save Template
-          </Button>
-        </Tabs.Panel>
-      </Tabs>
+
+          <Card shadow="sm" p="lg" withBorder>
+            <Tabs defaultValue="alert">
+              <Tabs.List>
+                <Tabs.Tab value="alert" leftSection={<IoChatboxOutline />}>
+                  Message Template
+                </Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value="alert" className="py-5">
+                <Stack gap="md">
+                  <Paper withBorder p="md" className="bg-blue-50">
+                    <Group>
+                      <IoNotificationsCircle
+                        className="text-blue-600"
+                        size={24}
+                      />
+                      <div>
+                        <Text fw={500} size="lg">
+                          Current Template
+                        </Text>
+                        <Text size="sm" c="dimmed">
+                          This is your active message template
+                        </Text>
+                      </div>
+                    </Group>
+                    <div className="mt-4">
+                      <Markdown rehypePlugins={[rehypeRaw]}>
+                        {messageTemplate}
+                      </Markdown>
+                    </div>
+                  </Paper>
+
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <Card withBorder shadow="sm">
+                      <Text fw={500} mb="md">
+                        Edit Template
+                      </Text>
+                      <RichTextEditor editor={editor}>
+                        <RichTextEditor.Toolbar sticky stickyOffset={60}>
+                          <RichTextEditor.ControlsGroup>
+                            <RichTextEditor.Bold />
+                            <RichTextEditor.Italic />
+                            <RichTextEditor.Underline />
+                            <RichTextEditor.Strikethrough />
+                            <RichTextEditor.ClearFormatting />
+                            <RichTextEditor.Highlight />
+                            <RichTextEditor.Code />
+                          </RichTextEditor.ControlsGroup>
+
+                          <RichTextEditor.ControlsGroup>
+                            <RichTextEditor.H1 />
+                            <RichTextEditor.H2 />
+                            <RichTextEditor.H3 />
+                            <RichTextEditor.H4 />
+                          </RichTextEditor.ControlsGroup>
+
+                          <RichTextEditor.ControlsGroup>
+                            <RichTextEditor.Blockquote />
+                            <RichTextEditor.Hr />
+                            <RichTextEditor.BulletList />
+                            <RichTextEditor.OrderedList />
+                            <RichTextEditor.Subscript />
+                            <RichTextEditor.Superscript />
+                          </RichTextEditor.ControlsGroup>
+
+                          <RichTextEditor.ControlsGroup>
+                            <RichTextEditor.Link />
+                            <RichTextEditor.Unlink />
+                          </RichTextEditor.ControlsGroup>
+
+                          <RichTextEditor.ControlsGroup>
+                            <RichTextEditor.AlignLeft />
+                            <RichTextEditor.AlignCenter />
+                            <RichTextEditor.AlignJustify />
+                            <RichTextEditor.AlignRight />
+                          </RichTextEditor.ControlsGroup>
+
+                          <RichTextEditor.ControlsGroup>
+                            <RichTextEditor.Undo />
+                            <RichTextEditor.Redo />
+                          </RichTextEditor.ControlsGroup>
+                        </RichTextEditor.Toolbar>
+
+                        <RichTextEditor.Content className="min-h-[300px]" />
+                      </RichTextEditor>
+                    </Card>
+
+                    <Card withBorder shadow="sm">
+                      <Text fw={500} mb="md">
+                        Preview
+                      </Text>
+                      <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+                        <Markdown rehypePlugins={[rehypeRaw]}>
+                          {template}
+                        </Markdown>
+                      </div>
+                    </Card>
+                  </div>
+
+                  <Group justify="flex-end">
+                    <Button
+                      leftSection={<IoSave />}
+                      onClick={saveMessageTemplate}
+                      variant="filled"
+                      color="blue"
+                    >
+                      Save Template
+                    </Button>
+                  </Group>
+                </Stack>
+              </Tabs.Panel>
+            </Tabs>
+          </Card>
+        </Stack>
+      </Container>
     </Page>
   );
 }
