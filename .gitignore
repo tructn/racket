@@ -32,4 +32,5 @@ go.work.sum
 
 .env
 .env.local
+!.env.example
 frontend/.env
