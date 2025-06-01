@@ -1,5 +1,4 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { Popover } from "@mantine/core";
 import cx from "clsx";
 import { FC, ReactNode, Suspense, useState } from "react";
 import { Navigate, NavLink, Outlet } from "react-router-dom";
@@ -20,6 +19,7 @@ import {
   IoStorefront,
   IoChevronDown,
 } from "react-icons/io5";
+import { Text } from "@mantine/core";
 
 interface MenuItem {
   label: string;
@@ -41,7 +41,8 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
   const handleClick = (e: React.MouseEvent) => {
     if (hasChildren) {
       e.preventDefault();
-      setExpanded(!expanded);
+      e.stopPropagation();
+      setExpanded((prev) => !prev);
     }
   };
 
@@ -56,48 +57,25 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
         )}
       >
         {hasChildren ? (
-          <Popover
-            position="right-start"
-            withArrow
-            shadow="md"
-            disabled={showLabel}
+          <div
+            onClick={handleClick}
+            className="flex w-full cursor-pointer items-center justify-between"
           >
-            <Popover.Target>
-              <div
-                onClick={handleClick}
-                className="flex w-full cursor-pointer items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl text-blue-100">{item.icon}</span>
-                  {item.label && showLabel && (
-                    <span className="font-medium">{item.label}</span>
-                  )}
-                </div>
-                {item.label && showLabel && (
-                  <IoChevronDown
-                    className={cx(
-                      "text-blue-100 transition-transform duration-300",
-                      expanded && "rotate-180",
-                    )}
-                  />
+            <div className="flex items-center gap-3">
+              <span className="text-xl text-blue-100">{item.icon}</span>
+              {item.label && showLabel && (
+                <span className="font-medium">{item.label}</span>
+              )}
+            </div>
+            {item.label && showLabel && (
+              <IoChevronDown
+                className={cx(
+                  "text-blue-100 transition-transform duration-300",
+                  expanded && "rotate-180",
                 )}
-              </div>
-            </Popover.Target>
-            {!showLabel && (
-              <Popover.Dropdown>
-                {item.childItems?.map((child, index) => (
-                  <NavLink
-                    key={index}
-                    to={child.path || "#"}
-                    className="flex items-center gap-2 px-2 py-1 hover:bg-blue-50"
-                  >
-                    <span className="text-blue-600">{child.icon}</span>
-                    <span>{child.label}</span>
-                  </NavLink>
-                ))}
-              </Popover.Dropdown>
+              />
             )}
-          </Popover>
+          </div>
         ) : (
           <NavLink
             to={item.path || "#"}
@@ -113,18 +91,12 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
       {hasChildren && showLabel && expanded && (
         <div className="mt-1 space-y-1">
           {item.childItems?.map((child, index) => (
-            <NavLink
+            <NavItem
               key={index}
-              to={child.path || "#"}
-              className={cx(
-                "flex items-center gap-3 rounded-lg px-4 py-2 text-sm transition-all duration-200",
-                "hover:bg-blue-600/80 hover:shadow-lg [&.active]:bg-blue-600 [&.active]:shadow-lg",
-                "ml-4",
-              )}
-            >
-              <span className="text-xl text-blue-100">{child.icon}</span>
-              <span className="font-medium">{child.label}</span>
-            </NavLink>
+              item={child}
+              showLabel={showLabel}
+              level={level + 1}
+            />
           ))}
         </div>
       )}
@@ -213,15 +185,20 @@ function AdminLayout() {
         )}
       >
         <div className="flex flex-1 flex-col">
-          <div className="flex justify-center p-4">
+          <div className="flex items-center justify-center gap-2 p-2">
             <img
               src="/logo.svg"
-              alt="LOGO"
+              alt="Racket"
               className={cx(
                 "transition-transform duration-300 hover:scale-110",
                 collapsed ? "h-12 w-12" : "h-16 w-16",
               )}
             />
+            {!collapsed && (
+              <Text size="xl" fw={700} className="text-white">
+                Racket
+              </Text>
+            )}
           </div>
           <div className={cx("flex flex-col p-4", collapsed && "items-center")}>
             <UserProfile showLabel={!collapsed} />
