@@ -169,6 +169,11 @@ function AdminLayout() {
           path: "/admin/requests",
           icon: <IoList />,
         },
+        {
+          label: "Users",
+          path: "/admin/users",
+          icon: <IoPerson />,
+        },
       ],
     },
     {

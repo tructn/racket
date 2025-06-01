@@ -21,6 +21,7 @@ const PageNotFoundScreen = lazy(() => import("@/pages/page-not-found"));
 const Requests = lazy(() => import("@/components/requests"));
 const AdminRequestScreen = lazy(() => import("@/pages/admin/requests"));
 const ReportingScreen = lazy(() => import("@/pages/admin/reporting"));
+const UsersScreen = lazy(() => import("@/pages/admin/users"));
 const PublicOutstandingReport = lazy(
   () => import("@/pages/anonymous/outstanding-report"),
 );
@@ -71,6 +72,7 @@ function App() {
           <Route path="matches" element={<MatchesScreen />} />
           <Route path="sportcenters" element={<SportCentersScreen />} />
           <Route path="reports" element={<ReportingScreen />} />
+          <Route path="users" element={<UsersScreen />} />
           <Route path="profile" element={<ProfileScreen />} />
           <Route path="settings" element={<SettingsScreen />} />
         </Route>
