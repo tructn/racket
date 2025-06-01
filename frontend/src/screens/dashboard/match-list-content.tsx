@@ -1,9 +1,9 @@
-import { Alert, Button, Modal, Switch } from "@mantine/core";
+import { Alert, Button, Modal, Switch, Skeleton, Tooltip } from "@mantine/core";
 import { useClipboard, useDisclosure } from "@mantine/hooks";
 import { useMutation } from "@tanstack/react-query";
 import cx from "clsx";
 import dayjs from "dayjs";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useCallback } from "react";
 import { FaCashRegister } from "react-icons/fa";
 import { FiDollarSign } from "react-icons/fi";
 import {
@@ -20,6 +20,7 @@ import {
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
+import { FixedSizeList as List } from "react-window";
 import formatter from "../../common/formatter";
 import httpService from "../../common/httpservice";
 import ToggleButton from "../../components/toggle";
@@ -40,6 +41,82 @@ interface Prop {
   match: MatchSummaryModel;
 }
 
+// Memoized registration row component
+const RegistrationRow = React.memo(
+  ({
+    reg,
+    matchId,
+    onRegister,
+    onUnregister,
+    onTogglePaid,
+    isRegisterLoading,
+    isUnregisterLoading,
+    isPaidLoading,
+  }: {
+    reg: RegistrationModel;
+    matchId: number;
+    onRegister: (data: RegistrationModel) => void;
+    onUnregister: (id: number) => void;
+    onTogglePaid: (id: number) => void;
+    isRegisterLoading: boolean;
+    isUnregisterLoading: boolean;
+    isPaidLoading: boolean;
+  }) => (
+    <div className="grid grid-cols-3 items-center justify-center gap-x-2 rounded from-green-300 to-green-50 px-2 py-2 align-middle transition-all odd:bg-slate-50 hover:bg-gradient-to-r">
+      <span className={cx("truncate", { "font-bold": !!reg.registrationId })}>
+        {reg.playerName || reg.email}
+      </span>
+      <div>
+        {!!reg.registrationId ? (
+          <Tooltip label="Unregister">
+            <ToggleButton
+              isActive={true}
+              isLoading={isUnregisterLoading}
+              activeColor="pink"
+              onClick={() =>
+                reg.registrationId && onUnregister(reg.registrationId)
+              }
+              icon={<IoHeartCircle />}
+            />
+          </Tooltip>
+        ) : (
+          <Tooltip label="Register">
+            <ToggleButton
+              isActive={false}
+              isLoading={isRegisterLoading}
+              activeColor="pink"
+              onClick={() =>
+                onRegister({
+                  matchId,
+                  playerId: reg.playerId,
+                })
+              }
+              icon={<IoHeartCircle />}
+            />
+          </Tooltip>
+        )}
+      </div>
+      {!!reg.registrationId ? (
+        <div>
+          <Tooltip label={reg.isPaid ? "Mark as unpaid" : "Mark as paid"}>
+            <ToggleButton
+              activeColor="green"
+              isActive={reg.isPaid}
+              isLoading={isPaidLoading}
+              onClick={() =>
+                reg.registrationId && onTogglePaid(reg.registrationId)
+              }
+              icon={<IconCurrencyPound />}
+            />
+          </Tooltip>
+        </div>
+      ) : (
+        <ToggleButton disabled={true} />
+      )}
+    </div>
+  ),
+);
+
 const MatchListContent: React.FC<Prop> = ({ match }) => {
   const clipboardLoc = useClipboard({ timeout: 500 });
   const clipboardRefLoc = useRef<HTMLDivElement>(null!);
@@ -52,46 +129,34 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
     { open: openAdditionalCost, close: closeAdditionalCost },
   ] = useDisclosure(false);
 
-  const { data: registrations, refetch: reload } = useRegistrationsByMatchQuery(
-    match.matchId,
-  );
+  const {
+    data: registrations,
+    refetch: reload,
+    isLoading: isLoadingRegistrations,
+  } = useRegistrationsByMatchQuery(match.matchId);
 
   const { data: messageTemplate } = useMesssageTemplateQuery();
 
-  const statPercentage = useMemo(() => {
-    return Math.round(
-      ((registrations?.filter((r) => !!r.registrationId).length ?? 0) /
-        (registrations?.length ?? 0)) *
-        100,
-    );
-  }, [registrations]);
+  // Memoized computations
+  const stats = useMemo(() => {
+    const totalPlayers =
+      registrations?.filter((r) => !!r.registrationId).length ?? 0;
+    const totalRegistrations = registrations?.length ?? 0;
 
-  const statPaid = useMemo(() => {
-    return registrations?.filter((r) => r.registrationId && !!r.isPaid).length;
-  }, [registrations]);
-
-  const statUnpaid = useMemo(() => {
-    return registrations?.filter((r) => r.registrationId && !r.isPaid).length;
-  }, [registrations]);
-
-  const statTotalPlayer = useMemo(() => {
-    return registrations?.filter((r) => !!r.registrationId).length;
-  }, [registrations]);
-
-  const individualCost = useMemo(() => {
-    const total = (match.cost ?? 0) + (match.additionalCost ?? 0);
-    const totalPlayer =
-      registrations?.filter((r) => !!r.registrationId)?.length ?? 0;
-    return totalPlayer === 0 ? 0 : total / totalPlayer;
-  }, [match.cost, registrations]);
-
-  const handleSaveAdditionalCosts = async (costs: AdditionalCost[]) => {
-    await httpService.put(
-      `api/v1/matches/${match.matchId}/additional-costs`,
-      costs,
-    );
-    closeAdditionalCost();
-  };
+    return {
+      percentage: Math.round((totalPlayers / totalRegistrations) * 100),
+      paid:
+        registrations?.filter((r) => r.registrationId && !!r.isPaid).length ??
+        0,
+      unpaid:
+        registrations?.filter((r) => r.registrationId && !r.isPaid).length ?? 0,
+      totalPlayers,
+      individualCost:
+        totalPlayers === 0
+          ? 0
+          : ((match.cost ?? 0) + (match.additionalCost ?? 0)) / totalPlayers,
+    };
+  }, [match.cost, match.additionalCost, registrations]);
 
   const costMessage = useMemo(() => {
     const bindTemplate = (template: string, data: any) => {
@@ -102,12 +167,12 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
       cost: match?.cost?.toFixed(2),
       customSection: match?.customSection,
       additionalCost: match.additionalCost?.toFixed(2),
-      individualCost: individualCost?.toFixed(2),
-      totalPlayer:
-        registrations?.filter((r) => !!r.registrationId)?.length ?? 0,
+      individualCost: stats.individualCost?.toFixed(2),
+      totalPlayer: stats.totalPlayers,
     });
-  }, [match, individualCost, registrations, messageTemplate]);
+  }, [match, stats, messageTemplate]);
 
+  // Memoized mutations
   const regMut = useMutation({
     onSuccess: reload,
     mutationFn: (model: RegistrationModel) =>
@@ -131,6 +196,56 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
     mutationFn: (registrationId: number) =>
       httpService.put(`api/v1/registrations/${registrationId}/unpaid`, {}),
   });
+
+  // Memoized handlers
+  const handleSaveAdditionalCosts = useCallback(
+    async (costs: AdditionalCost[]) => {
+      await httpService.put(
+        `api/v1/matches/${match.matchId}/additional-costs`,
+        costs,
+      );
+      closeAdditionalCost();
+    },
+    [match.matchId],
+  );
+
+  const filteredRegistrations = useMemo(
+    () =>
+      registrations?.filter(
+        (r) => showAttendantOnly === false || r.registrationId,
+      ) ?? [],
+    [registrations, showAttendantOnly],
+  );
+
+  const renderRegistrationRow = useCallback(
+    ({ index, style }: { index: number; style: React.CSSProperties }) => {
+      const reg = filteredRegistrations[index];
+      return (
+        <div style={style}>
+          <RegistrationRow
+            reg={reg}
+            matchId={match.matchId}
+            onRegister={regMut.mutate}
+            onUnregister={unregMut.mutate}
+            onTogglePaid={(id) =>
+              reg.isPaid ? unpaidMut.mutate(id) : paidMut.mutate(id)
+            }
+            isRegisterLoading={regMut.isPending}
+            isUnregisterLoading={unregMut.isPending}
+            isPaidLoading={unpaidMut.isPending || paidMut.isPending}
+          />
+        </div>
+      );
+    },
+    [
+      filteredRegistrations,
+      match.matchId,
+      regMut,
+      unregMut,
+      paidMut,
+      unpaidMut,
+    ],
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -207,44 +322,44 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
               icon={<IoTime />}
               label="Duration"
               figure={formatter.duration(match.start, match.end)}
-            ></MatchFigure>
+            />
 
             <MatchFigure
               icon={<IoPersonSharp />}
               label="Total players"
-              figure={statTotalPlayer?.toString()}
-            ></MatchFigure>
+              figure={stats.totalPlayers?.toString()}
+            />
 
             <MatchFigure
               icon={<IoCash />}
               label="Paid"
-              figure={statPaid?.toString()}
-            ></MatchFigure>
+              figure={stats.paid?.toString()}
+            />
 
             <MatchFigure
               icon={<IoBan />}
               label="Unpaid"
-              figure={statUnpaid?.toString()}
-            ></MatchFigure>
+              figure={stats.unpaid?.toString()}
+            />
 
             <MatchFigure
               icon={<IoBaseball />}
               label="Attendant percent"
-              figure={`${statPercentage}%`}
-            ></MatchFigure>
+              figure={`${stats.percentage}%`}
+            />
 
             <MatchFigure
               icon={<FiDollarSign />}
               label="Cost"
               figure={formatter.currency(match.cost ?? 0)}
-            ></MatchFigure>
+            />
 
             <MatchFigure
               icon={<FaCashRegister />}
-              label="Addtional cost"
+              label="Additional cost"
               figure={formatter.currency(match.additionalCost ?? 0)}
               onActionClick={openAdditionalCost}
-            ></MatchFigure>
+            />
           </div>
         </div>
 
@@ -258,61 +373,22 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
             label="Show attendant only"
           />
 
-          {registrations
-            ?.filter((r) => showAttendantOnly === false || r.registrationId)
-            ?.map((reg) => {
-              return (
-                <div
-                  key={reg.playerId}
-                  className="grid grid-cols-3 items-center justify-center gap-x-2 rounded from-green-300 to-green-50 px-2 py-2 align-middle transition-all odd:bg-slate-50 hover:bg-gradient-to-r"
-                >
-                  <span className={cx({ "font-bold": !!reg.registrationId })}>
-                    {reg.playerName || reg.email}
-                  </span>
-                  <div>
-                    {!!reg.registrationId ? (
-                      <ToggleButton
-                        isActive={true}
-                        isLoading={unregMut.isPending}
-                        activeColor="pink"
-                        onClick={() => unregMut.mutate(reg.registrationId)}
-                        icon={<IoHeartCircle />}
-                      />
-                    ) : (
-                      <ToggleButton
-                        isActive={false}
-                        isLoading={regMut.isPending}
-                        activeColor="pink"
-                        onClick={() =>
-                          regMut.mutate({
-                            matchId: match.matchId,
-                            playerId: reg.playerId,
-                          })
-                        }
-                        icon={<IoHeartCircle />}
-                      />
-                    )}
-                  </div>
-                  {!!reg.registrationId ? (
-                    <div>
-                      <ToggleButton
-                        activeColor="green"
-                        isActive={reg.isPaid}
-                        isLoading={unpaidMut.isPending || paidMut.isPending}
-                        onClick={() =>
-                          reg.isPaid
-                            ? unpaidMut.mutate(reg.registrationId)
-                            : paidMut.mutate(reg.registrationId)
-                        }
-                        icon={<IconCurrencyPound />}
-                      />
-                    </div>
-                  ) : (
-                    <ToggleButton disabled={true} />
-                  )}
-                </div>
-              );
-            })}
+          {isLoadingRegistrations ? (
+            <div className="space-y-2">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} height={40} />
+              ))}
+            </div>
+          ) : (
+            <List
+              height={400}
+              itemCount={filteredRegistrations.length}
+              itemSize={50}
+              width="100%"
+            >
+              {renderRegistrationRow}
+            </List>
+          )}
         </div>
       </div>
 
@@ -327,4 +403,4 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
   );
 };
 
-export default MatchListContent;
+export default React.memo(MatchListContent);

@@ -4,6 +4,10 @@ import {
   NumberInput,
   Table,
   TextInput,
+  Paper,
+  Group,
+  Text,
+  Stack,
 } from "@mantine/core";
 import React, { useRef, useState } from "react";
 import { FiPlusCircle, FiTrash2 } from "react-icons/fi";
@@ -48,59 +52,87 @@ const AdditionalCostEditor: React.FC<Props> = ({ onSaveClick }) => {
   };
 
   return (
-    <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-      <div className="flex items-center gap-2">
-        <TextInput
-          ref={nameRef}
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.currentTarget.value)}
-        />
-        <NumberInput
-          value={amount}
-          placeholder="Amount"
-          onChange={(e) => setAmount(+e)}
-        />
-        <ActionIcon variant="light" type="submit" size="lg">
-          <FiPlusCircle />
-        </ActionIcon>
-      </div>
-      <div>
-        <Table>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Amount</Table.Th>
-              <Table.Th></Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {costs.map((item) => (
-              <Table.Tr key={item.id}>
-                <Table.Td>{item.description}</Table.Td>
-                <Table.Td>£{item.amount}</Table.Td>
-                <Table.Td align="right">
-                  <ActionIcon
-                    variant="outline"
-                    color="red"
-                    onClick={() => handleRemove(item.id)}
-                  >
-                    <FiTrash2 />
-                  </ActionIcon>
-                </Table.Td>
+    <Paper shadow="sm" p="md" radius="md" withBorder>
+      <Stack gap="md">
+        <form onSubmit={handleSubmit}>
+          <Group align="flex-end" gap="sm">
+            <TextInput
+              ref={nameRef}
+              placeholder="Description"
+              value={description}
+              onChange={(e) => setDescription(e.currentTarget.value)}
+              label="Description"
+              size="md"
+              style={{ flex: 1 }}
+            />
+            <NumberInput
+              value={amount}
+              placeholder="Amount"
+              onChange={(e) => setAmount(+e)}
+              label="Amount"
+              size="md"
+              min={0}
+              decimalScale={2}
+              leftSection="£"
+              style={{ width: 150 }}
+            />
+            <ActionIcon
+              variant="filled"
+              type="submit"
+              size="lg"
+              color="blue"
+              className="mb-1"
+            >
+              <FiPlusCircle size={18} />
+            </ActionIcon>
+          </Group>
+        </form>
+
+        {costs.length > 0 ? (
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Description</Table.Th>
+                <Table.Th style={{ width: 150 }}>Amount</Table.Th>
+                <Table.Th style={{ width: 50 }}></Table.Th>
               </Table.Tr>
-            ))}
-          </Table.Tbody>
-        </Table>
-      </div>
-      <Button
-        onClick={handleSave}
-        disabled={costs.length === 0}
-        leftSection={<IoSave />}
-      >
-        Save changes
-      </Button>
-    </form>
+            </Table.Thead>
+            <Table.Tbody>
+              {costs.map((item) => (
+                <Table.Tr key={item.id}>
+                  <Table.Td>{item.description}</Table.Td>
+                  <Table.Td>£{item.amount.toFixed(2)}</Table.Td>
+                  <Table.Td align="right">
+                    <ActionIcon
+                      variant="subtle"
+                      color="red"
+                      onClick={() => handleRemove(item.id)}
+                    >
+                      <FiTrash2 size={16} />
+                    </ActionIcon>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        ) : (
+          <Text c="dimmed" ta="center" py="xl">
+            No additional costs added yet
+          </Text>
+        )}
+
+        <Group justify="flex-end">
+          <Button
+            onClick={handleSave}
+            disabled={costs.length === 0}
+            leftSection={<IoSave size={18} />}
+            size="md"
+          >
+            Save changes
+          </Button>
+        </Group>
+      </Stack>
+    </Paper>
   );
 };
 
