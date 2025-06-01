@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import cx from "clsx";
 import { FC, ReactNode, Suspense, useState } from "react";
-import { Navigate, NavLink, Outlet } from "react-router-dom";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
 import AppLoading from "@/components/loading/app-loading";
 import SectionLoading from "@/components/loading/section-loading";
 import LogoutButton from "@/components/auth/logout-button";
@@ -9,15 +9,17 @@ import UserProfile from "@/components/profile";
 
 import {
   IoBarChart,
-  IoBasketball,
-  IoCafe,
   IoChevronBackCircle,
-  IoDocumentText,
-  IoPersonAdd,
-  IoPeople,
   IoSettings,
-  IoStorefront,
   IoChevronDown,
+  IoStatsChart,
+  IoCalendar,
+  IoFootball,
+  IoShirt,
+  IoPerson,
+  IoList,
+  IoBusiness,
+  IoSpeedometer,
 } from "react-icons/io5";
 import { Text } from "@mantine/core";
 
@@ -37,6 +39,16 @@ interface NavItemProps {
 const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
   const [expanded, setExpanded] = useState(false);
   const hasChildren = item.childItems && item.childItems.length > 0;
+  const location = useLocation();
+
+  const isActive = (path?: string) => {
+    if (!path) return false;
+    return (
+      location.pathname === path || location.pathname.startsWith(`${path}/`)
+    );
+  };
+
+  const hasActiveChild = item.childItems?.some((child) => isActive(child.path));
 
   const handleClick = (e: React.MouseEvent) => {
     if (hasChildren) {
@@ -51,7 +63,8 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
       <div
         className={cx(
           "flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
-          "hover:bg-blue-600/80 hover:shadow-lg [&.active]:bg-blue-600 [&.active]:shadow-lg",
+          "hover:bg-blue-600/80 hover:shadow-lg",
+          (isActive(item.path) || hasActiveChild) && "bg-blue-600 shadow-lg",
           level > 0 && "ml-4",
           !showLabel && "justify-center px-2",
         )}
@@ -79,7 +92,9 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
         ) : (
           <NavLink
             to={item.path || "#"}
-            className="flex w-full items-center gap-3"
+            className={({ isActive }) =>
+              cx("flex w-full items-center gap-3", isActive && "text-white")
+            }
           >
             <span className="text-xl text-blue-100">{item.icon}</span>
             {item.label && showLabel && (
@@ -112,49 +127,49 @@ function AdminLayout() {
     {
       label: "Dashboard",
       path: "/admin/dashboard",
-      icon: <IoBarChart />,
+      icon: <IoSpeedometer />,
     },
     {
       label: "Sports",
-      icon: <IoBasketball />,
+      icon: <IoFootball />,
       childItems: [
         {
           label: "Matches",
           path: "/admin/matches",
-          icon: <IoBasketball />,
+          icon: <IoCalendar />,
         },
         {
           label: "Teams",
           path: "/admin/teams",
-          icon: <IoPeople />,
+          icon: <IoShirt />,
         },
         {
           label: "Players",
           path: "/admin/players",
-          icon: <IoPersonAdd />,
+          icon: <IoPerson />,
         },
       ],
     },
     {
       label: "Management",
-      icon: <IoDocumentText />,
+      icon: <IoStatsChart />,
       childItems: [
         {
           label: "Reports",
           path: "/admin/reports",
-          icon: <IoDocumentText />,
+          icon: <IoBarChart />,
         },
         {
           label: "Requests",
           path: "/admin/requests",
-          icon: <IoCafe />,
+          icon: <IoList />,
         },
       ],
     },
     {
       label: "Sport Centers",
       path: "/admin/sportcenters",
-      icon: <IoStorefront />,
+      icon: <IoBusiness />,
     },
     {
       label: "Settings",
@@ -184,8 +199,13 @@ function AdminLayout() {
           collapsed && "w-20",
         )}
       >
-        <div className="flex flex-1 flex-col">
-          <div className="flex items-center justify-center gap-2 p-2">
+        <div
+          className={cx(
+            "flex flex-1 flex-col",
+            collapsed ? "items-center" : "",
+          )}
+        >
+          <div className="flex items-center gap-2 p-2">
             <img
               src="/logo.svg"
               alt="Racket"
@@ -196,7 +216,7 @@ function AdminLayout() {
             />
             {!collapsed && (
               <Text size="xl" fw={700} className="text-white">
-                Racket
+                RACKET Console
               </Text>
             )}
           </div>
