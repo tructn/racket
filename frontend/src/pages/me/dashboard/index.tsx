@@ -173,104 +173,115 @@ function MeDashboard() {
           </Button>
         </div>
 
-        <Stack gap="md">
-          {availableMatches.map((match) => (
-            <Paper key={match.matchId} shadow="sm" p="md" withBorder>
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div className="flex-1">
-                  <Group mb="xs">
-                    <Badge color="green">Available</Badge>
-                    <Text fw={500} size="lg">
-                      {dayjs(match.start).format("ddd DD MMM, YYYY")}
-                    </Text>
-                  </Group>
+        {!availableMatches || availableMatches.length === 0 ? (
+          <div className="rounded-lg bg-slate-50 px-5 py-12 text-center">
+            <div className="text-xl font-bold text-slate-600">
+              No Matches Available
+            </div>
+            <p className="mt-1 text-sm text-slate-500">
+              There are no upcoming matches at the moment
+            </p>
+          </div>
+        ) : (
+          <Stack gap="md">
+            {availableMatches.map((match) => (
+              <Paper key={match.matchId} shadow="sm" p="md" withBorder>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex-1">
+                    <Group mb="xs">
+                      <Badge color="green">Available</Badge>
+                      <Text fw={500} size="lg">
+                        {dayjs(match.start).format("ddd DD MMM, YYYY")}
+                      </Text>
+                    </Group>
 
-                  <div className="flex flex-wrap gap-6">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
-                        <IoLocation className="text-blue-600" size={16} />
+                    <div className="flex flex-wrap gap-6">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoLocation className="text-blue-600" size={16} />
+                        </div>
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Location
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            {match.sportCenterName} - {match.court}
+                          </Text>
+                        </div>
                       </div>
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Location
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          {match.sportCenterName} - {match.court}
-                        </Text>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
-                        <IoPeople className="text-blue-600" size={16} />
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoPeople className="text-blue-600" size={16} />
+                        </div>
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Players
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            {match.playerCount}
+                          </Text>
+                        </div>
                       </div>
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Players
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          {match.playerCount}
-                        </Text>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
-                        <IoTime className="text-blue-600" size={16} />
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoTime className="text-blue-600" size={16} />
+                        </div>
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Time
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            {dayjs(match.start).format("HH:mm")} -{" "}
+                            {dayjs(match.end).format("HH:mm")}
+                          </Text>
+                        </div>
                       </div>
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Time
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          {dayjs(match.start).format("HH:mm")} -{" "}
-                          {dayjs(match.end).format("HH:mm")}
-                        </Text>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
-                        <IoWallet className="text-blue-600" size={16} />
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoWallet className="text-blue-600" size={16} />
+                        </div>
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Total Cost
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            <Currency value={match.cost} />
+                          </Text>
+                        </div>
                       </div>
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Total Cost
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          <Currency value={match.cost} />
-                        </Text>
-                      </div>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
-                        <IoWallet className="text-blue-600" size={16} />
-                      </div>
-                      <div>
-                        <Text size="xs" c="dimmed">
-                          Your Share
-                        </Text>
-                        <Text size="sm" fw={500}>
-                          <Currency value={match.individualCost} />
-                        </Text>
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoWallet className="text-blue-600" size={16} />
+                        </div>
+                        <div>
+                          <Text size="xs" c="dimmed">
+                            Your Share
+                          </Text>
+                          <Text size="sm" fw={500}>
+                            <Currency value={match.individualCost} />
+                          </Text>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    color="pink"
-                    onClick={() => handleBookNow(match.matchId)}
-                  >
-                    Book Now
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      color="pink"
+                      onClick={() => handleBookNow(match.matchId)}
+                    >
+                      Book Now
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Paper>
-          ))}
-        </Stack>
+              </Paper>
+            ))}
+          </Stack>
+        )}
       </Card>
     </Container>
   );
