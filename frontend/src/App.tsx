@@ -11,6 +11,7 @@ import Landing from "@/pages/landing";
 import AdminLayout from "@/components/layout/admin";
 import AnonymousLayout from "@/components/layout/anonymous";
 import MeLayout from "@/components/layout/me";
+import ComingSoon from "./pages/comming-soon";
 
 const DashboardScreen = lazy(() => import("@/pages/admin/dashboard"));
 const MatchesScreen = lazy(() => import("@/pages/admin/matches"));
@@ -60,7 +61,6 @@ function App() {
 
   return (
     <MantineProvider theme={theme}>
-      <Notifications position="top-right" />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/admin" element={<AdminLayout />}>
@@ -90,6 +90,7 @@ function App() {
             element={<PublicOutstandingReportV2 />}
           />
         </Route>
+        <Route path="/coming-soon" element={<ComingSoon />} />
         <Route path="*" element={<PageNotFoundScreen />} />
       </Routes>
     </MantineProvider>

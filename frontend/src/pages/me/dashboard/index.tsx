@@ -20,96 +20,65 @@ import {
   IoThumbsDown,
   IoApps,
   IoGolf,
+  IoTime,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { useClaims } from "@/hooks/useClaims";
+import { useQuery } from "@tanstack/react-query";
+import { useApi } from "@/hooks/useApi";
+import Currency from "@/components/currency";
+import { notifications } from "@mantine/notifications";
+import SectionLoading from "@/components/loading/section-loading";
 
 interface Match {
-  id: string;
-  location: string;
-  price: number;
-  team: string;
-  date: string;
-  time: string;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
-  status: "available" | "booked" | "pending";
+  matchId: number;
+  start: string;
+  end: string;
+  sportCenterName: string;
+  sportCenterId: number;
+  costPerSection: number;
+  minutePerSection: number;
+  individualCost: number;
+  cost: number;
+  additionalCost: number;
+  court: string;
+  customSection: string | null;
+  playerCount: number;
+  registrationIds: number[];
 }
 
 function MeDashboard() {
   const { user } = useAuth0();
   const navigate = useNavigate();
   const { isAdmin, isLoading: isClaimsLoading } = useClaims();
+  const { get } = useApi();
 
-  // Mock data - replace with actual API call
-  const availableMatches: Match[] = [
-    {
-      id: "1",
-      location: "Sports Center A - Court 1",
-      price: 50,
-      team: "Team Alpha",
-      date: "2024-03-20",
-      time: "18:00 - 20:00",
-      contactName: "John Smith",
-      contactPhone: "+1 234 567 890",
-      contactEmail: "john@example.com",
-      status: "available",
-    },
-    {
-      id: "2",
-      location: "Sports Center B - Court 2",
-      price: 45,
-      team: "Team Beta",
-      date: "2024-03-21",
-      time: "19:00 - 21:00",
-      contactName: "Sarah Johnson",
-      contactPhone: "+1 234 567 891",
-      contactEmail: "sarah@example.com",
-      status: "available",
-    },
-    {
-      id: "3",
-      location: "Sports Center C - Court 3",
-      price: 55,
-      team: "Team Gamma",
-      date: "2024-03-22",
-      time: "17:00 - 19:00",
-      contactName: "Mike Brown",
-      contactPhone: "+1 234 567 892",
-      contactEmail: "mike@example.com",
-      status: "available",
-    },
-  ];
+  const { data: availableMatches = [], isLoading: isMatchesLoading } = useQuery<
+    Match[]
+  >({
+    queryKey: ["upcoming-matches"],
+    queryFn: () => get<Match[]>("api/v1/upcoming-matches"),
+  });
 
-  const getStatusColor = (status: Match["status"]): string => {
-    switch (status) {
-      case "available":
-        return "green";
-      case "booked":
-        return "red";
-      case "pending":
-        return "yellow";
-      default:
-        return "gray";
-    }
-  };
-
-  const handleViewDetails = (matchId: string) => {
-    navigate(`/me/matches/${matchId}`);
-  };
-
-  const handleBookNow = (matchId: string) => {
-    navigate(`/me/bookings/new?matchId=${matchId}`);
+  const handleBookNow = (matchId: number) => {
+    notifications.show({
+      title: "Coming Soon",
+      message: "This feature is coming soon!",
+      color: "pink",
+    });
   };
 
   const handleNotInterested = () => {
-    navigate("/me/bookings");
+    notifications.show({
+      title: "Coming Soon",
+      message: "This feature is coming soon!",
+      color: "blue",
+    });
   };
 
-  if (isClaimsLoading) {
-    return null; // Or return a loading spinner
+  if (isClaimsLoading || isMatchesLoading) {
+    return <SectionLoading />;
   }
 
   return (
@@ -149,7 +118,7 @@ function MeDashboard() {
             shadow="sm"
             p="md"
             className="h-full cursor-pointer transition-shadow hover:shadow-md"
-            onClick={() => navigate("/me/requests")}
+            onClick={() => navigate("/coming-soon")}
           >
             <div className="flex items-center gap-3">
               <IoGolf className="text-blue-600" size={24} />
@@ -170,7 +139,7 @@ function MeDashboard() {
             shadow="sm"
             p="md"
             className="h-full cursor-pointer transition-shadow hover:shadow-md"
-            onClick={() => navigate("/me/wallet")}
+            onClick={() => navigate("/coming-soon")}
           >
             <div className="flex items-center gap-3">
               <IoWallet className="text-blue-600" size={24} />
@@ -206,55 +175,95 @@ function MeDashboard() {
 
         <Stack gap="md">
           {availableMatches.map((match) => (
-            <Paper key={match.id} shadow="sm" p="md" withBorder>
+            <Paper key={match.matchId} shadow="sm" p="md" withBorder>
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex-1">
                   <Group mb="xs">
-                    <Badge color={getStatusColor(match.status)}>
-                      {match.status.charAt(0).toUpperCase() +
-                        match.status.slice(1)}
-                    </Badge>
+                    <Badge color="green">Available</Badge>
                     <Text fw={500} size="lg">
-                      {dayjs(match.date).format("MMMM D, YYYY")} - {match.time}
+                      {dayjs(match.start).format("ddd DD MMM, YYYY")}
                     </Text>
                   </Group>
 
-                  <Group gap="xl" mb="xs">
-                    <Group gap="xs">
-                      <IoLocation className="text-blue-600" size={16} />
-                      <Text size="sm">{match.location}</Text>
-                    </Group>
-                    <Group gap="xs">
-                      <IoPeople className="text-blue-600" size={16} />
-                      <Text size="sm">{match.team}</Text>
-                    </Group>
-                    <Group gap="xs">
-                      <IoWallet className="text-blue-600" size={16} />
-                      <Text size="sm">${match.price}</Text>
-                    </Group>
-                  </Group>
+                  <div className="flex flex-wrap gap-6">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <IoLocation className="text-blue-600" size={16} />
+                      </div>
+                      <div>
+                        <Text size="xs" c="dimmed">
+                          Location
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          {match.sportCenterName} - {match.court}
+                        </Text>
+                      </div>
+                    </div>
 
-                  <Group gap="xl">
-                    <Group gap="xs">
-                      <IoCall className="text-blue-600" size={16} />
-                      <Text size="sm">{match.contactPhone}</Text>
-                    </Group>
-                    <Group gap="xs">
-                      <IoMail className="text-blue-600" size={16} />
-                      <Text size="sm">{match.contactEmail}</Text>
-                    </Group>
-                  </Group>
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <IoPeople className="text-blue-600" size={16} />
+                      </div>
+                      <div>
+                        <Text size="xs" c="dimmed">
+                          Players
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          {match.playerCount}
+                        </Text>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <IoTime className="text-blue-600" size={16} />
+                      </div>
+                      <div>
+                        <Text size="xs" c="dimmed">
+                          Time
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          {dayjs(match.start).format("HH:mm")} -{" "}
+                          {dayjs(match.end).format("HH:mm")}
+                        </Text>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <IoWallet className="text-blue-600" size={16} />
+                      </div>
+                      <div>
+                        <Text size="xs" c="dimmed">
+                          Total Cost
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          <Currency value={match.cost} />
+                        </Text>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <IoWallet className="text-blue-600" size={16} />
+                      </div>
+                      <div>
+                        <Text size="xs" c="dimmed">
+                          Your Share
+                        </Text>
+                        <Text size="sm" fw={500}>
+                          <Currency value={match.individualCost} />
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex gap-2">
                   <Button
-                    variant="light"
-                    color="blue"
-                    onClick={() => handleViewDetails(match.id)}
+                    color="pink"
+                    onClick={() => handleBookNow(match.matchId)}
                   >
-                    View Details
-                  </Button>
-                  <Button color="blue" onClick={() => handleBookNow(match.id)}>
                     Book Now
                   </Button>
                 </div>

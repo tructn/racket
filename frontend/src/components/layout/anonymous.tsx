@@ -21,7 +21,11 @@ function AnonymousLayout() {
           </motion.div>
 
           <Group>
-            <Button variant="gradient" onClick={() => loginWithRedirect()}>
+            <Button
+              variant="filled"
+              color="pink"
+              onClick={() => loginWithRedirect()}
+            >
               Login
             </Button>
           </Group>
