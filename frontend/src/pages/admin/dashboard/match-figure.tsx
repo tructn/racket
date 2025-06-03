@@ -26,39 +26,39 @@ const MatchFigure: React.FC<Prop> = ({
   const getGradientColors = (color: Prop["color"]) => {
     switch (color) {
       case "blue":
-        return "from-blue-50 to-blue-100";
+        return "from-slate-50 to-slate-100";
       case "sky":
-        return "from-sky-50 to-sky-100";
+        return "from-slate-50 to-slate-100";
       case "cyan":
-        return "from-cyan-50 to-cyan-100";
+        return "from-slate-50 to-slate-100";
       default:
-        return "from-blue-50 to-blue-100";
+        return "from-slate-50 to-slate-100";
     }
   };
 
   const getTextColor = (color: Prop["color"]) => {
     switch (color) {
       case "blue":
-        return "text-blue-700";
+        return "text-slate-700";
       case "sky":
-        return "text-sky-700";
+        return "text-slate-700";
       case "cyan":
-        return "text-cyan-700";
+        return "text-slate-700";
       default:
-        return "text-blue-700";
+        return "text-slate-700";
     }
   };
 
   const getIconColor = (color: Prop["color"]) => {
     switch (color) {
       case "blue":
-        return "text-blue-600";
+        return "text-slate-600";
       case "sky":
-        return "text-sky-600";
+        return "text-slate-600";
       case "cyan":
-        return "text-cyan-600";
+        return "text-slate-600";
       default:
-        return "text-blue-600";
+        return "text-slate-600";
     }
   };
 
