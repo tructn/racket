@@ -72,8 +72,6 @@ func AuthRequired() gin.HandlerFunc {
 	}
 
 	errorHandler := func(w http.ResponseWriter, r *http.Request, err error) {
-		log.Printf("Encountered error while validating JWT: %v", err)
-
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
@@ -103,8 +101,6 @@ func AuthRequired() gin.HandlerFunc {
 					return
 				}
 
-				log.Printf("auth header: %v", authHeader)
-
 				validatedClaims, ok := token.(*validator.ValidatedClaims)
 				if !ok {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid claims"})
@@ -116,8 +112,6 @@ func AuthRequired() gin.HandlerFunc {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid custom claims"})
 					return
 				}
-
-				log.Printf("validatedClaims: %v", validatedClaims)
 
 				c.Set("user", map[string]interface{}{
 					"sub": validatedClaims.RegisteredClaims.Subject,

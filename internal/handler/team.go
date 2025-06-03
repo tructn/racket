@@ -18,20 +18,20 @@ func NewTeamHandler(teamService *service.TeamService) *TeamHandler {
 	return &TeamHandler{teamService: teamService}
 }
 
-func (h *TeamHandler) UseTeamRouter(router *gin.RouterGroup) {
+func (h *TeamHandler) UseRouter(router *gin.RouterGroup) {
 	teams := router.Group("/teams")
 	{
-		teams.GET("", h.GetTeams)
-		teams.POST("", h.CreateTeam)
-		teams.GET(":id", h.GetTeam)
-		teams.PUT(":id", h.UpdateTeam)
-		teams.DELETE(":id", h.DeleteTeam)
-		teams.POST(":id/members", h.AddPlayer)
-		teams.DELETE(":id/members/:playerId", h.RemovePlayer)
+		teams.GET("", h.getTeams)
+		teams.POST("", h.createTeam)
+		teams.GET(":id", h.getTeam)
+		teams.PUT(":id", h.updateTeam)
+		teams.DELETE(":id", h.deleteTeam)
+		teams.POST(":id/members", h.addPlayer)
+		teams.DELETE(":id/members/:playerId", h.removePlayer)
 	}
 }
 
-func (h *TeamHandler) GetTeams(c *gin.Context) {
+func (h *TeamHandler) getTeams(c *gin.Context) {
 	teams, err := h.teamService.GetTeams(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -41,7 +41,7 @@ func (h *TeamHandler) GetTeams(c *gin.Context) {
 	c.JSON(http.StatusOK, teams)
 }
 
-func (h *TeamHandler) CreateTeam(c *gin.Context) {
+func (h *TeamHandler) createTeam(c *gin.Context) {
 	var req dto.CreateTeamRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -59,7 +59,7 @@ func (h *TeamHandler) CreateTeam(c *gin.Context) {
 	c.JSON(http.StatusCreated, team)
 }
 
-func (h *TeamHandler) GetTeam(c *gin.Context) {
+func (h *TeamHandler) getTeam(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
@@ -76,7 +76,7 @@ func (h *TeamHandler) GetTeam(c *gin.Context) {
 	c.JSON(http.StatusOK, team)
 }
 
-func (h *TeamHandler) UpdateTeam(c *gin.Context) {
+func (h *TeamHandler) updateTeam(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
@@ -98,7 +98,7 @@ func (h *TeamHandler) UpdateTeam(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *TeamHandler) DeleteTeam(c *gin.Context) {
+func (h *TeamHandler) deleteTeam(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
@@ -114,7 +114,7 @@ func (h *TeamHandler) DeleteTeam(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *TeamHandler) AddPlayer(c *gin.Context) {
+func (h *TeamHandler) addPlayer(c *gin.Context) {
 	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})
@@ -136,7 +136,7 @@ func (h *TeamHandler) AddPlayer(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func (h *TeamHandler) RemovePlayer(c *gin.Context) {
+func (h *TeamHandler) removePlayer(c *gin.Context) {
 	teamID, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid team ID"})

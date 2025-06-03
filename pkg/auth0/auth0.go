@@ -1,4 +1,4 @@
-package auth
+package auth0
 
 import (
 	"encoding/json"
@@ -18,7 +18,7 @@ var (
 	AUTH0_CLIENT_SECRET string
 )
 
-type Auth0User struct {
+type AuthUser struct {
 	UserID      string `json:"user_id"`
 	Email       string `json:"email"`
 	Name        string `json:"name"`
@@ -47,23 +47,31 @@ func init() {
 	}
 }
 
-func GetAuth0Users() ([]Auth0User, error) {
-	token, err := getToken(AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET)
+func GetUsers() ([]AuthUser, error) {
+
+	log.Printf("Domain: %s", AUTH0_DOMAIN)
+	log.Printf("Client ID: %s", AUTH0_CLIENT_ID)
+	log.Printf("Client Secret: %s", AUTH0_CLIENT_SECRET)
+
+	token, err := getAuth0AccessToken(AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET)
 
 	if err != nil {
-		log.Printf("error getting token: %v", err)
 		return nil, err
 	}
 
-	users, err := getUsers(AUTH0_DOMAIN, token)
+	users, err := getAuth0Users(AUTH0_DOMAIN, token)
+
 	if err != nil {
+		log.Printf("Error getting users: %v", err)
 		return nil, err
 	}
+
+	log.Printf("Users: %v", users)
 
 	return users, nil
 }
 
-func getToken(domain, clientId, clientSecret string) (string, error) {
+func getAuth0AccessToken(domain, clientId, clientSecret string) (string, error) {
 	url := fmt.Sprintf("https://%s/oauth/token", domain)
 
 	payload := strings.NewReader(fmt.Sprintf(`{
@@ -82,6 +90,7 @@ func getToken(domain, clientId, clientSecret string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get access token: %w", err)
 	}
+
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
@@ -89,23 +98,23 @@ func getToken(domain, clientId, clientSecret string) (string, error) {
 		return "", fmt.Errorf("failed to read response: %w", err)
 	}
 
-	var tokenResponse struct {
+	var tokenModel struct {
 		AccessToken string `json:"access_token"`
 		TokenType   string `json:"token_type"`
 	}
 
-	if err := json.Unmarshal(body, &tokenResponse); err != nil {
+	if err := json.Unmarshal(body, &tokenModel); err != nil {
 		return "", fmt.Errorf("failed to parse token response: %w", err)
 	}
 
-	if tokenResponse.AccessToken == "" {
+	if tokenModel.AccessToken == "" {
 		return "", fmt.Errorf("no access token in response")
 	}
 
-	return tokenResponse.AccessToken, nil
+	return tokenModel.AccessToken, nil
 }
 
-func getUsers(domain, token string) ([]Auth0User, error) {
+func getAuth0Users(domain, token string) ([]AuthUser, error) {
 	url := fmt.Sprintf("https://%s/api/v2/users", domain)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -116,8 +125,11 @@ func getUsers(domain, token string) ([]Auth0User, error) {
 	req.Header.Set("Accept", "application/json")
 
 	client := &http.Client{}
+
 	res, err := client.Do(req)
+
 	if err != nil {
+		log.Printf("Error: %v", err)
 		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
 	defer res.Body.Close()
@@ -127,10 +139,7 @@ func getUsers(domain, token string) ([]Auth0User, error) {
 		return nil, fmt.Errorf("failed to read users response: %w", err)
 	}
 
-	// Log response for debugging
-	log.Printf("Auth0 users response: %s", string(body))
-
-	var users []Auth0User
+	var users []AuthUser
 	if err := json.Unmarshal(body, &users); err != nil {
 		return nil, fmt.Errorf("failed to parse users response: %w", err)
 	}

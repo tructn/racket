@@ -1,4 +1,4 @@
-import { Button, Container, Group, Text, Title } from "@mantine/core";
+import { Button, Container, Group, Text } from "@mantine/core";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
@@ -9,7 +9,7 @@ function AnonymousLayout() {
   const { loginWithRedirect } = useAuth0();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <header className="fixed top-0 z-50 w-full bg-white/90 shadow-sm backdrop-blur-lg">
         <Container size="lg" className="flex h-16 items-center justify-between">
@@ -17,29 +17,19 @@ function AnonymousLayout() {
             whileHover={{ scale: 1.05 }}
             className="flex items-center gap-2"
           >
-            <img src="/logo.svg" alt="Racket" className="h-8" />
-            <Title order={3} className="text-blue-600">
-              Racket
-            </Title>
+            <img src="/logo.svg" alt="Racket" className="h-16" />
           </motion.div>
 
           <Group>
-            <Button
-              variant="light"
-              color="blue"
-              onClick={() => loginWithRedirect()}
-            >
-              Sign In
-            </Button>
-            <Button color="blue" onClick={() => loginWithRedirect()}>
-              Get Started
+            <Button variant="gradient" onClick={() => loginWithRedirect()}>
+              Login
             </Button>
           </Group>
         </Container>
       </header>
 
       {/* Main Content */}
-      <main className="pt-16">
+      <main className="flex-1 pt-16">
         <Suspense fallback={<SectionLoading />}>
           <Outlet />
         </Suspense>

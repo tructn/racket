@@ -67,7 +67,7 @@ export default function UnpaidReport() {
 
   async function shareToEveryOne() {
     const res = await httpService.post("api/v1/share-codes/urls", {
-      url: `${window.location.origin}/public/outstanding-report`,
+      url: `${window.location.origin}/anonymous/outstanding-report`,
     });
     setShareCodeUrl(res.fullUrl);
     openShareCodeResult();
