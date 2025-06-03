@@ -21,6 +21,7 @@ var (
 type AuthUser struct {
 	UserID      string `json:"user_id"`
 	Email       string `json:"email"`
+	MaskedEmail string `json:"masked_email"`
 	Name        string `json:"name"`
 	Picture     string `json:"picture"`
 	LastLogin   string `json:"last_login"`
@@ -49,10 +50,6 @@ func init() {
 
 func GetUsers() ([]AuthUser, error) {
 
-	log.Printf("Domain: %s", AUTH0_DOMAIN)
-	log.Printf("Client ID: %s", AUTH0_CLIENT_ID)
-	log.Printf("Client Secret: %s", AUTH0_CLIENT_SECRET)
-
 	token, err := getAuth0AccessToken(AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET)
 
 	if err != nil {
@@ -65,8 +62,6 @@ func GetUsers() ([]AuthUser, error) {
 		log.Printf("Error getting users: %v", err)
 		return nil, err
 	}
-
-	log.Printf("Users: %v", users)
 
 	return users, nil
 }
@@ -114,6 +109,25 @@ func getAuth0AccessToken(domain, clientId, clientSecret string) (string, error) 
 	return tokenModel.AccessToken, nil
 }
 
+func maskEmail(email string) string {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return email
+	}
+
+	username := parts[0]
+	domain := parts[1]
+
+	// If username is 2 or fewer characters, just show first character
+	if len(username) <= 2 {
+		return username[:1] + "***@" + domain
+	}
+
+	// Show first 2 characters and last character of username
+	maskedUsername := username[:2] + "***" + username[len(username)-1:]
+	return maskedUsername + "@" + domain
+}
+
 func getAuth0Users(domain, token string) ([]AuthUser, error) {
 	url := fmt.Sprintf("https://%s/api/v2/users", domain)
 	req, err := http.NewRequest("GET", url, nil)
@@ -142,6 +156,13 @@ func getAuth0Users(domain, token string) ([]AuthUser, error) {
 	var users []AuthUser
 	if err := json.Unmarshal(body, &users); err != nil {
 		return nil, fmt.Errorf("failed to parse users response: %w", err)
+	}
+
+	// Add masked email for each user
+	for i := range users {
+		users[i].MaskedEmail = maskEmail(users[i].Email)
+		// Clear the original email
+		users[i].Email = ""
 	}
 
 	return users, nil

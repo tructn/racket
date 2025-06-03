@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 type Auth0User = {
   user_id: string;
   email: string;
+  masked_email: string;
   name: string;
   picture?: string;
   last_login?: string;
@@ -29,7 +30,7 @@ const useAuth0Users = () => {
       return data.map((user) => ({
         id: user.user_id,
         idpUserId: user.user_id,
-        email: user.email,
+        email: user.masked_email,
         firstName: user.name?.split(" ")[0] || "",
         lastName: user.name?.split(" ")[1] || "",
         picture: user.picture,
