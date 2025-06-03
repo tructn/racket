@@ -218,18 +218,29 @@ function AdminLayout() {
               collapsed && "justify-center",
             )}
           >
-            <img
-              src="/logo.svg"
-              alt="Racket"
-              className={cx(
-                "transition-transform duration-300 hover:scale-110",
-                collapsed ? "h-16 w-16" : "h-20 w-20",
-              )}
-            />
-            {!collapsed && (
-              <Text size="lg" fw={700} className="text-white">
-                Admin Panel
-              </Text>
+            {!collapsed ? (
+              <>
+                <img
+                  src="/logo.svg"
+                  alt="Racket"
+                  className="h-20 w-20 transition-transform duration-300 hover:scale-110"
+                />
+                <Text size="lg" fw={700} className="text-white">
+                  Admin Panel
+                </Text>
+              </>
+            ) : (
+              <button
+                onClick={toggleSideNav}
+                className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600/20 p-2 text-xl text-white transition-all duration-300 hover:bg-blue-600/40 hover:shadow-md"
+              >
+                <IoChevronBackCircle
+                  className={cx(
+                    "transition-transform duration-300",
+                    collapsed && "rotate-180",
+                  )}
+                />
+              </button>
             )}
           </div>
           <div className={cx("flex flex-col p-4", collapsed && "items-center")}>
@@ -240,17 +251,19 @@ function AdminLayout() {
               <NavItem key={index} item={item} showLabel={!collapsed} />
             ))}
           </div>
-          <button
-            onClick={toggleSideNav}
-            className="absolute -right-3 top-4 hidden rounded-full border-2 border-blue-500 bg-white p-1 text-lg text-blue-500 shadow-lg ring-2 ring-blue-500/20 transition-all duration-300 hover:scale-110 hover:shadow-xl group-hover:block"
-          >
-            <IoChevronBackCircle
-              className={cx(
-                "transition-transform duration-300",
-                collapsed && "rotate-180",
-              )}
-            />
-          </button>
+          {!collapsed && (
+            <button
+              onClick={toggleSideNav}
+              className="absolute -right-3 top-4 hidden h-8 w-8 items-center justify-center rounded-lg bg-blue-600/20 p-1.5 text-lg text-white transition-all duration-300 hover:bg-blue-600/40 hover:shadow-md group-hover:flex"
+            >
+              <IoChevronBackCircle
+                className={cx(
+                  "transition-transform duration-300",
+                  collapsed && "rotate-180",
+                )}
+              />
+            </button>
+          )}
         </div>
         <div className="border-t border-blue-600/20 p-4">
           <LogoutButton showLabel={!collapsed} />
