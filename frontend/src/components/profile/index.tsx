@@ -2,10 +2,8 @@ import React from "react";
 import SectionLoading from "../loading/section-loading";
 import { useAuth0 } from "@auth0/auth0-react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { ActionIcon, Avatar, Menu, Text, UnstyledButton } from "@mantine/core";
-import { IoPerson, IoLogOut } from "react-icons/io5";
-import LogoutButton from "../auth/logout-button";
-import cx from "clsx";
+import { Avatar, Menu, Text, UnstyledButton } from "@mantine/core";
+import { IoPerson, IoLogOut, IoPieChart } from "react-icons/io5";
 
 interface UserProfileProp {
   showLabel: boolean;
@@ -78,6 +76,12 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
             onClick={() => navigate("/admin/profile")}
           >
             Profile
+          </Menu.Item>
+          <Menu.Item
+            leftSection={<IoPieChart size={14} />}
+            onClick={() => navigate("/me")}
+          >
+            My Dashboard
           </Menu.Item>
           <Menu.Divider />
           <Menu.Item

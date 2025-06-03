@@ -4,7 +4,6 @@ import {
   Paper,
   Text,
   Title,
-  Card,
   Group,
   Badge,
   Stack,
@@ -14,13 +13,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 import {
   IoWallet,
   IoLocation,
-  IoCall,
-  IoMail,
   IoPeople,
   IoThumbsDown,
   IoApps,
   IoGolf,
   IoTime,
+  IoCalendar,
+  IoBookmark,
+  IoCloseCircle,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -157,24 +157,32 @@ function MeDashboard() {
       </Grid>
 
       {/* Available Matches Section */}
-      <Card shadow="sm" p="lg" className="mt-8">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="mt-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <Title order={3}>Available Matches</Title>
-            <Text c="dimmed">Find and book your next match</Text>
+            <Title order={3} className="flex items-center gap-2">
+              <IoCalendar className="text-blue-600" size={24} />
+              Available Matches
+            </Title>
+            <Text c="dimmed" className="flex items-center gap-2">
+              <IoBookmark className="text-slate-400" size={16} />
+              Find and book your next match
+            </Text>
           </div>
           <Button
             color="red"
             variant="light"
-            leftSection={<IoThumbsDown />}
+            leftSection={<IoThumbsDown size={18} />}
             onClick={handleNotInterested}
+            className="w-full sm:w-auto"
           >
             Not interested
           </Button>
         </div>
 
         {!availableMatches || availableMatches.length === 0 ? (
-          <div className="rounded-lg bg-slate-50 px-5 py-12 text-center">
+          <div className="rounded-lg bg-slate-50 px-4 py-8 text-center sm:px-5 sm:py-12">
+            <IoCloseCircle size={48} className="mx-auto mb-4 text-slate-400" />
             <div className="text-xl font-bold text-slate-600">
               No Matches Available
             </div>
@@ -186,35 +194,40 @@ function MeDashboard() {
           <Stack gap="md">
             {availableMatches.map((match) => (
               <Paper key={match.matchId} shadow="sm" p="md" withBorder>
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-4">
                   <div className="flex-1">
-                    <Group mb="xs">
-                      <Badge color="green">Available</Badge>
-                      <Text fw={500} size="lg">
+                    <Group mb="xs" wrap="nowrap">
+                      <Badge
+                        color="green"
+                        leftSection={<IoCalendar size={14} />}
+                      >
+                        Available
+                      </Badge>
+                      <Text fw={500} size="lg" className="truncate">
                         {dayjs(match.start).format("ddd DD MMM, YYYY")}
                       </Text>
                     </Group>
 
-                    <div className="flex flex-wrap gap-6">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50">
                           <IoLocation className="text-blue-600" size={16} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text size="xs" c="dimmed">
                             Location
                           </Text>
-                          <Text size="sm" fw={500}>
+                          <Text size="sm" fw={500} className="truncate">
                             {match.sportCenterName} - {match.court}
                           </Text>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50">
                           <IoPeople className="text-blue-600" size={16} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text size="xs" c="dimmed">
                             Players
                           </Text>
@@ -225,10 +238,10 @@ function MeDashboard() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50">
                           <IoTime className="text-blue-600" size={16} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text size="xs" c="dimmed">
                             Time
                           </Text>
@@ -240,10 +253,10 @@ function MeDashboard() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50">
                           <IoWallet className="text-blue-600" size={16} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text size="xs" c="dimmed">
                             Total Cost
                           </Text>
@@ -254,10 +267,10 @@ function MeDashboard() {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50">
                           <IoWallet className="text-blue-600" size={16} />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text size="xs" c="dimmed">
                             Your Share
                           </Text>
@@ -269,10 +282,12 @@ function MeDashboard() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex justify-end">
                     <Button
                       color="pink"
+                      leftSection={<IoBookmark size={18} />}
                       onClick={() => handleBookNow(match.matchId)}
+                      className="w-full sm:w-auto"
                     >
                       Book Now
                     </Button>
@@ -282,7 +297,7 @@ function MeDashboard() {
             ))}
           </Stack>
         )}
-      </Card>
+      </div>
     </Container>
   );
 }

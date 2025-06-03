@@ -2,7 +2,6 @@ import { lazy } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 import { MantineProvider, createTheme } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
