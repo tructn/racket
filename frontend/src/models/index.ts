@@ -47,6 +47,10 @@ export interface RegistrationDetailModel {
 export interface RegistrationModel {
   playerId: number;
   matchId: number;
+  registrationId?: number;
+  playerName?: string;
+  email?: string;
+  isPaid?: boolean;
 }
 
 export interface SportCenterModel {

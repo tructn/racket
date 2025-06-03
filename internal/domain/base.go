@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -9,10 +10,27 @@ import (
 type (
 	BaseModel struct {
 		*gorm.Model
-		ID        uint           `gorm:"primarykey" json:"id"`
-		CreatedAt time.Time      `json:"createdAt"`
-		UpdatedAt time.Time      `json:"updatedAt"`
-		DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt"`
-		TenantID  uint           `json:"tenantId"`
+		ID          uint           `gorm:"primarykey" json:"id"`
+		CreatedByID string         `json:"createdById" gorm:"index"`
+		UpdatedByID *string        `json:"updatedById" gorm:"index"`
+		CreatedAt   time.Time      `json:"createdAt" gorm:"autoCreateTime"`
+		UpdatedAt   time.Time      `json:"updatedAt" gorm:"autoUpdateTime"`
+		DeletedAt   gorm.DeletedAt `json:"deletedAt" gorm:"index"`
 	}
 )
+
+func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
+	log.Println("BeforeCreate", tx.Statement.Context)
+	if userId, ok := tx.Statement.Context.Value("user_id").(string); ok {
+		b.CreatedByID = userId
+	}
+	return
+}
+
+func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
+	log.Println("BeforeUpdate", tx.Statement.Context)
+	if userId, ok := tx.Statement.Context.Value("user_id").(string); ok {
+		b.UpdatedByID = &userId
+	}
+	return
+}

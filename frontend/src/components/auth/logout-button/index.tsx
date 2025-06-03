@@ -12,16 +12,21 @@ const LogoutButton: FC<Prop> = ({ showLabel }) => {
   const { logout } = useAuth0();
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    });
+  };
+
   return (
     <button
       className={cx(
         `bg-blue-600`,
         "flex w-full items-center justify-center gap-2 rounded px-3 py-3 text-center text-white active:translate-y-1",
       )}
-      onClick={() => {
-        navigate("/login", { replace: true });
-        logout({ logoutParams: { returnTo: window.location.origin } });
-      }}
+      onClick={handleLogout}
     >
       <FaSignOutAlt />
       {showLabel && <span>Sign Out</span>}

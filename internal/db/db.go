@@ -18,7 +18,7 @@ var (
 
 func NewDatabase() *gorm.DB {
 	once.Do(func() {
-		DB_CONN := os.Getenv("DB")
+		DB_CONN := os.Getenv("DATABASE_URL")
 
 		dbCtx, err := gorm.Open(postgres.Open(DB_CONN), &gorm.Config{
 			NowFunc: func() time.Time {
@@ -42,6 +42,7 @@ func NewDatabase() *gorm.DB {
 			&domain.ShareCode{},
 			&domain.Team{},
 			&domain.TeamMember{},
+			&domain.User{},
 		)
 
 		db = dbCtx.Debug()

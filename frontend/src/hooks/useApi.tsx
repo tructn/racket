@@ -4,7 +4,7 @@ import { useCallback } from "react";
 
 // Create a single Axios client instance
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_HOST,
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Utility to get auth headers using useAuth0

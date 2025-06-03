@@ -1,61 +1,99 @@
 import { lazy } from "react";
-import { Route, Routes } from "react-router-dom";
-import { useClaims } from "./hooks/useClaims";
-import AdminLayout from "./screens/layouts/admin";
-import PublicLayout from "./screens/layouts/public";
-import Landing from "./screens/landing";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import { MantineProvider, createTheme } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 
-const DashboardScreen = lazy(() => import("./screens/dashboard"));
-const MatchesScreen = lazy(() => import("./screens/matches"));
-const PlayerScreen = lazy(() => import("./screens/players"));
-const SportCentersScreen = lazy(() => import("./screens/sportcenter"));
-const SettingsScreen = lazy(() => import("./screens/settings"));
-const PageNotFoundScreen = lazy(() => import("./screens/page-not-found"));
-const Requests = lazy(() => import("./components/requests"));
-const AdminRequestScreen = lazy(() => import("./screens/admin-requests"));
-const ReportingScreen = lazy(() => import("./screens/reporting"));
+import { useClaims } from "@/hooks/useClaims";
+import Landing from "@/pages/landing";
+import AdminLayout from "@/components/layout/admin";
+import AnonymousLayout from "@/components/layout/anonymous";
+import MeLayout from "@/components/layout/me";
+import ComingSoon from "./pages/comming-soon";
+
+const DashboardScreen = lazy(() => import("@/pages/admin/dashboard"));
+const MatchesScreen = lazy(() => import("@/pages/admin/matches"));
+const PlayerScreen = lazy(() => import("@/pages/admin/players"));
+const SportCentersScreen = lazy(() => import("@/pages/admin/sportcenter"));
+const SettingsScreen = lazy(() => import("@/pages/admin/settings"));
+const PageNotFoundScreen = lazy(() => import("@/pages/page-not-found"));
+const Requests = lazy(() => import("@/components/requests"));
+const AdminRequestScreen = lazy(() => import("@/pages/admin/requests"));
+const ReportingScreen = lazy(() => import("@/pages/admin/reporting"));
+const UsersScreen = lazy(() => import("@/pages/admin/users"));
 const PublicOutstandingReport = lazy(
-  () => import("./screens/public/outstanding-report"),
+  () => import("@/pages/anonymous/outstanding-report"),
 );
 const PublicOutstandingReportV2 = lazy(
-  () => import("./screens/public/outstanding-report-v2"),
+  () => import("@/pages/anonymous/outstanding-report-v2"),
 );
-const TeamsScreen = lazy(() => import("./screens/teams"));
+const TeamManagement = lazy(() => import("@/pages/admin/teams"));
+const ProfileScreen = lazy(() => import("@/pages/admin/profile"));
+
+// Me
+const MeDashboard = lazy(() => import("@/pages/me/dashboard"));
+
+const theme = createTheme({
+  primaryColor: "blue",
+  fontFamily: "Inter, sans-serif",
+});
 
 function App() {
   const { isAdmin } = useClaims();
+  const { isAuthenticated, isLoading } = useAuth0();
+  const location = useLocation();
+
+  // Handle post-login redirection
+  if (isAuthenticated && !isLoading) {
+    const isLandingPage = location.pathname === "/";
+    if (isLandingPage) {
+      if (isAdmin) {
+        return <Navigate to="/admin/dashboard" replace />;
+      } else {
+        return <Navigate to="/me" replace />;
+      }
+    }
+  }
 
   console.log("Admin: ", isAdmin);
 
   return (
-    <Routes>
-      {isAdmin ? (
-        <Route element={<AdminLayout />}>
-          <Route index={true} path="/" element={<DashboardScreen />} />
-          <Route path="/requests" element={<AdminRequestScreen />} />
-          <Route path="/players" element={<PlayerScreen />} />
-          <Route path="/teams" element={<TeamsScreen />} />
-          <Route path="/matches" element={<MatchesScreen />} />
-          <Route path="/sportcenters" element={<SportCentersScreen />} />
-          <Route path="/reports" element={<ReportingScreen />} />
-          <Route path="/settings" element={<SettingsScreen />} />
-          <Route path="*" element={<PageNotFoundScreen />} />
+    <MantineProvider theme={theme}>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index={true} element={<Navigate to="dashboard" />} />
+          <Route path="dashboard" element={<DashboardScreen />} />
+          <Route path="requests" element={<AdminRequestScreen />} />
+          <Route path="players" element={<PlayerScreen />} />
+          <Route path="teams" element={<TeamManagement />} />
+          <Route path="matches" element={<MatchesScreen />} />
+          <Route path="sportcenters" element={<SportCentersScreen />} />
+          <Route path="reports" element={<ReportingScreen />} />
+          <Route path="users" element={<UsersScreen />} />
+          <Route path="profile" element={<ProfileScreen />} />
+          <Route path="settings" element={<SettingsScreen />} />
         </Route>
-      ) : (
-        <Route element={<PublicLayout />}>
+        <Route path="/me" element={<MeLayout />}>
+          <Route index element={<MeDashboard />} />
+        </Route>
+        <Route path="/anonymous" element={<AnonymousLayout />}>
           <Route index element={<Requests />} />
+          <Route
+            path="outstanding-report"
+            element={<PublicOutstandingReport />}
+          />
+          <Route
+            path="outstanding-report/v2"
+            element={<PublicOutstandingReportV2 />}
+          />
         </Route>
-      )}
-      <Route path="/login" element={<Landing />} />
-      <Route
-        path="/public/outstanding-report"
-        element={<PublicOutstandingReport />}
-      />
-      <Route
-        path="/public/outstanding-report/v2"
-        element={<PublicOutstandingReportV2 />}
-      />
-    </Routes>
+        <Route path="/coming-soon" element={<ComingSoon />} />
+        <Route path="*" element={<PageNotFoundScreen />} />
+      </Routes>
+    </MantineProvider>
   );
 }
 

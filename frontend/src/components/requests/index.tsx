@@ -1,17 +1,32 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { Skeleton } from "@mantine/core";
 import cx from "clsx";
 import dayjs from "dayjs";
+import { AnimatePresence, motion } from "framer-motion";
 import { FiCalendar, FiClock, FiGift, FiMapPin } from "react-icons/fi";
-import { IoCheckmarkCircle, IoFileTrayOutline } from "react-icons/io5";
+import {
+  IoCheckmarkCircle,
+  IoFileTrayOutline,
+  IoAddCircle,
+} from "react-icons/io5";
+
+import { useAuth0 } from "@auth0/auth0-react";
+import {
+  Badge,
+  Group,
+  Paper,
+  Skeleton,
+  Stack,
+  Text,
+  Button,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+
 import formatter from "../../common/formatter";
+import { useApi } from "../../hooks/useApi";
 import {
   useAttendantRequestsQuery,
   useUpcomingMatches,
 } from "../../hooks/useQueries";
 import { MatchSummaryModel } from "../../models";
-import { useApi } from "../../hooks/useApi";
-import { notifications } from "@mantine/notifications";
 
 export default function Requests() {
   const api = useApi();
@@ -39,83 +54,149 @@ export default function Requests() {
 
       notifications.show({
         title: "Success",
-        message: "Successfully joined the match!",
+        message: "You've successfully joined the match!",
         color: "green",
       });
     } catch (error) {
       notifications.show({
         title: "Error",
-        message: "Failed to join the match. Please try again.",
+        message: "Unable to join the match. Please try again.",
         color: "red",
       });
     }
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-3 px-2 py-5 md:w-2/3 xl:w-1/3">
-      {matchsLoading ? (
-        <>
-          <div className="flex items-center justify-between rounded bg-slate-100 px-3 py-3">
-            <Skeleton height={30} />
-          </div>
-          <div className="flex items-center justify-between rounded bg-slate-100 px-3 py-3">
-            <Skeleton height={30} />
-          </div>
-        </>
-      ) : matches && matches.length > 0 ? (
-        matches.map((m) => {
-          const isAttended = attendantRequests
-            ?.map((r) => r.matchId)
-            ?.includes(m.matchId);
-          return (
-            <div
-              key={m.matchId}
-              className="flex items-center justify-between rounded bg-slate-100 px-3 py-3"
-            >
-              <div className="flex flex-col">
-                <div className="flex items-center space-x-2 font-bold">
-                  <FiCalendar />
-                  <span>{formatter.formatWeekDay(m.start, false)}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <FiMapPin />
-                  <span>{m.sportCenterName}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <FiClock />
-                  <span>{formatter.formatTime(m.start)}</span>
-                  <span>-</span>
-                  <span>{formatter.formatTime(m.end)}</span>
-                </div>
-                {isAttended && (
-                  <div className="flex items-center space-x-2 font-bold text-pink-500">
-                    <FiGift />
-                    <span>{formatter.currency(m.individualCost)}</span>
-                  </div>
-                )}
-              </div>
+    <div className="flex h-full w-full flex-col gap-4 px-4 py-6">
+      <div className="mb-4">
+        <Text size="xl" fw={700} className="mb-1">
+          Available Matches
+        </Text>
+        <Text size="sm" c="dimmed">
+          Join matches and play with other players
+        </Text>
+      </div>
 
-              {!dayjs(new Date()).isSame(m.start, "day") && (
-                <button
-                  onClick={() => toggleAttendantClick(m)}
+      {matchsLoading ? (
+        <Stack gap="md">
+          {[1, 2].map((i) => (
+            <Paper key={i} withBorder p="md" radius="md">
+              <Skeleton height={100} />
+            </Paper>
+          ))}
+        </Stack>
+      ) : matches && matches.length > 0 ? (
+        <AnimatePresence>
+          {matches.map((m) => {
+            const isAttended = attendantRequests
+              ?.map((r) => r.matchId)
+              ?.includes(m.matchId);
+            return (
+              <motion.div
+                key={m.matchId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Paper
+                  withBorder
+                  p="md"
+                  radius="md"
                   className={cx(
-                    "rounded-full ring-2 ring-offset-1 transition-all active:translate-y-1",
-                    isAttended
-                      ? "animate-pulse text-green-500 ring-green-500"
-                      : "text-slate-300 ring-slate-300",
+                    "mb-4 transition-all duration-300 hover:shadow-md",
+                    isAttended && "border-l-4 border-l-green-500",
                   )}
                 >
-                  <IoCheckmarkCircle size={50} />
-                </button>
-              )}
-            </div>
-          );
-        })
+                  <div className="flex flex-col gap-4">
+                    {/* Header with Date and Status */}
+                    <div className="flex items-center justify-between">
+                      <Group gap="xs">
+                        <FiCalendar className="text-blue-500" size={20} />
+                        <Text fw={600} size="lg">
+                          {formatter.formatWeekDay(m.start, false)}
+                        </Text>
+                      </Group>
+                      {isAttended && (
+                        <Badge color="green" variant="light" size="lg">
+                          You're In!
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Location and Time */}
+                    <div className="flex flex-col gap-2">
+                      <Group gap="xs">
+                        <FiMapPin className="text-blue-500" size={18} />
+                        <Text size="sm" c="dimmed">
+                          {m.sportCenterName}
+                        </Text>
+                      </Group>
+
+                      <Group gap="xs">
+                        <FiClock className="text-blue-500" size={18} />
+                        <Text size="sm" c="dimmed">
+                          {formatter.formatTime(m.start)} -{" "}
+                          {formatter.formatTime(m.end)}
+                        </Text>
+                      </Group>
+
+                      {isAttended && (
+                        <Group gap="xs">
+                          <FiGift className="text-pink-500" size={18} />
+                          <Text fw={600} c="pink" size="sm">
+                            Cost: {formatter.currency(m.individualCost)}
+                          </Text>
+                        </Group>
+                      )}
+                    </div>
+
+                    {/* Action Button */}
+                    {!dayjs(new Date()).isSame(m.start, "day") && (
+                      <div className="flex justify-end">
+                        {isAttended ? (
+                          <Button
+                            variant="light"
+                            color="green"
+                            leftSection={<IoCheckmarkCircle size={20} />}
+                            className="w-full sm:w-auto"
+                          >
+                            Joined Successfully
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="filled"
+                            color="blue"
+                            leftSection={<IoAddCircle size={20} />}
+                            onClick={() => toggleAttendantClick(m)}
+                            className="w-full sm:w-auto"
+                          >
+                            Join Match
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Paper>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       ) : (
-        <div className="flex flex-col items-center justify-center">
-          <IoFileTrayOutline size={30} />
-          <span>No Match Available</span>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center gap-4 rounded-lg border-2 border-dashed border-slate-200 p-8 text-center"
+        >
+          <IoFileTrayOutline size={48} className="text-slate-400" />
+          <Text size="lg" fw={500} c="dimmed">
+            No Matches Available
+          </Text>
+          <Text size="sm" c="dimmed" className="max-w-sm">
+            There are no upcoming matches at the moment. Check back soon for new
+            opportunities to play!
+          </Text>
+        </motion.div>
       )}
     </div>
   );
