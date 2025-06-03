@@ -3,9 +3,8 @@ import Page from "@/components/page";
 import { Button, Table, Text, Group, ActionIcon, Stack } from "@mantine/core";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { IoRefresh, IoTrash, IoCheckmark, IoClose } from "react-icons/io5";
+import { IoRefresh, IoCheckmark, IoClose } from "react-icons/io5";
 import httpService from "@/common/httpservice";
-import BreadcrumbsComponent from "@/components/breadcrumbs";
 
 interface User {
   id: string;
@@ -23,7 +22,7 @@ function UsersPage() {
   const { data: users, isLoading } = useQuery<User[]>({
     queryKey: ["users"],
     queryFn: () =>
-      httpService.get("/api/admin/users").then((res: any) => res.data),
+      httpService.get("/api/v1/auth0/users").then((res: any) => res.data),
   });
 
   const syncUsersMutation = useMutation({
@@ -77,26 +76,17 @@ function UsersPage() {
     toggleUserStatusMutation.mutate({ userId, isActive: !currentStatus });
   };
 
-  const breadcrumbItems = [
-    { title: "Admin", href: "/admin" },
-    { title: "Management", href: "/admin/management" },
-    { title: "Users" },
-  ];
-
   return (
-    <Page title="User Management" breadcrumbs={false}>
-      <BreadcrumbsComponent items={breadcrumbItems} />
+    <Page title="User Management" breadcrumbs={true}>
       <Stack gap="md">
         <Group justify="space-between">
-          <Text size="lg" fw={500}>
-            Manage Users
-          </Text>
           <Button
+            variant="outline"
             leftSection={<IoRefresh />}
             onClick={handleSyncUsers}
             loading={isSyncing}
           >
-            Sync with Auth0
+            Manual Sync Users
           </Button>
         </Group>
 

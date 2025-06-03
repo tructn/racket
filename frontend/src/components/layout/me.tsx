@@ -115,7 +115,7 @@ function MeLayout() {
                     leftSection={<IoSettings size={14} />}
                     onClick={() => navigate("/admin/dashboard")}
                   >
-                    Admin Console
+                    Admin Panel
                   </Menu.Item>
                 )}
                 <Menu.Divider />

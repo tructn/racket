@@ -15,19 +15,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CustomClaims contains custom data we want from the token.
 type CustomClaims struct {
 	Scope string   `json:"scope"`
 	Roles []string `json:"https://auth.tn.co.uk/roles"`
 }
 
-// Validate does nothing for this example, but we need
-// it to satisfy validator.CustomClaims interface.
 func (c CustomClaims) Validate(ctx context.Context) error {
 	return nil
 }
 
-// HasScope checks whether our claims have a specific scope.
 func (c CustomClaims) HasScope(expectedScope string) bool {
 	result := strings.Split(c.Scope, " ")
 	for i := range result {
@@ -40,7 +36,6 @@ func (c CustomClaims) HasScope(expectedScope string) bool {
 }
 
 func (c CustomClaims) IsAdmin() bool {
-	// WANT TO USE SLICE TO DO THE NAIVE WAY
 	for _, role := range c.Roles {
 		if role == "admin" {
 			return true
@@ -90,51 +85,45 @@ func AuthRequired() gin.HandlerFunc {
 	)
 
 	return func(c *gin.Context) {
-		// Convert Gin context to http.Handler
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Copy headers from Gin to http.Request
 			for k, v := range c.Request.Header {
 				r.Header[k] = v
 			}
 
-			// Run JWT validation
 			middleware.CheckJWT(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// Extract token from Authorization header
 				authHeader := r.Header.Get("Authorization")
 				if authHeader == "" {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No authorization header"})
 					return
 				}
 
-				// Remove "Bearer " prefix and parse token
 				token, err := jwtValidator.ValidateToken(r.Context(), strings.TrimPrefix(authHeader, "Bearer "))
 				if err != nil {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 					return
 				}
 
-				// Extract claims
+				log.Printf("auth header: %v", authHeader)
+
 				validatedClaims, ok := token.(*validator.ValidatedClaims)
 				if !ok {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid claims"})
 					return
 				}
 
-				// Get custom claims
 				customClaims, ok := validatedClaims.CustomClaims.(*CustomClaims)
 				if !ok {
 					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid custom claims"})
 					return
 				}
 
-				// Store user info in Gin context
+				log.Printf("validatedClaims: %v", validatedClaims)
+
 				c.Set("user", map[string]interface{}{
-					"sub":     validatedClaims.RegisteredClaims.Subject,
-					"email":   validatedClaims.RegisteredClaims.Subject,
-					"name":    validatedClaims.RegisteredClaims.Subject,
-					"picture": "",
+					"sub": validatedClaims.RegisteredClaims.Subject,
 				})
 				c.Set("user_roles", customClaims.Roles)
+				c.Set("user_id", validatedClaims.RegisteredClaims.Subject)
 
 				c.Next()
 			})).ServeHTTP(w, r)

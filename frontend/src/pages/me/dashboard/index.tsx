@@ -12,14 +12,14 @@ import {
 } from "@mantine/core";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  IoShieldCheckmark,
   IoWallet,
-  IoNotifications,
   IoLocation,
   IoCall,
   IoMail,
   IoPeople,
   IoThumbsDown,
+  IoApps,
+  IoGolf,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -130,10 +130,10 @@ function MeDashboard() {
               onClick={() => navigate("/admin/dashboard")}
             >
               <div className="flex items-center gap-3">
-                <IoShieldCheckmark className="text-blue-600" size={24} />
+                <IoApps className="text-blue-600" size={24} />
                 <div>
                   <Text size="lg" fw={500}>
-                    Admin Console
+                    Admin Panel
                   </Text>
                   <Text size="sm" c="dimmed">
                     Organize your teams and matches
@@ -152,7 +152,7 @@ function MeDashboard() {
             onClick={() => navigate("/me/requests")}
           >
             <div className="flex items-center gap-3">
-              <IoNotifications className="text-blue-600" size={24} />
+              <IoGolf className="text-blue-600" size={24} />
               <div>
                 <Text size="lg" fw={500}>
                   My Requests

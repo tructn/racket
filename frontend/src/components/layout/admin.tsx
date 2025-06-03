@@ -14,12 +14,12 @@ import {
   IoChevronDown,
   IoStatsChart,
   IoCalendar,
-  IoFootball,
   IoShirt,
   IoPerson,
   IoList,
   IoBusiness,
-  IoSpeedometer,
+  IoApps,
+  IoBaseball,
 } from "react-icons/io5";
 import { FaCircleDot } from "react-icons/fa6";
 import { Text } from "@mantine/core";
@@ -49,8 +49,6 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
     );
   };
 
-  const hasActiveChild = item.childItems?.some((child) => isActive(child.path));
-
   const handleClick = (e: React.MouseEvent) => {
     if (hasChildren) {
       e.preventDefault();
@@ -77,9 +75,7 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
           >
             <div className="flex items-center gap-3">
               <span className="text-xl text-blue-100">{item.icon}</span>
-              {item.label && showLabel && (
-                <span className="font-medium">{item.label}</span>
-              )}
+              {item.label && showLabel && <span>{item.label}</span>}
             </div>
             {item.label && showLabel && (
               <IoChevronDown
@@ -132,11 +128,11 @@ function AdminLayout() {
     {
       label: "Dashboard",
       path: "/admin/dashboard",
-      icon: <IoSpeedometer />,
+      icon: <IoApps />,
     },
     {
       label: "Sports",
-      icon: <IoFootball />,
+      icon: <IoBaseball />,
       childItems: [
         {
           label: "Matches",
@@ -215,7 +211,13 @@ function AdminLayout() {
             collapsed ? "items-center" : "",
           )}
         >
-          <div className="flex items-center justify-center gap-2 p-2">
+          <div
+            className={cx(
+              "flex items-center gap-2 py-4",
+              !collapsed && "justify-start",
+              collapsed && "justify-center",
+            )}
+          >
             <img
               src="/logo.svg"
               alt="Racket"
@@ -225,8 +227,8 @@ function AdminLayout() {
               )}
             />
             {!collapsed && (
-              <Text size="xl" fw={700} className="text-white">
-                Administration Console
+              <Text size="lg" fw={700} className="text-white">
+                Admin Panel
               </Text>
             )}
           </div>

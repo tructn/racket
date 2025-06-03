@@ -19,12 +19,11 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	godotenv.Load(".env")
+	PORT := os.Getenv("PORT")
 
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		port = "8000"
+	if PORT == "" {
+		PORT = "8000"
 	}
 
 	reg := di.Register()
@@ -59,82 +58,77 @@ func main() {
 		publicV2.GET("/reports/unpaid", handler.GetUnpaidDetailsByPlayer)
 	})
 
-	v1RouterGroup := router.Group("/api/v1")
-	v1RouterGroup.Use(middleware.AuthRequired())
+	v1 := router.Group("/api/v1")
+	v1.Use(middleware.AuthRequired())
 
 	reg.Invoke(func(handler *handler.MatchHandler) {
-		v1RouterGroup.POST("/matches", handler.Create)
-		v1RouterGroup.GET("/matches", handler.GetAll)
-		v1RouterGroup.GET("/matches/archived", handler.GetArchivedMatches)
-		v1RouterGroup.GET("/matches/future", handler.GetFutureMatches)
-		v1RouterGroup.GET("/matches/today", handler.GetTodayMatches)
-		v1RouterGroup.GET("/upcoming-matches", handler.GetUpcomingMatches)
-		v1RouterGroup.GET("/matches/:matchId/registrations", handler.GetRegistrationsByMatch)
-		v1RouterGroup.GET("/matches/:matchId/cost", handler.GetCost)
-		v1RouterGroup.POST("/matches/:matchId/clone", handler.Clone)
-		v1RouterGroup.GET("/matches/:matchId/additional-costs", handler.GetAdditionalCost)
-		v1RouterGroup.PUT("/matches/:matchId", handler.UpdateMatch)
-		v1RouterGroup.PUT("/matches/:matchId/costs", handler.UpdateCost)
-		v1RouterGroup.PUT("/matches/:matchId/additional-costs", handler.CreateAdditionalCost)
-		v1RouterGroup.DELETE("/matches/:matchId", handler.Delete)
+		v1.POST("/matches", handler.Create)
+		v1.GET("/matches", handler.GetAll)
+		v1.GET("/matches/archived", handler.GetArchivedMatches)
+		v1.GET("/matches/future", handler.GetFutureMatches)
+		v1.GET("/matches/today", handler.GetTodayMatches)
+		v1.GET("/upcoming-matches", handler.GetUpcomingMatches)
+		v1.GET("/matches/:matchId/registrations", handler.GetRegistrationsByMatch)
+		v1.GET("/matches/:matchId/cost", handler.GetCost)
+		v1.POST("/matches/:matchId/clone", handler.Clone)
+		v1.GET("/matches/:matchId/additional-costs", handler.GetAdditionalCost)
+		v1.PUT("/matches/:matchId", handler.UpdateMatch)
+		v1.PUT("/matches/:matchId/costs", handler.UpdateCost)
+		v1.PUT("/matches/:matchId/additional-costs", handler.CreateAdditionalCost)
+		v1.DELETE("/matches/:matchId", handler.Delete)
 	})
 
 	reg.Invoke(func(handler *handler.PlayerHandler) {
-		v1RouterGroup.GET("/players", handler.GetAll)
-		v1RouterGroup.GET("/players/external-users/:externalUserId/attendant-requests", handler.GetExternalUserAttendantRequests)
-		v1RouterGroup.POST("/players", handler.Create)
-		v1RouterGroup.DELETE("/players/:playerId", handler.Delete)
-		v1RouterGroup.PUT("/players/:playerId", handler.Update)
-		v1RouterGroup.PUT("/players/:playerId/outstanding-payments/paid", handler.MarkOutstandingPaymentsAsPaid)
-		v1RouterGroup.POST("/players/:playerId/accounts", handler.OpenAccount)
+		v1.GET("/players", handler.GetAll)
+		v1.GET("/players/external-users/:externalUserId/attendant-requests", handler.GetExternalUserAttendantRequests)
+		v1.POST("/players", handler.Create)
+		v1.DELETE("/players/:playerId", handler.Delete)
+		v1.PUT("/players/:playerId", handler.Update)
+		v1.PUT("/players/:playerId/outstanding-payments/paid", handler.MarkOutstandingPaymentsAsPaid)
+		v1.POST("/players/:playerId/accounts", handler.OpenAccount)
 	})
 
 	reg.Invoke(func(handler *handler.RegistrationHandler) {
-		v1RouterGroup.GET("/registrations", handler.GetAll)
-		v1RouterGroup.POST("/registrations", handler.Register)
-		v1RouterGroup.POST("/registrations/attendant-requests", handler.AttendantRequest)
-		v1RouterGroup.PUT("/registrations/:registrationId/paid", handler.MarkPaid)
-		v1RouterGroup.PUT("/registrations/:registrationId/unpaid", handler.MarkUnPaid)
-		v1RouterGroup.DELETE("/registrations/:registrationId", handler.Unregister)
+		v1.GET("/registrations", handler.GetAll)
+		v1.POST("/registrations", handler.Register)
+		v1.POST("/registrations/attendant-requests", handler.AttendantRequest)
+		v1.PUT("/registrations/:registrationId/paid", handler.MarkPaid)
+		v1.PUT("/registrations/:registrationId/unpaid", handler.MarkUnPaid)
+		v1.DELETE("/registrations/:registrationId", handler.Unregister)
 	})
 
 	reg.Invoke(func(handler *handler.SportCenterHandler) {
-		v1RouterGroup.GET("/sportcenters", handler.GetAll)
-		v1RouterGroup.GET("/sportcenters/options", handler.GetOptions)
-		v1RouterGroup.POST("/sportcenters", handler.Create)
-		v1RouterGroup.PUT("/sportcenters/:sportCenterId", handler.Update)
+		v1.GET("/sportcenters", handler.GetAll)
+		v1.GET("/sportcenters/options", handler.GetOptions)
+		v1.POST("/sportcenters", handler.Create)
+		v1.PUT("/sportcenters/:sportCenterId", handler.Update)
 	})
 
 	reg.Invoke(func(handler *handler.SettingsHandler) {
-		v1RouterGroup.GET("/settings/message-template", handler.GetMessageTemplate)
-		v1RouterGroup.POST("/settings/message-template", handler.CreateMessageTemplate)
+		v1.GET("/settings/message-template", handler.GetMessageTemplate)
+		v1.POST("/settings/message-template", handler.CreateMessageTemplate)
 	})
 
 	reg.Invoke(func(handler *handler.ReportHandler) {
-		v1RouterGroup.GET("/reports/unpaid", handler.GetUnpaidReport)
+		v1.GET("/reports/unpaid", handler.GetUnpaidReport)
 	})
 
 	reg.Invoke(func(handler *handler.ActivityHandler) {
-		v1RouterGroup.GET("/activities", handler.GetAll)
+		v1.GET("/activities", handler.GetAll)
 	})
 
 	reg.Invoke(func(handler *handler.ShareCodeHandler) {
-		v1RouterGroup.GET("/share-codes/urls", handler.GetShareUrls)
-		v1RouterGroup.POST("/share-codes/urls", handler.CreateShareUrl)
-		v1RouterGroup.DELETE("/share-codes/urls/:shareCodeId", handler.DeleteShareCodeUrl)
+		v1.GET("/share-codes/urls", handler.GetShareUrls)
+		v1.POST("/share-codes/urls", handler.CreateShareUrl)
+		v1.DELETE("/share-codes/urls/:shareCodeId", handler.DeleteShareCodeUrl)
 	})
 
 	reg.Invoke(func(handler *handler.TeamHandler) {
-		handler.RegisterTeamRouters(v1RouterGroup)
-	})
-
-	reg.Invoke(func(handler *handler.UserHandler) {
-		v1RouterGroup.GET("/users/me", handler.GetCurrentUser)
-		v1RouterGroup.PUT("/users/me", handler.UpdateProfile)
+		handler.UseTeamRouter(v1)
 	})
 
 	server := &http.Server{
-		Addr:    fmt.Sprintf(":%s", port),
+		Addr:    fmt.Sprintf(":%s", PORT),
 		Handler: router.Handler(),
 	}
 
