@@ -212,15 +212,9 @@ function AdminLayout() {
             collapsed ? "items-center" : "",
           )}
         >
-          <div
-            className={cx(
-              "flex items-center gap-2 py-4",
-              !collapsed && "justify-start",
-              collapsed && "justify-center",
-            )}
-          >
+          <div className={cx("flex items-center justify-center gap-2 py-4")}>
             {!collapsed ? (
-              <>
+              <div className="flex flex-col items-center">
                 <img
                   src="/logo.svg"
                   alt="Racket"
@@ -229,7 +223,7 @@ function AdminLayout() {
                 <Text size="lg" fw={700} className="text-white">
                   RACKET CONSOLE
                 </Text>
-              </>
+              </div>
             ) : (
               <button
                 onClick={toggleSideNav}

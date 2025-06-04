@@ -23,6 +23,8 @@ type Auth0User struct {
 	Email       string `json:"email"`
 	MaskedEmail string `json:"masked_email"`
 	Name        string `json:"name"`
+	GivenName   string `json:"given_name"`
+	FamilyName  string `json:"family_name"`
 	Picture     string `json:"picture"`
 	LastLogin   string `json:"last_login"`
 	LoginsCount int    `json:"logins_count"`
@@ -161,8 +163,6 @@ func getAuth0Users(domain, token string) ([]Auth0User, error) {
 	// Add masked email for each user
 	for i := range users {
 		users[i].MaskedEmail = maskEmail(users[i].Email)
-		// Clear the original email
-		users[i].Email = ""
 	}
 
 	return users, nil

@@ -60,7 +60,7 @@ function UsersPage() {
   });
 
   const syncUsersMutation = useMutation({
-    mutationFn: () => httpService.post("/api/admin/users/sync", {}),
+    mutationFn: () => httpService.post("/api/v1/users/auth0/sync", {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       notifications.show({
@@ -69,7 +69,7 @@ function UsersPage() {
         color: "green",
       });
     },
-    onError: (error) => {
+    onError: (_error) => {
       notifications.show({
         title: "Error",
         message: "Failed to sync users",
@@ -230,15 +230,16 @@ function UsersPage() {
         <Card withBorder shadow="sm" p="md">
           <Group justify="space-between" mb="md">
             <Title order={3}>User Accounts</Title>
-            <Button
-              variant="light"
-              leftSection={<IoRefresh />}
-              onClick={handleSyncUsers}
-              loading={isSyncing}
-              disabled={isLoading}
-            >
-              Refresh
-            </Button>
+            <Group>
+              <Button
+                leftSection={<IoRefresh />}
+                onClick={handleSyncUsers}
+                loading={isSyncing}
+                disabled={isLoading}
+              >
+                Sync Users
+              </Button>
+            </Group>
           </Group>
 
           <Table striped highlightOnHover>

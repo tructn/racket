@@ -53,7 +53,7 @@ func (h *RegistrationHandler) AttendantRequest(c *gin.Context) {
 				FirstName:      dto.FirstName,
 				LastName:       dto.LastName,
 				Email:          dto.Email,
-				ExternalUserId: dto.ExternalUserId,
+				ExternalUserID: dto.ExternalUserId,
 			}
 
 			if err := tx.Create(player).Error; err != nil {
@@ -206,6 +206,7 @@ func (h *RegistrationHandler) GetAll(c *gin.Context) {
 			r.id AS registration_id,
 			m.id AS match_id, 
 			p.id AS player_id,
+			p.email,
 			COALESCE(sc.name,'N/A') AS location,
 			m.start, 
 			m.end, 

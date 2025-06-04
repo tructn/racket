@@ -73,7 +73,7 @@ const RegistrationRow = React.memo(
               : "bg-slate-200 text-slate-400",
           )}
         >
-          {(reg.playerName || reg.email || "?").charAt(0).toUpperCase()}
+          {(reg.playerName || "?").charAt(0).toUpperCase()}
         </div>
         <div className="flex flex-col">
           <span
@@ -81,11 +81,11 @@ const RegistrationRow = React.memo(
               "font-bold": !!reg.registrationId,
             })}
           >
-            {reg.playerName || reg.email}
+            {reg.playerName}
           </span>
-          {reg.registrationId && (
-            <span className="text-xs text-slate-500">Registered Player</span>
-          )}
+          <span className="text-xs text-slate-500">
+            {reg.email || "unknown"}
+          </span>
         </div>
       </div>
 

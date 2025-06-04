@@ -35,6 +35,7 @@ func Register() *dig.Container {
 	c.Provide(service.NewActivityService)
 	c.Provide(service.NewUserService)
 	c.Provide(service.NewTeamService)
+	c.Provide(service.NewUserService)
 
 	return c
 }
