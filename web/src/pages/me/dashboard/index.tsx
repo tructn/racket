@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import { useState } from "react";
+import ReactConfetti from "react-confetti";
 import {
   IoApps,
   IoBookmark,
@@ -12,6 +14,7 @@ import {
   IoWallet,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useWindowSize } from "react-use";
 
 import Currency from "@/components/currency";
 import SectionLoading from "@/components/loading/section-loading";
@@ -56,6 +59,8 @@ function MeDashboard() {
   const { user } = useAuth0();
   const { isAdmin, isLoading: isClaimsLoading } = useClaims();
   const { get, post } = useApi();
+  const { width, height } = useWindowSize();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const { data: availableMatches = [], isLoading: isMatchesLoading } = useQuery<
     MyUpcomingMatch[]
@@ -70,9 +75,11 @@ function MeDashboard() {
         matchId,
       }),
     onSuccess: () => {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000); // Hide confetti after 5 seconds
       notifications.show({
         title: "Success",
-        message: "Successfully registered for the match",
+        message: "Successfully booked the match",
         color: "green",
       });
       queryClient.invalidateQueries({ queryKey: ["my-upcoming-matches"] });
@@ -80,7 +87,7 @@ function MeDashboard() {
     onError: (error) => {
       notifications.show({
         title: "Error",
-        message: error.message || "Failed to register for the match",
+        message: error.message || "Failed to book the match",
         color: "red",
       });
     },
@@ -122,6 +129,15 @@ function MeDashboard() {
 
   return (
     <Container size="lg" className="py-8">
+      {showConfetti && (
+        <ReactConfetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.2}
+        />
+      )}
       <div className="mb-8">
         <Title order={2}>Welcome, {user?.name || "User"}!</Title>
         <Text c="dimmed">Your activity overview</Text>
