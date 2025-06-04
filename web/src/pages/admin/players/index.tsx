@@ -6,6 +6,13 @@ import {
   Text,
   TextInput,
   Tooltip,
+  Paper,
+  Group,
+  Stack,
+  Title,
+  Badge,
+  Box,
+  LoadingOverlay,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -18,6 +25,7 @@ import {
   IoPencil,
   IoSave,
   IoTrash,
+  IoPerson,
 } from "react-icons/io5";
 import { z } from "zod";
 import formatter from "@/common/formatter";
@@ -133,91 +141,140 @@ function Players() {
   };
 
   return (
-    <>
-      <Page title="Players Management">
-        <div>
+    <Page title="Players Management">
+      <Stack gap="lg">
+        <Group justify="space-between" align="center">
           <Button
-            leftSection={<IoAdd />}
-            variant="default"
+            leftSection={<IoAdd size={20} />}
             onClick={openDrawer}
+            variant="filled"
+            color="blue"
           >
-            Create Player
+            Add New Player
           </Button>
-        </div>
-        <Table striped withRowBorders={false}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>First Name</Table.Th>
-              <Table.Th>Last Name</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Created At</Table.Th>
-              <Table.Th>SSO</Table.Th>
-              <Table.Th>Action</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {isPending && <DataTableSkeleton row={3} col={6} />}
-            {!isPending &&
-              players?.map((item) => {
-                return (
+        </Group>
+
+        <Paper withBorder radius="md" pos="relative">
+          <LoadingOverlay visible={isPending} />
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Player</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Created At</Table.Th>
+                <Table.Th>SSO</Table.Th>
+                <Table.Th style={{ width: 150 }}>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {isPending && <DataTableSkeleton row={3} col={5} />}
+              {!isPending &&
+                players?.map((item) => (
                   <Table.Tr key={item.id}>
-                    <Table.Td>{item.firstName}</Table.Td>
-                    <Table.Td>{item.lastName}</Table.Td>
+                    <Table.Td>
+                      <Group gap="xs">
+                        <IoPerson size={20} />
+                        <Box>
+                          <Text fw={500}>
+                            {item.firstName} {item.lastName}
+                          </Text>
+                        </Box>
+                      </Group>
+                    </Table.Td>
                     <Table.Td>{item.email}</Table.Td>
                     <Table.Td>{formatter.formatDate(item.createdAt)}</Table.Td>
                     <Table.Td>
-                      {item.externalUserId?.substring(
-                        0,
-                        item.externalUserId.lastIndexOf("|"),
+                      {item.externalUserId && (
+                        <Badge variant="light" color="blue">
+                          {item.externalUserId.substring(
+                            0,
+                            item.externalUserId.lastIndexOf("|"),
+                          )}
+                        </Badge>
                       )}
                     </Table.Td>
-                    <Table.Td className="flex items-center justify-end gap-2">
-                      <Tooltip label="Open New Account" position="top">
-                        <ActionIcon
-                          color="pink"
-                          onClick={() => openNewAccount(item)}
-                          size="lg"
-                        >
-                          <IoCalculatorOutline />
-                        </ActionIcon>
-                      </Tooltip>
+                    <Table.Td>
+                      <Group gap="xs" justify="flex-end">
+                        <Tooltip label="Open New Account">
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            onClick={() => openNewAccount(item)}
+                            size="lg"
+                          >
+                            <IoCalculatorOutline size={18} />
+                          </ActionIcon>
+                        </Tooltip>
 
-                      <ActionIcon onClick={() => editClick(item)} size="lg">
-                        <IoPencil />
-                      </ActionIcon>
+                        <Tooltip label="Edit Player">
+                          <ActionIcon
+                            variant="light"
+                            color="yellow"
+                            onClick={() => editClick(item)}
+                            size="lg"
+                          >
+                            <IoPencil size={18} />
+                          </ActionIcon>
+                        </Tooltip>
 
-                      <ActionIcon
-                        size="lg"
-                        color="red"
-                        onClick={() => deleteClick(item)}
-                      >
-                        <IoTrash />
-                      </ActionIcon>
+                        <Tooltip label="Delete Player">
+                          <ActionIcon
+                            variant="light"
+                            color="red"
+                            onClick={() => deleteClick(item)}
+                            size="lg"
+                          >
+                            <IoTrash size={18} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Group>
                     </Table.Td>
                   </Table.Tr>
-                );
-              })}
-          </Table.Tbody>
-        </Table>
-      </Page>
+                ))}
+            </Table.Tbody>
+          </Table>
+        </Paper>
+      </Stack>
+
       <Drawer
         position="right"
         opened={opened}
         onClose={closeDrawer}
-        title="Create Player"
+        title={
+          <Title order={3}>
+            {form.values.id ? "Edit Player" : "Create New Player"}
+          </Title>
+        }
+        size="md"
       >
         <form
           onSubmit={form.onSubmit((model) => createOrUpdateMut.mutate(model))}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-4"
         >
-          <TextInput label="First name" {...form.getInputProps("firstName")} />
-          <TextInput label="Last name" {...form.getInputProps("lastName")} />
-          <Button leftSection={<IoSave />} type="submit">
-            Save changes
+          <TextInput
+            label="First name"
+            placeholder="Enter first name"
+            size="md"
+            {...form.getInputProps("firstName")}
+          />
+          <TextInput
+            label="Last name"
+            placeholder="Enter last name"
+            size="md"
+            {...form.getInputProps("lastName")}
+          />
+          <Button
+            leftSection={<IoSave size={20} />}
+            type="submit"
+            size="md"
+            fullWidth
+            mt="xl"
+          >
+            Save Changes
           </Button>
         </form>
       </Drawer>
-    </>
+    </Page>
   );
 }
 
