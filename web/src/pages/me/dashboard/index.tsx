@@ -228,15 +228,6 @@ function MeDashboard() {
             </Title>
             <Text c="dimmed">Find and book your next match</Text>
           </div>
-          <Button
-            color="red"
-            variant="light"
-            leftSection={<IoThumbsDown size={18} />}
-            onClick={handleNotInterested}
-            className="w-full sm:w-auto"
-          >
-            Not interested
-          </Button>
         </div>
 
         {!availableMatches || availableMatches.length === 0 ? (
