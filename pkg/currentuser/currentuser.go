@@ -2,17 +2,32 @@ package currentuser
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tructn/racket/internal/domain"
+	"gorm.io/gorm"
 )
 
-func GetUserId(c *gin.Context) (string, error) {
-	user, exists := c.Get("user")
+func GetIdpUser(c *gin.Context) (map[string]interface{}, error) {
+	user, exists := c.Get("idp_user")
+
+	log.Printf("user: %v", user)
+
+	if !exists {
+		return nil, fmt.Errorf("user not found in context")
+	}
+	return user.(map[string]interface{}), nil
+}
+
+func GetIdpUserId(c *gin.Context) (string, error) {
+	idpUserId, exists := c.Get("idp_user_id")
+
 	if !exists {
 		return "", fmt.Errorf("user not found in context")
 	}
 
-	userId, ok := user.(map[string]interface{})["sub"].(string)
+	userId, ok := idpUserId.(string)
 	if !ok {
 		return "", fmt.Errorf("invalid user ID in claims")
 	}
@@ -20,8 +35,8 @@ func GetUserId(c *gin.Context) (string, error) {
 	return userId, nil
 }
 
-func GetUserRoles(c *gin.Context) ([]string, error) {
-	user, exists := c.Get("user")
+func GetIdpUserRoles(c *gin.Context) ([]string, error) {
+	user, exists := c.Get("idp_user_roles")
 	if !exists {
 		return []string{}, fmt.Errorf("user not found in context")
 	}
@@ -32,4 +47,32 @@ func GetUserRoles(c *gin.Context) ([]string, error) {
 	}
 
 	return roles, nil
+}
+
+func GetCurrentPlayerId(c *gin.Context, db *gorm.DB) (uint, error) {
+	idpUserId, err := GetIdpUserId(c)
+	if err != nil {
+		return 0, err
+	}
+
+	var playerId uint
+	if err := db.Model(&domain.Player{}).Where("external_user_id = ?", idpUserId).Select("id").First(&playerId).Error; err != nil {
+		return 0, err
+	}
+
+	return playerId, nil
+}
+
+func GetCurrentUserId(c *gin.Context, db *gorm.DB) (uint, error) {
+	idpUserId, err := GetIdpUserId(c)
+	if err != nil {
+		return 0, err
+	}
+
+	var userId uint
+	if err := db.Model(&domain.User{}).Where("idp_user_id = ?", idpUserId).Select("id").First(&userId).Error; err != nil {
+		return 0, err
+	}
+
+	return userId, nil
 }

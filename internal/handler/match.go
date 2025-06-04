@@ -75,7 +75,6 @@ func (h *MatchHandler) GetArchivedMatches(c *gin.Context) {
 // This is for player to register match
 // This might show some extra infomation about the cost of individual
 // This is not just the same with get future match
-// TODO: revisit
 func (h *MatchHandler) GetUpcomingMatches(c *gin.Context) {
 	var matches []domain.Match
 	h.db.

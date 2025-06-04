@@ -1,4 +1,3 @@
-import { SelectOption } from "../common/models/select-option";
 
 export interface ValueLabel {
   value: string;
@@ -65,5 +64,5 @@ export interface AttendantRequestModel {
   matchId: number;
   playerId: number;
 }
-
+export type { ActivityModel } from "./reports/activity";
 export type { AdditionalCost } from "./cost/additional-cost";

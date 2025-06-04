@@ -19,7 +19,7 @@ import httpService from "@/common/httpservice";
 import Currency from "@/components/currency";
 import DataTableSkeleton from "@/components/loading/skeleton/data-table-skeleton";
 import { useApi } from "@/hooks/useApi";
-import { UnpaidModel } from "@/models/reports/unpaid";
+import { UnpaidModel } from "@/types/reports/unpaid";
 
 export default function UnpaidReport() {
   const { get } = useApi();

@@ -1,37 +1,39 @@
+import dayjs from "dayjs";
 import {
-  Container,
-  Grid,
-  Paper,
-  Text,
-  Title,
-  Group,
-  Badge,
-  Stack,
-  Button,
-} from "@mantine/core";
-import { useAuth0 } from "@auth0/auth0-react";
-import {
-  IoWallet,
+  IoApps,
+  IoBookmark,
+  IoCalendar,
+  IoCheckmark,
+  IoCloseCircle,
+  IoGolf,
   IoLocation,
   IoPeople,
   IoThumbsDown,
-  IoApps,
-  IoGolf,
   IoTime,
-  IoCalendar,
-  IoBookmark,
-  IoCloseCircle,
+  IoWallet,
 } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
-import { useClaims } from "@/hooks/useClaims";
-import { useQuery } from "@tanstack/react-query";
-import { useApi } from "@/hooks/useApi";
-import Currency from "@/components/currency";
-import { notifications } from "@mantine/notifications";
-import SectionLoading from "@/components/loading/section-loading";
 
-interface Match {
+import Currency from "@/components/currency";
+import SectionLoading from "@/components/loading/section-loading";
+import { useApi } from "@/hooks/useApi";
+import { useClaims } from "@/hooks/useClaims";
+import { useAuth0 } from "@auth0/auth0-react";
+import {
+  Badge,
+  Button,
+  Container,
+  Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+interface MyUpcomingMatch {
   matchId: number;
   start: string;
   end: string;
@@ -46,28 +48,44 @@ interface Match {
   customSection: string | null;
   playerCount: number;
   registrationIds: number[];
+  isRegistered: boolean;
 }
 
 function MeDashboard() {
-  const { user } = useAuth0();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user } = useAuth0();
   const { isAdmin, isLoading: isClaimsLoading } = useClaims();
-  const { get } = useApi();
+  const { get, post } = useApi();
 
   const { data: availableMatches = [], isLoading: isMatchesLoading } = useQuery<
-    Match[]
+    MyUpcomingMatch[]
   >({
-    queryKey: ["upcoming-matches"],
-    queryFn: () => get<Match[]>("api/v1/upcoming-matches"),
+    queryKey: ["my-upcoming-matches"],
+    queryFn: () => get<MyUpcomingMatch[]>("api/v1/me/upcoming-matches"),
   });
 
-  const handleBookNow = (matchId: number) => {
-    notifications.show({
-      title: "Coming Soon",
-      message: "This feature is coming soon!",
-      color: "pink",
-    });
-  };
+  const { mutate: registerMatch, isPending: isRegistering } = useMutation({
+    mutationFn: (matchId: number) =>
+      post<{ matchId: number }>("api/v1/registrations/matches", {
+        matchId,
+      }),
+    onSuccess: () => {
+      notifications.show({
+        title: "Success",
+        message: "Successfully registered for the match",
+        color: "green",
+      });
+      queryClient.invalidateQueries({ queryKey: ["my-upcoming-matches"] });
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Error",
+        message: error.message || "Failed to register for the match",
+        color: "red",
+      });
+    },
+  });
 
   const handleNotInterested = () => {
     notifications.show({
@@ -83,7 +101,6 @@ function MeDashboard() {
 
   return (
     <Container size="lg" className="py-8">
-      {/* Dashboard Tiles Section */}
       <div className="mb-8">
         <Title order={2}>Welcome, {user?.name || "User"}!</Title>
         <Text c="dimmed">Your activity overview</Text>
@@ -156,7 +173,6 @@ function MeDashboard() {
         </Grid.Col>
       </Grid>
 
-      {/* Available Matches Section */}
       <div className="mt-8">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -164,10 +180,7 @@ function MeDashboard() {
               <IoCalendar className="text-blue-600" size={24} />
               Available Matches
             </Title>
-            <Text c="dimmed" className="flex items-center gap-2">
-              <IoBookmark className="text-slate-400" size={16} />
-              Find and book your next match
-            </Text>
+            <Text c="dimmed">Find and book your next match</Text>
           </div>
           <Button
             color="red"
@@ -193,15 +206,23 @@ function MeDashboard() {
         ) : (
           <Stack gap="md">
             {availableMatches.map((match) => (
-              <Paper key={match.matchId} shadow="sm" p="md" withBorder>
+              <Paper
+                key={match.matchId}
+                shadow="sm"
+                p="md"
+                withBorder
+                className={
+                  match.isRegistered ? "border-green-500 bg-green-50" : ""
+                }
+              >
                 <div className="flex flex-col gap-4">
                   <div className="flex-1">
                     <Group mb="xs" wrap="nowrap">
                       <Badge
-                        color="green"
+                        color={match.isRegistered ? "pink" : "green"}
                         leftSection={<IoCalendar size={14} />}
                       >
-                        Available
+                        {match.isRegistered ? "Registered" : "Available"}
                       </Badge>
                       <Text fw={500} size="lg" className="truncate">
                         {dayjs(match.start).format("ddd DD MMM, YYYY")}
@@ -283,14 +304,27 @@ function MeDashboard() {
                   </div>
 
                   <div className="flex justify-end">
-                    <Button
-                      color="pink"
-                      leftSection={<IoBookmark size={18} />}
-                      onClick={() => handleBookNow(match.matchId)}
-                      className="w-full sm:w-auto"
-                    >
-                      Book Now
-                    </Button>
+                    {match.isRegistered ? (
+                      <Button
+                        color="green"
+                        leftSection={<IoCheckmark size={18} />}
+                        disabled
+                        className="w-full sm:w-auto"
+                      >
+                        Registered
+                      </Button>
+                    ) : (
+                      <Button
+                        color="pink"
+                        leftSection={<IoBookmark size={18} />}
+                        onClick={() => registerMatch(match.matchId)}
+                        loading={isRegistering}
+                        disabled={isRegistering}
+                        className="w-full sm:w-auto"
+                      >
+                        Book Now
+                      </Button>
+                    )}
                   </div>
                 </div>
               </Paper>

@@ -8,6 +8,15 @@ type Registration struct {
 	Comment  string `json:"comment"`
 }
 
+func NewRegistration(playerId, matchId uint) *Registration {
+	return &Registration{
+		PlayerId: playerId,
+		MatchId:  matchId,
+		IsPaid:   false,
+		Comment:  "",
+	}
+}
+
 func (reg *Registration) MarkPaid() {
 	reg.IsPaid = true
 }

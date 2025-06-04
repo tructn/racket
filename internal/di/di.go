@@ -18,7 +18,7 @@ func Register() *dig.Container {
 	// Handlers
 	c.Provide(handler.NewMatchHandler)
 	c.Provide(handler.NewPlayerHandler)
-	c.Provide(handler.NewRegHandler)
+	c.Provide(handler.NewRegistrationHandler)
 	c.Provide(handler.NewSportCenterHandler)
 	c.Provide(handler.NewSettingsHandler)
 	c.Provide(handler.NewReportHandler)
@@ -26,6 +26,7 @@ func Register() *dig.Container {
 	c.Provide(handler.NewShareCodeHandler)
 	c.Provide(handler.NewTeamHandler)
 	c.Provide(handler.NewUserHandler)
+	c.Provide(handler.NewMeHandler)
 
 	// Services
 	c.Provide(service.NewSportCenterService)
@@ -36,6 +37,8 @@ func Register() *dig.Container {
 	c.Provide(service.NewUserService)
 	c.Provide(service.NewTeamService)
 	c.Provide(service.NewUserService)
+	c.Provide(service.NewRegistrationService)
+	c.Provide(service.NewMeService)
 
 	return c
 }

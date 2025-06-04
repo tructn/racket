@@ -5,7 +5,7 @@ import { IoCalendarOutline, IoSearch } from "react-icons/io5";
 import { useSearchParams } from "react-router-dom";
 import Currency from "@/components/currency";
 import { useApi } from "@/hooks/useApi";
-import { UnpaidModel } from "@/models/reports/unpaid";
+import { UnpaidModel } from "@/types/reports/unpaid";
 
 const PlayerLoading = () => (
   <>

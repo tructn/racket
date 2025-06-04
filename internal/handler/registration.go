@@ -9,25 +9,42 @@ import (
 	"github.com/tructn/racket/internal/domain"
 	"github.com/tructn/racket/internal/dto"
 	"github.com/tructn/racket/internal/service"
+	"github.com/tructn/racket/pkg/currentuser"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type RegistrationHandler struct {
-	db          *gorm.DB
-	logger      *zap.SugaredLogger
-	activitysvc *service.ActivityService
+	db                  *gorm.DB
+	logger              *zap.SugaredLogger
+	activityService     *service.ActivityService
+	registrationService *service.RegistrationService
 }
 
-func NewRegHandler(
+func NewRegistrationHandler(
 	db *gorm.DB,
 	logger *zap.SugaredLogger,
-	activitysvc *service.ActivityService,
+	activityService *service.ActivityService,
+	registrationService *service.RegistrationService,
 ) *RegistrationHandler {
 	return &RegistrationHandler{
-		db:          db,
-		logger:      logger,
-		activitysvc: activitysvc,
+		db:                  db,
+		logger:              logger,
+		activityService:     activityService,
+		registrationService: registrationService,
+	}
+}
+
+func (h *RegistrationHandler) UseRouter(router *gin.RouterGroup) {
+	group := router.Group("/registrations")
+	{
+		group.GET("/", h.GetAll)
+		group.POST("/", h.Register)
+		group.POST("/attendant-requests", h.AttendantRequest)
+		group.PUT("/:registrationId/paid", h.MarkPaid)
+		group.PUT("/:registrationId/unpaid", h.MarkUnPaid)
+		group.DELETE("/:registrationId", h.Unregister)
+		group.POST("/matches", h.RegisterMatch)
 	}
 }
 
@@ -106,6 +123,28 @@ func (h *RegistrationHandler) AttendantRequest(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func (h *RegistrationHandler) RegisterMatch(c *gin.Context) {
+	var dto dto.RegistrationMatchDto
+	if err := c.BindJSON(&dto); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	idpUserId, err := currentuser.GetIdpUserId(c)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = h.registrationService.RegisterMatch(idpUserId, dto.MatchId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
 func (h *RegistrationHandler) Register(c *gin.Context) {
 	dto := dto.RegistrationDto{}
 	var err error
@@ -135,7 +174,7 @@ func (h *RegistrationHandler) Register(c *gin.Context) {
 			return err
 		}
 
-		ac, err := h.activitysvc.BuildRegisterActivity(dto.PlayerId, dto.MatchId)
+		ac, err := h.activityService.BuildRegisterActivity(dto.PlayerId, dto.MatchId)
 		if err != nil {
 			return err
 		}
@@ -159,7 +198,7 @@ func (h *RegistrationHandler) Unregister(c *gin.Context) {
 			return err
 		}
 		h.logger.Info(reg)
-		ac, err := h.activitysvc.BuildUnregisterActivity(reg.PlayerId, reg.MatchId)
+		ac, err := h.activityService.BuildUnregisterActivity(reg.PlayerId, reg.MatchId)
 		if err != nil {
 			return err
 		}

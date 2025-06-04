@@ -26,7 +26,7 @@ import {
   useAttendantRequestsQuery,
   useUpcomingMatches,
 } from "../../hooks/useQueries";
-import { MatchSummaryModel } from "../../models";
+import { MatchSummaryModel } from "../../types";
 
 export default function Requests() {
   const api = useApi();

@@ -22,7 +22,7 @@ import httpService from "@/common/httpservice";
 import Currency from "@/components/currency";
 import Page from "@/components/page";
 import { useSportCenterValueLabelQuery } from "@/hooks/useQueries";
-import { CreateOrUpdateMatchModel } from "@/models";
+import { CreateOrUpdateMatchModel } from "@/types";
 import { MatchModel } from "./models";
 import DataTableSkeleton from "@/components/loading/skeleton/data-table-skeleton";
 

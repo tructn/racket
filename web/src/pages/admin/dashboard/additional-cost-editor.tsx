@@ -12,7 +12,7 @@ import {
 import React, { useRef, useState } from "react";
 import { FiPlusCircle, FiTrash2 } from "react-icons/fi";
 import { IoSave } from "react-icons/io5";
-import { AdditionalCost } from "@/models";
+import { AdditionalCost } from "@/types";
 
 interface Props {
   onSaveClick?: (costs: AdditionalCost[]) => void;

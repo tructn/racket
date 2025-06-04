@@ -18,6 +18,7 @@ type (
 		CustomSection    *float64  `json:"customSection"`
 		PlayerCount      int       `json:"playerCount"`
 		RegistrationIds  []uint    `json:"registrationIds"`
+		IsRegistered     bool      `json:"isRegistered"`
 	}
 
 	MatchSummaryDto struct {

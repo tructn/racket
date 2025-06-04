@@ -1,7 +1,7 @@
 import { Skeleton, Title } from "@mantine/core";
 import React from "react";
 import { IoPlanetOutline } from "react-icons/io5";
-import { MatchSummaryModel } from "@/models";
+import { MatchSummaryModel } from "@/types";
 import MatchList from "./match-list";
 
 interface Props {

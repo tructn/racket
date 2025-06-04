@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/tructn/racket/internal/domain"
+	"github.com/tructn/racket/internal/dto"
 	"github.com/tructn/racket/pkg/auth0"
 	"gorm.io/gorm"
 )
@@ -129,4 +130,12 @@ func (s *UserService) GetAllUsers() ([]domain.User, error) {
 		return nil, err
 	}
 	return users, nil
+}
+
+func (s *UserService) CreateUser(dto dto.CreateUserDto) (*domain.User, error) {
+	user := domain.NewIdpUser(dto.IdpUserID, dto.Email, dto.FirstName, dto.LastName, dto.Picture)
+	if err := s.db.Create(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }

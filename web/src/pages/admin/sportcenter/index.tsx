@@ -15,7 +15,7 @@ import { z } from "zod";
 import formatter from "@/common/formatter";
 import httpService from "@/common/httpservice";
 import Page from "@/components/page";
-import { SportCenterModel } from "@/models";
+import { SportCenterModel } from "@/types";
 
 const schema = z.object({
   id: z.number().nullable(),

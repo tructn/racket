@@ -88,15 +88,6 @@ func main() {
 		apiV1.POST("/players/:playerId/accounts", handler.OpenAccount)
 	})
 
-	reg.Invoke(func(handler *handler.RegistrationHandler) {
-		apiV1.GET("/registrations", handler.GetAll)
-		apiV1.POST("/registrations", handler.Register)
-		apiV1.POST("/registrations/attendant-requests", handler.AttendantRequest)
-		apiV1.PUT("/registrations/:registrationId/paid", handler.MarkPaid)
-		apiV1.PUT("/registrations/:registrationId/unpaid", handler.MarkUnPaid)
-		apiV1.DELETE("/registrations/:registrationId", handler.Unregister)
-	})
-
 	reg.Invoke(func(handler *handler.SportCenterHandler) {
 		apiV1.GET("/sportcenters", handler.GetAll)
 		apiV1.GET("/sportcenters/options", handler.GetOptions)
@@ -126,9 +117,13 @@ func main() {
 	reg.Invoke(func(
 		teamHandler *handler.TeamHandler,
 		userHandler *handler.UserHandler,
+		registrationHandler *handler.RegistrationHandler,
+		meHandler *handler.MeHandler,
 	) {
+		registrationHandler.UseRouter(apiV1)
 		teamHandler.UseRouter(apiV1)
 		userHandler.UseRouter(apiV1)
+		meHandler.UseRouter(apiV1)
 	})
 
 	server := &http.Server{

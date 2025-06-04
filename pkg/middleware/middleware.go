@@ -113,11 +113,11 @@ func AuthRequired() gin.HandlerFunc {
 					return
 				}
 
-				c.Set("user", map[string]interface{}{
+				c.Set("idp_user", map[string]interface{}{
 					"sub": validatedClaims.RegisteredClaims.Subject,
 				})
-				c.Set("user_roles", customClaims.Roles)
-				c.Set("user_id", validatedClaims.RegisteredClaims.Subject)
+				c.Set("idp_user_roles", customClaims.Roles)
+				c.Set("idp_user_id", validatedClaims.RegisteredClaims.Subject)
 
 				c.Next()
 			})).ServeHTTP(w, r)

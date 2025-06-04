@@ -19,15 +19,15 @@ func NewTeamHandler(teamService *service.TeamService) *TeamHandler {
 }
 
 func (h *TeamHandler) UseRouter(router *gin.RouterGroup) {
-	teams := router.Group("/teams")
+	group := router.Group("/teams")
 	{
-		teams.GET("", h.getTeams)
-		teams.POST("", h.createTeam)
-		teams.GET(":id", h.getTeam)
-		teams.PUT(":id", h.updateTeam)
-		teams.DELETE(":id", h.deleteTeam)
-		teams.POST(":id/members", h.addPlayer)
-		teams.DELETE(":id/members/:playerId", h.removePlayer)
+		group.GET("", h.getTeams)
+		group.POST("", h.createTeam)
+		group.GET(":id", h.getTeam)
+		group.PUT(":id", h.updateTeam)
+		group.DELETE(":id", h.deleteTeam)
+		group.POST(":id/members", h.addPlayer)
+		group.DELETE(":id/members/:playerId", h.removePlayer)
 	}
 }
 
@@ -48,7 +48,7 @@ func (h *TeamHandler) createTeam(c *gin.Context) {
 		return
 	}
 
-	userId, _ := currentuser.GetUserId(c)
+	userId, _ := currentuser.GetIdpUserId(c)
 
 	team, err := h.teamService.CreateTeam(req, userId)
 	if err != nil {
@@ -66,7 +66,7 @@ func (h *TeamHandler) getTeam(c *gin.Context) {
 		return
 	}
 
-	userId, _ := currentuser.GetUserId(c)
+	userId, _ := currentuser.GetIdpUserId(c)
 	team, err := h.teamService.GetTeam(uint(id), userId)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Team not found"})
@@ -89,7 +89,7 @@ func (h *TeamHandler) updateTeam(c *gin.Context) {
 		return
 	}
 
-	userId, _ := currentuser.GetUserId(c)
+	userId, _ := currentuser.GetIdpUserId(c)
 	if err := h.teamService.UpdateTeam(uint(id), req, userId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -105,7 +105,7 @@ func (h *TeamHandler) deleteTeam(c *gin.Context) {
 		return
 	}
 
-	userId, _ := currentuser.GetUserId(c)
+	userId, _ := currentuser.GetIdpUserId(c)
 	if err := h.teamService.DeleteTeam(uint(id), userId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -127,7 +127,7 @@ func (h *TeamHandler) addPlayer(c *gin.Context) {
 		return
 	}
 
-	userId, _ := currentuser.GetUserId(c)
+	userId, _ := currentuser.GetIdpUserId(c)
 	if err := h.teamService.AddPlayer(uint(teamID), req.PlayerID, req.Role, userId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -149,7 +149,7 @@ func (h *TeamHandler) removePlayer(c *gin.Context) {
 		return
 	}
 
-	userId, _ := currentuser.GetUserId(c)
+	userId, _ := currentuser.GetIdpUserId(c)
 	if err := h.teamService.RemovePlayer(uint(teamID), uint(playerID), userId); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

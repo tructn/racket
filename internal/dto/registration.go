@@ -15,6 +15,10 @@ type (
 		MatchId  uint `json:"matchId"`
 	}
 
+	RegistrationMatchDto struct {
+		MatchId uint `json:"matchId"`
+	}
+
 	AttendantRequestDto struct {
 		FirstName      string `json:"firstName"`
 		LastName       string `json:"lastName"`

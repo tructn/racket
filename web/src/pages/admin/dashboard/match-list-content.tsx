@@ -28,7 +28,7 @@ import {
   useMesssageTemplateQuery,
   useRegistrationsByMatchQuery,
 } from "@/hooks/useQueries";
-import { AdditionalCost, MatchSummaryModel, RegistrationModel } from "@/models";
+import { AdditionalCost, MatchSummaryModel, RegistrationModel } from "@/types";
 import AdditionalCostEditor from "./additional-cost-editor";
 import MatchFigure from "./match-figure";
 import { IconCurrencyPound } from "@tabler/icons-react";
