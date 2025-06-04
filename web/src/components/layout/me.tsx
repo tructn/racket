@@ -122,7 +122,13 @@ function MeLayout() {
                 <Menu.Item
                   color="red"
                   leftSection={<IoLogOut size={14} />}
-                  onClick={() => logout()}
+                  onClick={() =>
+                    logout({
+                      logoutParams: {
+                        returnTo: window.location.origin,
+                      },
+                    })
+                  }
                 >
                   Logout
                 </Menu.Item>

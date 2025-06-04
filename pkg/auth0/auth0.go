@@ -18,7 +18,7 @@ var (
 	AUTH0_CLIENT_SECRET string
 )
 
-type AuthUser struct {
+type Auth0User struct {
 	UserID      string `json:"user_id"`
 	Email       string `json:"email"`
 	MaskedEmail string `json:"masked_email"`
@@ -48,7 +48,7 @@ func init() {
 	}
 }
 
-func GetUsers() ([]AuthUser, error) {
+func GetAuth0Users() ([]Auth0User, error) {
 
 	token, err := getAuth0AccessToken(AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET)
 
@@ -128,7 +128,7 @@ func maskEmail(email string) string {
 	return maskedUsername + "@" + domain
 }
 
-func getAuth0Users(domain, token string) ([]AuthUser, error) {
+func getAuth0Users(domain, token string) ([]Auth0User, error) {
 	url := fmt.Sprintf("https://%s/api/v2/users", domain)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -153,7 +153,7 @@ func getAuth0Users(domain, token string) ([]AuthUser, error) {
 		return nil, fmt.Errorf("failed to read users response: %w", err)
 	}
 
-	var users []AuthUser
+	var users []Auth0User
 	if err := json.Unmarshal(body, &users); err != nil {
 		return nil, fmt.Errorf("failed to parse users response: %w", err)
 	}

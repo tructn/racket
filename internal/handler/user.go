@@ -27,7 +27,7 @@ func (h *UserHandler) UseRouter(router *gin.RouterGroup) {
 }
 
 func (h *UserHandler) getAuth0Users(c *gin.Context) {
-	users, err := auth0.GetUsers()
+	users, err := auth0.GetAuth0Users()
 	if err != nil {
 		c.JSON(500, gin.H{"error": "Failed to get users"})
 		return

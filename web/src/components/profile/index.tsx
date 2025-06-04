@@ -10,7 +10,7 @@ interface UserProfileProp {
 }
 
 const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { user, isAuthenticated, isLoading, logout } = useAuth0();
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -88,13 +88,11 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
             leftSection={<IoLogOut size={14} />}
             color="red"
             onClick={() => {
-              // Trigger logout
-              const logoutButton = document.querySelector(
-                "[data-logout-button]",
-              );
-              if (logoutButton instanceof HTMLElement) {
-                logoutButton.click();
-              }
+              logout({
+                logoutParams: {
+                  returnTo: window.location.origin,
+                },
+              });
             }}
           >
             Logout

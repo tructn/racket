@@ -20,6 +20,7 @@ import {
   IoBusiness,
   IoApps,
   IoBaseball,
+  IoChevronBackCircleOutline,
 } from "react-icons/io5";
 import { FaCircleDot } from "react-icons/fa6";
 import { Text } from "@mantine/core";
@@ -226,15 +227,16 @@ function AdminLayout() {
                   className="h-20 w-20 transition-transform duration-300 hover:scale-110"
                 />
                 <Text size="lg" fw={700} className="text-white">
-                  Admin Panel
+                  RACKET CONSOLE
                 </Text>
               </>
             ) : (
               <button
                 onClick={toggleSideNav}
-                className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600/20 p-2 text-xl text-white transition-all duration-300 hover:bg-blue-600/40 hover:shadow-md"
+                className="flex h-12 w-12 items-center justify-center rounded-lg bg-lime-500 p-2 text-xl text-white transition-all duration-300 hover:bg-lime-500/40 hover:shadow-md"
               >
-                <IoChevronBackCircle
+                <IoChevronBackCircleOutline
+                  size={20}
                   className={cx(
                     "transition-transform duration-300",
                     collapsed && "rotate-180",
