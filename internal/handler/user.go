@@ -2,24 +2,28 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/tructn/racket/internal/dto"
+	"github.com/tructn/racket/internal/domain"
 	"github.com/tructn/racket/internal/service"
 	"github.com/tructn/racket/pkg/auth0"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 )
 
 type UserHandler struct {
 	logger      *zap.SugaredLogger
 	userService *service.UserService
+	db          *gorm.DB
 }
 
 func NewUserHandler(
 	logger *zap.SugaredLogger,
 	userService *service.UserService,
+	db *gorm.DB,
 ) *UserHandler {
 	return &UserHandler{
 		logger:      logger,
 		userService: userService,
+		db:          db,
 	}
 }
 
@@ -70,18 +74,24 @@ func (h *UserHandler) syncAuth0UsersHook(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.CreateUser(dto.CreateUserDto{
-		FirstName: req.FirstName,
-		LastName:  req.LastName,
-		Email:     req.Email,
-		Picture:   req.Picture,
-		IdpUserID: req.UserID,
+	err := h.db.Transaction(func(tx *gorm.DB) error {
+		user := domain.NewIdpUser(req.UserID, req.Email, req.FirstName, req.LastName, req.Picture)
+		if err := tx.Create(user).Error; err != nil {
+			return err
+		}
+
+		player := domain.NewPlayer(user.ID, req.UserID, req.Email, req.FirstName, req.LastName)
+		if err := tx.Create(player).Error; err != nil {
+			return err
+		}
+
+		return nil
 	})
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Failed to create user"})
+		c.JSON(500, gin.H{"error": "Failed to create user and player"})
 		return
 	}
 
-	c.JSON(200, gin.H{"message": "User created successfully", "user": user})
+	c.JSON(200, gin.H{"message": "User and player created successfully"})
 }

@@ -76,6 +76,7 @@ func (h *RegistrationHandler) AttendantRequest(c *gin.Context) {
 
 			if err := tx.Create(player).Error; err != nil {
 				return err
+
 			}
 
 			debugf("create player done %v with error %v", player, err)
