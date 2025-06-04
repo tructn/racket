@@ -268,7 +268,7 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-8">
           <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
             <p className="text-gray-600">
-              © 2024 Racket. All rights reserved.
+              © {new Date().getFullYear()} Racket. All rights reserved.
             </p>
             <div className="flex gap-8">
               <a href="#" className="text-gray-600 hover:text-blue-700">

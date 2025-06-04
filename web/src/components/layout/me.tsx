@@ -150,7 +150,7 @@ function MeLayout() {
         <Container size="lg">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <Text size="sm" c="dimmed">
-              © 2024 Racket. All rights reserved.
+              © {new Date().getFullYear()} Racket. All rights reserved.
             </Text>
             <Group gap="xl">
               <Text
