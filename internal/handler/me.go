@@ -27,7 +27,7 @@ func (h *MeHandler) UseRouter(router *gin.RouterGroup) {
 }
 
 func (h *MeHandler) getMyUpcomingMatches(c *gin.Context) {
-	playerId, err := currentuser.GetCurrentPlayerId(c, h.db)
+	playerId, err := currentuser.GetPlayerId(c, h.db)
 
 	log.Printf("playerId: %v", playerId)
 

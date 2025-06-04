@@ -15,7 +15,7 @@ type (
 		MatchId  uint `json:"matchId"`
 	}
 
-	RegistrationMatchDto struct {
+	MatchRegistrationDto struct {
 		MatchId uint `json:"matchId"`
 	}
 

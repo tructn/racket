@@ -44,7 +44,8 @@ func (h *RegistrationHandler) UseRouter(router *gin.RouterGroup) {
 		group.PUT("/:registrationId/paid", h.MarkPaid)
 		group.PUT("/:registrationId/unpaid", h.MarkUnPaid)
 		group.DELETE("/:registrationId", h.Unregister)
-		group.POST("/matches", h.RegisterMatch)
+		group.POST("/matches/register", h.RegisterMatch)
+		group.POST("/matches/unregister", h.UnregisterMatch)
 	}
 }
 
@@ -124,19 +125,41 @@ func (h *RegistrationHandler) AttendantRequest(c *gin.Context) {
 }
 
 func (h *RegistrationHandler) RegisterMatch(c *gin.Context) {
-	var dto dto.RegistrationMatchDto
+	var dto dto.MatchRegistrationDto
 	if err := c.BindJSON(&dto); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	idpUserId, err := currentuser.GetIdpUserId(c)
+	playerId, err := currentuser.GetPlayerId(c, h.db)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	err = h.registrationService.RegisterMatch(idpUserId, dto.MatchId)
+	err = h.registrationService.RegisterMatch(playerId, dto.MatchId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func (h *RegistrationHandler) UnregisterMatch(c *gin.Context) {
+	var dto dto.MatchRegistrationDto
+	if err := c.BindJSON(&dto); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	playerId, err := currentuser.GetPlayerId(c, h.db)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	err = h.registrationService.UnregisterMatch(playerId, dto.MatchId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

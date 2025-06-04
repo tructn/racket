@@ -67,7 +67,7 @@ function MeDashboard() {
 
   const { mutate: registerMatch, isPending: isRegistering } = useMutation({
     mutationFn: (matchId: number) =>
-      post<{ matchId: number }>("api/v1/registrations/matches", {
+      post<{ matchId: number }>("api/v1/registrations/matches/register", {
         matchId,
       }),
     onSuccess: () => {
@@ -82,6 +82,28 @@ function MeDashboard() {
       notifications.show({
         title: "Error",
         message: error.message || "Failed to register for the match",
+        color: "red",
+      });
+    },
+  });
+
+  const { mutate: unregisterMatch, isPending: isUnregistering } = useMutation({
+    mutationFn: (matchId: number) =>
+      post<{ matchId: number }>("api/v1/registrations/matches/unregister", {
+        matchId,
+      }),
+    onSuccess: () => {
+      notifications.show({
+        title: "Success",
+        message: "Successfully unregistered for the match",
+        color: "green",
+      });
+      queryClient.invalidateQueries({ queryKey: ["my-upcoming-matches"] });
+    },
+    onError: (error) => {
+      notifications.show({
+        title: "Error",
+        message: error.message || "Failed to unregister for the match",
         color: "red",
       });
     },
@@ -222,7 +244,7 @@ function MeDashboard() {
                         color={match.isRegistered ? "pink" : "green"}
                         leftSection={<IoCalendar size={14} />}
                       >
-                        {match.isRegistered ? "Registered" : "Available"}
+                        {match.isRegistered ? "Booked" : "Available"}
                       </Badge>
                       <Text fw={500} size="lg" className="truncate">
                         {dayjs(match.start).format("ddd DD MMM, YYYY")}
@@ -306,12 +328,15 @@ function MeDashboard() {
                   <div className="flex justify-end">
                     {match.isRegistered ? (
                       <Button
-                        color="green"
-                        leftSection={<IoCheckmark size={18} />}
-                        disabled
+                        color="red"
+                        variant="light"
+                        leftSection={<IoCloseCircle size={18} />}
+                        onClick={() => unregisterMatch(match.matchId)}
+                        loading={isUnregistering}
+                        disabled={isUnregistering}
                         className="w-full sm:w-auto"
                       >
-                        Registered
+                        Cancel
                       </Button>
                     ) : (
                       <Button

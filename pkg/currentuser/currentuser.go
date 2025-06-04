@@ -49,7 +49,7 @@ func GetIdpUserRoles(c *gin.Context) ([]string, error) {
 	return roles, nil
 }
 
-func GetCurrentPlayerId(c *gin.Context, db *gorm.DB) (uint, error) {
+func GetPlayerId(c *gin.Context, db *gorm.DB) (uint, error) {
 	idpUserId, err := GetIdpUserId(c)
 	if err != nil {
 		return 0, err
@@ -63,7 +63,7 @@ func GetCurrentPlayerId(c *gin.Context, db *gorm.DB) (uint, error) {
 	return playerId, nil
 }
 
-func GetCurrentUserId(c *gin.Context, db *gorm.DB) (uint, error) {
+func GetUserId(c *gin.Context, db *gorm.DB) (uint, error) {
 	idpUserId, err := GetIdpUserId(c)
 	if err != nil {
 		return 0, err
