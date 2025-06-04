@@ -134,8 +134,17 @@ function MeDashboard() {
           width={width}
           height={height}
           recycle={false}
-          numberOfPieces={200}
-          gravity={0.2}
+          numberOfPieces={500}
+          gravity={0.5}
+          initialVelocityY={10}
+          tweenDuration={4000}
+          colors={["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF"]}
+          confettiSource={{ x: 0, y: 0, w: width, h: 0 }}
+          drawShape={(ctx) => {
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, 2 * Math.PI);
+            ctx.fill();
+          }}
         />
       )}
       <div className="mb-8">
