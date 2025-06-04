@@ -3,7 +3,6 @@ import {
   IoApps,
   IoBookmark,
   IoCalendar,
-  IoCheckmark,
   IoCloseCircle,
   IoGolf,
   IoLocation,
