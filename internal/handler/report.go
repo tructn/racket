@@ -28,11 +28,11 @@ func NewReportHandler(paymentservice *service.PaymentService, db *gorm.DB, logge
 func (h *ReportHandler) UseRouter(router *gin.RouterGroup) {
 	group := router.Group("/reports")
 	{
-		group.GET("/unpaid", h.getUnpaidReport)
+		group.GET("/outstanding-payments", h.getOutstandingPayments)
 	}
 }
 
-func (h *ReportHandler) getUnpaidReport(c *gin.Context) {
+func (h *ReportHandler) getOutstandingPayments(c *gin.Context) {
 	res, err := h.paymentservice.GetPlayerUnpaidReport()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

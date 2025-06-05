@@ -12,6 +12,9 @@ import {
   Modal,
   Table,
   Badge,
+  Paper,
+  Grid,
+  Divider,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -19,7 +22,7 @@ import { teamService } from "@/services/teamService";
 import { Team } from "@/types/team";
 import Page from "@/components/page";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { FiPlus, FiEdit, FiTrash } from "react-icons/fi";
+import { FiPlus, FiEdit, FiTrash, FiUsers } from "react-icons/fi";
 
 function TeamManagement() {
   const queryClient = useQueryClient();
@@ -147,57 +150,119 @@ function TeamManagement() {
 
   return (
     <Page title="Team Management">
-      <div className="flex justify-start">
-        <Button
-          leftSection={<FiPlus size={16} />}
-          onClick={() => setCreateModalOpen(true)}
-          loading={createTeamMutation.isPending}
-        >
-          Create Team
-        </Button>
-      </div>
+      <Stack gap="lg">
+        {/* Header Section */}
+        <Paper p="md" withBorder>
+          <Group justify="space-between" mb="md">
+            <Title order={3}>Teams Overview</Title>
+            <Button
+              leftSection={<FiPlus size={16} />}
+              variant="filled"
+              onClick={() => setCreateModalOpen(true)}
+              loading={createTeamMutation.isPending}
+            >
+              Create Team
+            </Button>
+          </Group>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {teams.map((team: Team) => (
-          <Card key={team.id} shadow="sm" p="lg" radius="md" withBorder>
-            <Stack gap="md">
-              <Group justify="space-between">
-                <Title order={3}>{team.name}</Title>
-                <Group gap="xs">
-                  <ActionIcon
-                    variant="light"
-                    color="blue"
-                    onClick={() => setSelectedTeam(team)}
-                    loading={isLoadingTeams}
-                  >
-                    <FiEdit size={16} />
-                  </ActionIcon>
-                  <ActionIcon
-                    variant="light"
-                    color="red"
-                    onClick={() => handleDeleteTeam(team.id)}
-                    loading={deleteTeamMutation.isPending}
-                  >
-                    <FiTrash size={16} />
-                  </ActionIcon>
-                </Group>
-              </Group>
-              <Text size="sm" color="dimmed">
-                {team.description}
-              </Text>
-              <Group gap="xs">
-                <Badge color="blue">{team.members.length} Members</Badge>
-              </Group>
-            </Stack>
-          </Card>
-        ))}
-      </div>
+          <Grid>
+            <Grid.Col span={{ base: 12, md: 3 }}>
+              <Paper p="md" withBorder>
+                <Text size="sm" c="dimmed">
+                  Total Teams
+                </Text>
+                <Title order={2}>{teams.length}</Title>
+              </Paper>
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 3 }}>
+              <Paper p="md" withBorder>
+                <Text size="sm" c="dimmed">
+                  Total Members
+                </Text>
+                <Title order={2}>
+                  {teams.reduce((acc, team) => acc + team.members.length, 0)}
+                </Title>
+              </Paper>
+            </Grid.Col>
+          </Grid>
+        </Paper>
+
+        {/* Teams Grid */}
+        <Paper withBorder>
+          <Table striped highlightOnHover>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Team Name</Table.Th>
+                <Table.Th>Description</Table.Th>
+                <Table.Th>Members</Table.Th>
+                <Table.Th style={{ width: 120 }}>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {teams.map((team: Team) => (
+                <Table.Tr key={team.id}>
+                  <Table.Td>
+                    <Group gap="xs">
+                      <Text fw={500}>{team.name}</Text>
+                      <Badge variant="light" color="blue">
+                        {team.members.length} Members
+                      </Badge>
+                    </Group>
+                  </Table.Td>
+                  <Table.Td>
+                    <Text lineClamp={2} size="sm" c="dimmed">
+                      {team.description || "No description"}
+                    </Text>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs">
+                      {team.members.slice(0, 3).map((member) => (
+                        <Badge key={member.id} variant="light">
+                          {member.name}
+                        </Badge>
+                      ))}
+                      {team.members.length > 3 && (
+                        <Badge variant="light">
+                          +{team.members.length - 3}
+                        </Badge>
+                      )}
+                    </Group>
+                  </Table.Td>
+                  <Table.Td>
+                    <Group gap="xs" justify="flex-end">
+                      <ActionIcon
+                        size="md"
+                        variant="light"
+                        color="blue"
+                        onClick={() => setSelectedTeam(team)}
+                        loading={isLoadingTeams}
+                      >
+                        <FiEdit size={16} />
+                      </ActionIcon>
+                      <ActionIcon
+                        size="md"
+                        variant="light"
+                        color="red"
+                        onClick={() => handleDeleteTeam(team.id)}
+                        loading={deleteTeamMutation.isPending}
+                      >
+                        <FiTrash size={16} />
+                      </ActionIcon>
+                    </Group>
+                  </Table.Td>
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
+        </Paper>
+      </Stack>
 
       {/* Create Team Modal */}
       <Modal
         opened={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
-        title="Create Team"
+        title={<Title order={3}>Create Team</Title>}
+        size="lg"
       >
         <form onSubmit={teamForm.onSubmit(handleCreateTeam)}>
           <Stack gap="md">
@@ -212,9 +277,15 @@ function TeamManagement() {
               placeholder="Enter team description"
               {...teamForm.getInputProps("description")}
             />
-            <Button type="submit" loading={createTeamMutation.isPending}>
-              Create Team
-            </Button>
+            <Divider />
+            <Group justify="flex-end" mt="md">
+              <Button variant="light" onClick={() => setCreateModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={createTeamMutation.isPending}>
+                Create Team
+              </Button>
+            </Group>
           </Stack>
         </form>
       </Modal>
@@ -223,47 +294,67 @@ function TeamManagement() {
       <Modal
         opened={!!selectedTeam}
         onClose={() => setSelectedTeam(null)}
-        title={selectedTeam?.name}
+        title={
+          <Group gap="xs">
+            <FiUsers size={20} />
+            <Title order={3}>{selectedTeam?.name}</Title>
+          </Group>
+        }
         size="xl"
       >
         {selectedTeam && (
           <Stack gap="xl">
-            <div>
-              <Title order={4} className="mb-4">
-                Members
-              </Title>
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <Paper withBorder p="md">
+              <Stack gap="md">
+                <Group justify="space-between">
+                  <Title order={4}>Team Information</Title>
+                  <Badge size="lg" variant="light" color="blue">
+                    {selectedTeam.members.length} Members
+                  </Badge>
+                </Group>
+                <Text size="sm" c="dimmed">
+                  {selectedTeam.description || "No description provided"}
+                </Text>
+              </Stack>
+            </Paper>
+
+            <Paper withBorder>
+              <Table striped highlightOnHover>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Name</Table.Th>
+                    <Table.Th>Email</Table.Th>
+                    <Table.Th>Role</Table.Th>
+                    <Table.Th style={{ width: 100 }}>Actions</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
                   {selectedTeam.members.map((member) => (
-                    <tr key={member.id}>
-                      <td>{member.name}</td>
-                      <td>{member.email}</td>
-                      <td>{member.role}</td>
-                      <td>
-                        <ActionIcon
-                          variant="light"
-                          color="red"
-                          onClick={() =>
-                            handleRemoveMember(selectedTeam.id, member.id)
-                          }
-                          loading={removeMemberMutation.isPending}
-                        >
-                          <FiTrash size={16} />
-                        </ActionIcon>
-                      </td>
-                    </tr>
+                    <Table.Tr key={member.id}>
+                      <Table.Td>{member.name}</Table.Td>
+                      <Table.Td>{member.email}</Table.Td>
+                      <Table.Td>
+                        <Badge variant="light">{member.role}</Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Group gap="xs" justify="flex-end">
+                          <ActionIcon
+                            variant="light"
+                            color="red"
+                            onClick={() =>
+                              handleRemoveMember(selectedTeam.id, member.id)
+                            }
+                            loading={removeMemberMutation.isPending}
+                          >
+                            <FiTrash size={16} />
+                          </ActionIcon>
+                        </Group>
+                      </Table.Td>
+                    </Table.Tr>
                   ))}
-                </tbody>
+                </Table.Tbody>
               </Table>
-            </div>
+            </Paper>
           </Stack>
         )}
       </Modal>

@@ -211,7 +211,6 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
       httpService.put(`api/v1/registrations/${registrationId}/unpaid`, {}),
   });
 
-  // Memoized handlers
   const handleSaveAdditionalCosts = useCallback(
     async (costs: AdditionalCost[]) => {
       await httpService.put(

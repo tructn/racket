@@ -6,7 +6,7 @@ import Page from "@/components/page";
 import { rem, Tabs } from "@mantine/core";
 import { IconMoneybag, IconTimeline } from "@tabler/icons-react";
 
-type TabType = "unpaid" | "activity-log" | "share-codes";
+type TabType = "outstanding-payments" | "activity-log" | "share-codes";
 
 const OutstandingPayment = lazy(() => import("./outstanding-payment"));
 const ActivityLog = lazy(() => import("./activity-log"));
@@ -14,18 +14,18 @@ const ShareCodes = lazy(() => import("./sharecodes"));
 
 export default function Reporting() {
   const iconStyle = { width: rem(16), height: rem(16) };
-  const [tab, setTab] = useState<TabType>("unpaid");
+  const [tab, setTab] = useState<TabType>("outstanding-payments");
 
   return (
     <Page title="Reports">
-      <Tabs defaultValue="unpaid">
+      <Tabs defaultValue="outstanding-payments">
         <Tabs.List>
           <Tabs.Tab
-            value="unpaid"
+            value="outstanding-payments"
             leftSection={<IconMoneybag style={iconStyle} />}
-            onClick={() => setTab("unpaid")}
+            onClick={() => setTab("outstanding-payments")}
           >
-            Unpaid
+            Outstanding Payments
           </Tabs.Tab>
           <Tabs.Tab
             value="activity-log"
@@ -45,7 +45,7 @@ export default function Reporting() {
 
         <Tabs.Panel value={tab}>
           <Suspense fallback={<SectionLoading />}>
-            {tab === "unpaid" && <OutstandingPayment />}
+            {tab === "outstanding-payments" && <OutstandingPayment />}
             {tab === "activity-log" && <ActivityLog />}
             {tab === "share-codes" && <ShareCodes />}
           </Suspense>
