@@ -21,7 +21,7 @@ import DataTableSkeleton from "@/components/loading/skeleton/data-table-skeleton
 import { useApi } from "@/hooks/useApi";
 import { UnpaidModel } from "@/types/reports/unpaid";
 
-export default function UnpaidReport() {
+export default function OutstandingPayment() {
   const { get } = useApi();
 
   const [opened, { open: openShareCodeResult, close: closeShareCodeResult }] =
@@ -67,7 +67,7 @@ export default function UnpaidReport() {
 
   async function shareToEveryOne() {
     const res = await httpService.post("api/v1/share-codes/urls", {
-      url: `${window.location.origin}/anonymous/outstanding-report`,
+      url: `${window.location.origin}/anonymous/outstanding-payment-report`,
     });
     setShareCodeUrl(res.fullUrl);
     openShareCodeResult();
@@ -120,7 +120,14 @@ export default function UnpaidReport() {
             {data?.map((item) => {
               return (
                 <Table.Tr key={item.playerId}>
-                  <Table.Td>{item.playerName}</Table.Td>
+                  <Table.Td>
+                    <div className="flex flex-col">
+                      <span>{item.playerName}</span>
+                      <span className="text-sm text-gray-500">
+                        {item.email}
+                      </span>
+                    </div>
+                  </Table.Td>
                   <Table.Td
                     className={clsx(
                       "font-bold",

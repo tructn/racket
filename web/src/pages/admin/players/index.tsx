@@ -13,6 +13,9 @@ import {
   Badge,
   Box,
   LoadingOverlay,
+  Container,
+  Card,
+  Flex,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -144,6 +147,12 @@ function Players() {
     <Page title="Players Management">
       <Stack gap="lg">
         <Group justify="space-between" align="center">
+          <Stack gap={0}>
+            <Title order={2}>Players</Title>
+            <Text size="sm" c="dimmed">
+              Manage and monitor player accounts
+            </Text>
+          </Stack>
           <Button
             leftSection={<IoAdd size={20} />}
             onClick={openDrawer}
@@ -159,11 +168,11 @@ function Players() {
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th>Player</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Created At</Table.Th>
-                <Table.Th>SSO</Table.Th>
-                <Table.Th style={{ width: 150 }}>Actions</Table.Th>
+                <Table.Th style={{ width: "30%" }}>Player</Table.Th>
+                <Table.Th style={{ width: "25%" }}>Email</Table.Th>
+                <Table.Th style={{ width: "20%" }}>Created At</Table.Th>
+                <Table.Th style={{ width: "15%" }}>SSO</Table.Th>
+                <Table.Th style={{ width: "10%" }}>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -173,19 +182,32 @@ function Players() {
                   <Table.Tr key={item.id}>
                     <Table.Td>
                       <Group gap="xs">
-                        <IoPerson size={20} />
+                        <Box className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoPerson size={18} className="text-blue-500" />
+                        </Box>
                         <Box>
-                          <Text fw={500}>
+                          <Text fw={500} size="sm">
                             {item.firstName} {item.lastName}
+                          </Text>
+                          <Text size="xs" c="dimmed">
+                            ID: {item.id}
                           </Text>
                         </Box>
                       </Group>
                     </Table.Td>
-                    <Table.Td>{item.email}</Table.Td>
-                    <Table.Td>{formatter.formatDate(item.createdAt)}</Table.Td>
+                    <Table.Td>
+                      <Text size="sm" c="dimmed" className="truncate">
+                        {item.email}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">
+                        {formatter.formatDate(item.createdAt)}
+                      </Text>
+                    </Table.Td>
                     <Table.Td>
                       {item.externalUserId && (
-                        <Badge variant="light" color="blue">
+                        <Badge variant="light" color="blue" size="sm">
                           {item.externalUserId.substring(
                             0,
                             item.externalUserId.lastIndexOf("|"),
@@ -200,9 +222,9 @@ function Players() {
                             variant="light"
                             color="blue"
                             onClick={() => openNewAccount(item)}
-                            size="lg"
+                            size="md"
                           >
-                            <IoCalculatorOutline size={18} />
+                            <IoCalculatorOutline size={16} />
                           </ActionIcon>
                         </Tooltip>
 
@@ -211,9 +233,9 @@ function Players() {
                             variant="light"
                             color="yellow"
                             onClick={() => editClick(item)}
-                            size="lg"
+                            size="md"
                           >
-                            <IoPencil size={18} />
+                            <IoPencil size={16} />
                           </ActionIcon>
                         </Tooltip>
 
@@ -222,9 +244,9 @@ function Players() {
                             variant="light"
                             color="red"
                             onClick={() => deleteClick(item)}
-                            size="lg"
+                            size="md"
                           >
-                            <IoTrash size={18} />
+                            <IoTrash size={16} />
                           </ActionIcon>
                         </Tooltip>
                       </Group>
@@ -241,9 +263,16 @@ function Players() {
         opened={opened}
         onClose={closeDrawer}
         title={
-          <Title order={3}>
-            {form.values.id ? "Edit Player" : "Create New Player"}
-          </Title>
+          <Stack gap={0}>
+            <Title order={3}>
+              {form.values.id ? "Edit Player" : "Create New Player"}
+            </Title>
+            <Text size="sm" c="dimmed">
+              {form.values.id
+                ? "Update player information"
+                : "Add a new player to the system"}
+            </Text>
+          </Stack>
         }
         size="md"
       >

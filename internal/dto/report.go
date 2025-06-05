@@ -2,9 +2,10 @@ package dto
 
 import "time"
 
-type RegistrationSummaryByPlayerDto struct {
+type PlayerUnpaidDto struct {
 	PlayerId            uint    `json:"playerId"`
 	PlayerName          string  `json:"playerName"`
+	Email               string  `json:"email"`
 	MatchCount          uint    `json:"matchCount"`
 	UnpaidAmount        float64 `json:"unpaidAmount"`
 	RegistrationSummary string  `json:"registrationSummary"`

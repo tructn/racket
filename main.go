@@ -48,70 +48,61 @@ func main() {
 		ctx.Status(200)
 	})
 
-	publicV1 := router.Group("/api/v1/public")
-	reg.Invoke(func(handler *handler.ReportHandler) {
-		publicV1.GET("/reports/unpaid", handler.GetUnpaidReportForPublic)
+	anonymousApi := router.Group("/api/v1")
+	reg.Invoke(func(anonymousHandler *handler.AnonymousHandler) {
+		anonymousHandler.UseRouter(anonymousApi)
 	})
 
-	publicV2 := router.Group("/api/v2/public")
-	reg.Invoke(func(handler *handler.ReportHandler) {
-		publicV2.GET("/reports/unpaid", handler.GetUnpaidDetailsByPlayer)
-	})
-
-	apiV1 := router.Group("/api/v1")
-	apiV1.Use(middleware.AuthRequired())
+	api := router.Group("/api/v1")
+	api.Use(middleware.AuthRequired())
 
 	reg.Invoke(func(handler *handler.MatchHandler) {
-		apiV1.POST("/matches", handler.Create)
-		apiV1.GET("/matches", handler.GetAll)
-		apiV1.GET("/matches/archived", handler.GetArchivedMatches)
-		apiV1.GET("/matches/future", handler.GetFutureMatches)
-		apiV1.GET("/matches/today", handler.GetTodayMatches)
-		apiV1.GET("/upcoming-matches", handler.GetUpcomingMatches)
-		apiV1.GET("/matches/:matchId/registrations", handler.GetRegistrationsByMatch)
-		apiV1.GET("/matches/:matchId/cost", handler.GetCost)
-		apiV1.POST("/matches/:matchId/clone", handler.Clone)
-		apiV1.GET("/matches/:matchId/additional-costs", handler.GetAdditionalCost)
-		apiV1.PUT("/matches/:matchId", handler.UpdateMatch)
-		apiV1.PUT("/matches/:matchId/costs", handler.UpdateCost)
-		apiV1.PUT("/matches/:matchId/additional-costs", handler.CreateAdditionalCost)
-		apiV1.DELETE("/matches/:matchId", handler.Delete)
+		api.POST("/matches", handler.Create)
+		api.GET("/matches", handler.GetAll)
+		api.GET("/matches/archived", handler.GetArchivedMatches)
+		api.GET("/matches/future", handler.GetFutureMatches)
+		api.GET("/matches/today", handler.GetTodayMatches)
+		api.GET("/upcoming-matches", handler.GetUpcomingMatches)
+		api.GET("/matches/:matchId/registrations", handler.GetRegistrationsByMatch)
+		api.GET("/matches/:matchId/cost", handler.GetCost)
+		api.POST("/matches/:matchId/clone", handler.Clone)
+		api.GET("/matches/:matchId/additional-costs", handler.GetAdditionalCost)
+		api.PUT("/matches/:matchId", handler.UpdateMatch)
+		api.PUT("/matches/:matchId/costs", handler.UpdateCost)
+		api.PUT("/matches/:matchId/additional-costs", handler.CreateAdditionalCost)
+		api.DELETE("/matches/:matchId", handler.Delete)
 	})
 
 	reg.Invoke(func(handler *handler.PlayerHandler) {
-		apiV1.GET("/players", handler.GetAll)
-		apiV1.GET("/players/external-users/:externalUserId/attendant-requests", handler.GetExternalUserAttendantRequests)
-		apiV1.POST("/players", handler.Create)
-		apiV1.DELETE("/players/:playerId", handler.Delete)
-		apiV1.PUT("/players/:playerId", handler.Update)
-		apiV1.PUT("/players/:playerId/outstanding-payments/paid", handler.MarkOutstandingPaymentsAsPaid)
-		apiV1.POST("/players/:playerId/accounts", handler.OpenAccount)
+		api.GET("/players", handler.GetAll)
+		api.GET("/players/external-users/:externalUserId/attendant-requests", handler.GetExternalUserAttendantRequests)
+		api.POST("/players", handler.Create)
+		api.DELETE("/players/:playerId", handler.Delete)
+		api.PUT("/players/:playerId", handler.Update)
+		api.PUT("/players/:playerId/outstanding-payments/paid", handler.MarkOutstandingPaymentsAsPaid)
+		api.POST("/players/:playerId/accounts", handler.OpenAccount)
 	})
 
 	reg.Invoke(func(handler *handler.SportCenterHandler) {
-		apiV1.GET("/sportcenters", handler.GetAll)
-		apiV1.GET("/sportcenters/options", handler.GetOptions)
-		apiV1.POST("/sportcenters", handler.Create)
-		apiV1.PUT("/sportcenters/:sportCenterId", handler.Update)
+		api.GET("/sportcenters", handler.GetAll)
+		api.GET("/sportcenters/options", handler.GetOptions)
+		api.POST("/sportcenters", handler.Create)
+		api.PUT("/sportcenters/:sportCenterId", handler.Update)
 	})
 
 	reg.Invoke(func(handler *handler.SettingsHandler) {
-		apiV1.GET("/settings/message-template", handler.GetMessageTemplate)
-		apiV1.POST("/settings/message-template", handler.CreateMessageTemplate)
-	})
-
-	reg.Invoke(func(handler *handler.ReportHandler) {
-		apiV1.GET("/reports/unpaid", handler.GetUnpaidReport)
+		api.GET("/settings/message-template", handler.GetMessageTemplate)
+		api.POST("/settings/message-template", handler.CreateMessageTemplate)
 	})
 
 	reg.Invoke(func(handler *handler.ActivityHandler) {
-		apiV1.GET("/activities", handler.GetAll)
+		api.GET("/activities", handler.GetAll)
 	})
 
 	reg.Invoke(func(handler *handler.ShareCodeHandler) {
-		apiV1.GET("/share-codes/urls", handler.GetShareUrls)
-		apiV1.POST("/share-codes/urls", handler.CreateShareUrl)
-		apiV1.DELETE("/share-codes/urls/:shareCodeId", handler.DeleteShareCodeUrl)
+		api.GET("/share-codes/urls", handler.GetShareUrls)
+		api.POST("/share-codes/urls", handler.CreateShareUrl)
+		api.DELETE("/share-codes/urls/:shareCodeId", handler.DeleteShareCodeUrl)
 	})
 
 	reg.Invoke(func(
@@ -119,11 +110,13 @@ func main() {
 		userHandler *handler.UserHandler,
 		registrationHandler *handler.RegistrationHandler,
 		meHandler *handler.MeHandler,
+		reportHandler *handler.ReportHandler,
 	) {
-		registrationHandler.UseRouter(apiV1)
-		teamHandler.UseRouter(apiV1)
-		userHandler.UseRouter(apiV1)
-		meHandler.UseRouter(apiV1)
+		registrationHandler.UseRouter(api)
+		teamHandler.UseRouter(api)
+		userHandler.UseRouter(api)
+		meHandler.UseRouter(api)
+		reportHandler.UseRouter(api)
 	})
 
 	server := &http.Server{

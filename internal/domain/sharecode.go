@@ -44,7 +44,7 @@ func NewShareCode(generator Generator) *ShareCode {
 
 func NewShareCodeWithUrl(url string, generator Generator) *ShareCode {
 	code, _ := generator.Gen(20)
-	fullUrl := fmt.Sprintf("%s/v2?share-code=%s", url, code)
+	fullUrl := fmt.Sprintf("%s?share-code=%s", url, code)
 	expiry := createExpiry()
 
 	return &ShareCode{

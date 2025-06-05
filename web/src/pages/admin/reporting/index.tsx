@@ -1,14 +1,15 @@
+import { lazy, Suspense, useState } from "react";
+import { IoQrCodeOutline } from "react-icons/io5";
+
+import SectionLoading from "@/components/loading/section-loading";
+import Page from "@/components/page";
 import { rem, Tabs } from "@mantine/core";
 import { IconMoneybag, IconTimeline } from "@tabler/icons-react";
-import { lazy, Suspense, useState } from "react";
-import Page from "@/components/page";
-import SectionLoading from "@/components/loading/section-loading";
-import { IoQrCodeOutline } from "react-icons/io5";
 
 type TabType = "unpaid" | "activity-log" | "share-codes";
 
-const Unpaid = lazy(() => import("./unpaid"));
-const ActivityLogs = lazy(() => import("./activity-log"));
+const OutstandingPayment = lazy(() => import("./outstanding-payment"));
+const ActivityLog = lazy(() => import("./activity-log"));
 const ShareCodes = lazy(() => import("./sharecodes"));
 
 export default function Reporting() {
@@ -44,8 +45,8 @@ export default function Reporting() {
 
         <Tabs.Panel value={tab}>
           <Suspense fallback={<SectionLoading />}>
-            {tab === "unpaid" && <Unpaid />}
-            {tab === "activity-log" && <ActivityLogs />}
+            {tab === "unpaid" && <OutstandingPayment />}
+            {tab === "activity-log" && <ActivityLog />}
             {tab === "share-codes" && <ShareCodes />}
           </Suspense>
         </Tabs.Panel>

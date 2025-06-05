@@ -27,6 +27,7 @@ func Register() *dig.Container {
 	c.Provide(handler.NewTeamHandler)
 	c.Provide(handler.NewUserHandler)
 	c.Provide(handler.NewMeHandler)
+	c.Provide(handler.NewAnonymousHandler)
 
 	// Services
 	c.Provide(service.NewSportCenterService)

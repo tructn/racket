@@ -22,11 +22,8 @@ const Requests = lazy(() => import("@/components/requests"));
 const AdminRequestScreen = lazy(() => import("@/pages/admin/requests"));
 const ReportingScreen = lazy(() => import("@/pages/admin/reporting"));
 const UsersScreen = lazy(() => import("@/pages/admin/users"));
-const PublicOutstandingReport = lazy(
-  () => import("@/pages/anonymous/outstanding-report"),
-);
-const PublicOutstandingReportV2 = lazy(
-  () => import("@/pages/anonymous/outstanding-report-v2"),
+const OutstandingPaymentReport = lazy(
+  () => import("@/pages/anonymous/outstanding-payment-report"),
 );
 const TeamManagement = lazy(() => import("@/pages/admin/teams"));
 const ProfileScreen = lazy(() => import("@/pages/admin/profile"));
@@ -81,12 +78,8 @@ function App() {
         <Route path="/anonymous" element={<AnonymousLayout />}>
           <Route index element={<Requests />} />
           <Route
-            path="outstanding-report"
-            element={<PublicOutstandingReport />}
-          />
-          <Route
-            path="outstanding-report/v2"
-            element={<PublicOutstandingReportV2 />}
+            path="outstanding-payment-report"
+            element={<OutstandingPaymentReport />}
           />
         </Route>
         <Route path="/coming-soon" element={<ComingSoon />} />

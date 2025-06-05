@@ -40,17 +40,17 @@ const PlayerLoading = () => (
   </div>
 );
 
-export default function Page() {
+export default function OutstandingReport() {
   const { get } = useApi();
   const [search, setSearch] = useState("");
   const [searchParams] = useSearchParams();
   const shareCode = searchParams.get("share-code");
   const { isFetching, data, isError } = useQuery<PlayerGrouping[]>({
     retry: false,
-    queryKey: ["getPublicUnpaidReportV2"],
+    queryKey: ["getOutstandingPaymentReport"],
     queryFn: () =>
       get<PlayerGrouping[]>(
-        `api/v2/public/reports/unpaid?shareCode=${shareCode}`,
+        `api/v1/anonymous/reports/outstanding-payments?shareCode=${shareCode}`,
       ),
     initialData: [],
   });

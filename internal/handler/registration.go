@@ -38,8 +38,8 @@ func NewRegistrationHandler(
 func (h *RegistrationHandler) UseRouter(router *gin.RouterGroup) {
 	group := router.Group("/registrations")
 	{
-		group.GET("/", h.GetAll)
-		group.POST("/", h.Register)
+		group.GET("", h.GetAll)
+		group.POST("", h.Register)
 		group.POST("/attendant-requests", h.AttendantRequest)
 		group.PUT("/:registrationId/paid", h.MarkPaid)
 		group.PUT("/:registrationId/unpaid", h.MarkUnPaid)
