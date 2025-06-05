@@ -14,6 +14,7 @@ type PlayerUnpaidDto struct {
 type MatchCostDetailsDto struct {
 	PlayerId            uint      `json:"playerId"`
 	PlayerName          string    `json:"playerName"`
+	PlayerEmail         string    `json:"playerEmail"`
 	MatchDate           time.Time `json:"matchDate"`
 	MatchCost           float64   `json:"matchCost"`
 	MatchAdditionalCost float64   `json:"matchAdditionalCost"`

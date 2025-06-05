@@ -62,17 +62,3 @@ func GetPlayerId(c *gin.Context, db *gorm.DB) (uint, error) {
 
 	return playerId, nil
 }
-
-func GetUserId(c *gin.Context, db *gorm.DB) (uint, error) {
-	idpUserId, err := GetIdpUserId(c)
-	if err != nil {
-		return 0, err
-	}
-
-	var userId uint
-	if err := db.Model(&domain.User{}).Where("idp_user_id = ?", idpUserId).Select("id").First(&userId).Error; err != nil {
-		return 0, err
-	}
-
-	return userId, nil
-}

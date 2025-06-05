@@ -3,6 +3,8 @@ package handler
 import (
 	"net/http"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +19,7 @@ type (
 	grouping struct {
 		PlayerId        uint      `json:"playerId"`
 		PlayerName      string    `json:"playerName"`
+		PlayerEmail     string    `json:"playerEmail"`
 		PlayerTotalCost float64   `json:"playerTotalCost"`
 		Matches         []details `json:"matches"`
 	}
@@ -56,7 +59,7 @@ func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
 	}
 
 	groupedByPlayer := lo.GroupBy(data, func(item dto.MatchCostDetailsDto) string {
-		return item.PlayerName
+		return strconv.Itoa(int(item.PlayerId))
 	})
 
 	aggregation := lo.MapValues(groupedByPlayer, func(value []dto.MatchCostDetailsDto, key string) grouping {
@@ -75,9 +78,10 @@ func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
 		})
 
 		return grouping{
-			PlayerId:   items[0].PlayerId,
-			PlayerName: key,
-			Matches:    matches,
+			PlayerId:    items[0].PlayerId,
+			PlayerName:  items[0].PlayerName,
+			PlayerEmail: maskEmail(items[0].PlayerEmail),
+			Matches:     matches,
 			PlayerTotalCost: lo.SumBy(matches, func(m details) float64 {
 				return m.IndividualCost
 			}),
@@ -110,12 +114,7 @@ func (h *AnonymousHandler) syncUserWebHook(c *gin.Context) {
 	}
 
 	err := h.db.Transaction(func(tx *gorm.DB) error {
-		user := domain.NewIdpUser(req.UserID, req.Email, req.FirstName, req.LastName, req.Picture)
-		if err := tx.Create(user).Error; err != nil {
-			return err
-		}
-
-		player := domain.NewPlayer(user.ID, req.UserID, req.Email, req.FirstName, req.LastName)
+		player := domain.NewPlayer(req.UserID, req.Email, req.FirstName, req.LastName)
 		if err := tx.Create(player).Error; err != nil {
 			return err
 		}
@@ -129,4 +128,23 @@ func (h *AnonymousHandler) syncUserWebHook(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "User and player created successfully"})
+}
+
+func maskEmail(email string) string {
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return email
+	}
+
+	username := parts[0]
+	domain := parts[1]
+
+	// If username is 2 or fewer characters, just return the original
+	if len(username) <= 2 {
+		return email
+	}
+
+	// Keep first 2 characters and last character of username
+	maskedUsername := username[:2] + strings.Repeat("*", len(username)-3) + username[len(username)-1:]
+	return maskedUsername + "@" + domain
 }

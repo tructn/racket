@@ -26,6 +26,7 @@ type MatchDetails = {
 type PlayerGrouping = {
   playerId: number;
   playerName: string;
+  playerEmail: string;
   playerTotalCost: number;
   matches: MatchDetails[];
 };
@@ -142,27 +143,29 @@ export default function OutstandingReport() {
         <div className="space-y-4">
           {filterGroupingData?.map((player) => (
             <div
-              key={player.playerName}
+              key={player.playerId}
               className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-all hover:border-blue-200 hover:bg-blue-50/50 hover:shadow-md"
             >
               {/* Player Header */}
               <div className="border-b border-slate-100 bg-slate-50 p-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                      <IoPerson className="text-blue-600" />
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                      <IoPerson className="text-blue-600" size={20} />
                     </div>
-                    <div>
+                    <div className="space-y-0.5">
                       <div className="font-semibold text-slate-800">
                         {player.playerName}
                       </div>
-                      <div className="text-xs text-slate-500">
-                        {player.matches.length} matches
+                      <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span>{player.playerEmail}</span>
+                        <span>•</span>
+                        <span>{player.matches.length} matches</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 rounded-full bg-green-50 px-3 py-1">
-                    <IoWallet className="text-green-600" />
+                  <div className="flex items-center gap-2 rounded-full bg-green-50 px-4 py-1.5">
+                    <IoWallet className="text-green-600" size={18} />
                     <span className="font-semibold text-green-700">
                       <Currency value={player.playerTotalCost} />
                     </span>

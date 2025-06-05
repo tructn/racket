@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"strconv"
 
 	"github.com/samber/lo"
@@ -62,6 +63,7 @@ func (s *SportCenterService) Update(
 	entity := domain.SportCenter{}
 
 	if err := s.db.Find(&entity, id).Error; err != nil {
+		log.Printf("Error finding sport center: %v", err)
 		return err
 	}
 
@@ -70,7 +72,11 @@ func (s *SportCenterService) Update(
 	entity.CostPerSection = costPerSection
 	entity.MinutePerSection = minutePerSection
 
-	return s.db.Save(entity).Error
+	err := s.db.Save(&entity).Error
+
+	log.Printf("Error saving sport center: %v", err)
+
+	return err
 }
 
 func (s *SportCenterService) GetOptions() ([]dto.SelectOption, error) {

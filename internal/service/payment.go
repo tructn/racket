@@ -70,7 +70,15 @@ func (s *PaymentService) GetOutstandingPaymentReportForAnonymous() ([]dto.MatchC
 			where m.deleted_at is null
 			group by m.id, m."cost", m.start, ac.total
 		)
-		select p.id as player_id, CONCAT(p.first_name, ' ', p.last_name) as player_name, pc.match_id, pc.match_date, pc.match_cost, pc.match_additional_cost, pc.match_player_count
+		select 
+			p.id as player_id, 
+			CONCAT(p.first_name, ' ', p.last_name) as player_name, 
+			p.email as player_email,
+			pc.match_id, 
+			pc.match_date, 
+			pc.match_cost, 
+			pc.match_additional_cost, 
+			pc.match_player_count
 		from public.registrations r
 		join public.players p on p.id = r.player_id
 		join cte_player_counts pc on pc.match_id  = r.match_id

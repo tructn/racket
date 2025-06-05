@@ -49,7 +49,7 @@ func (h *UserHandler) syncAuth0UsersDbUser(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "Failed to get users"})
 		return
 	}
-	if err := h.userService.SyncUsersFromAuth0Users(users); err != nil {
+	if err := h.userService.SyncPlayersFromAuth0Users(users); err != nil {
 		c.JSON(500, gin.H{"error": "Failed to sync users"})
 		return
 	}
