@@ -33,7 +33,7 @@ func (h *ReportHandler) UseRouter(router *gin.RouterGroup) {
 }
 
 func (h *ReportHandler) getOutstandingPayments(c *gin.Context) {
-	res, err := h.paymentservice.GetPlayerUnpaidReport()
+	res, err := h.paymentservice.GetOutstandingPaymentReportForAdmin()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

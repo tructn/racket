@@ -49,7 +49,7 @@ func (h *AnonymousHandler) UseRouter(router *gin.RouterGroup) {
 
 func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
 	//TODO: share code verification
-	data, err := h.paymentservice.GetUnpaidReportMatchWise()
+	data, err := h.paymentservice.GetOutstandingPaymentReportForAnonymous()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return

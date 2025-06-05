@@ -69,9 +69,19 @@ func (s *UserService) SyncUsersFromAuth0Users(auth0Users []auth0.Auth0User) erro
 			}
 
 			var existingPlayer domain.Player
-			_ = tx.Where("external_user_id = ?", auth0User.UserID).First(&existingPlayer).Error
+			err = tx.Where("external_user_id = ?", auth0User.UserID).First(&existingPlayer).Error
 
-			if existingPlayer.ID == 0 {
+			if err == nil {
+				existingPlayer.Email = auth0User.Email
+				existingPlayer.FirstName = auth0User.GivenName
+				existingPlayer.LastName = auth0User.FamilyName
+				existingPlayer.UserID = &newUser.ID
+				if err := tx.Save(&existingPlayer).Error; err != nil {
+					return err
+				}
+				log.Printf("Player updated: %+v", existingPlayer)
+			} else {
+				// Create new player if not exists
 				player := domain.NewPlayer(
 					newUser.ID,
 					auth0User.UserID,
@@ -83,7 +93,6 @@ func (s *UserService) SyncUsersFromAuth0Users(auth0Users []auth0.Auth0User) erro
 				if err := tx.Create(player).Error; err != nil {
 					return err
 				}
-
 				log.Printf("Player created: %+v", player)
 			}
 

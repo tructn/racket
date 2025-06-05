@@ -17,6 +17,7 @@ var (
 )
 
 func NewDatabase() *gorm.DB {
+
 	once.Do(func() {
 		DB_CONN := os.Getenv("DATABASE_URL")
 

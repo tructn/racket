@@ -15,7 +15,7 @@ func NewPaymentService(db *gorm.DB) *PaymentService {
 	}
 }
 
-func (s *PaymentService) GetPlayerUnpaidReport() ([]dto.PlayerUnpaidDto, error) {
+func (s *PaymentService) GetOutstandingPaymentReportForAdmin() ([]dto.PlayerUnpaidDto, error) {
 	sql := `
 	WITH cte_match_costs AS (
 		SELECT 
@@ -55,7 +55,7 @@ func (s *PaymentService) GetPlayerUnpaidReport() ([]dto.PlayerUnpaidDto, error) 
 	return result, nil
 }
 
-func (s *PaymentService) GetUnpaidReportMatchWise() ([]dto.MatchCostDetailsDto, error) {
+func (s *PaymentService) GetOutstandingPaymentReportForAnonymous() ([]dto.MatchCostDetailsDto, error) {
 	sql := `with 
 		cte_addtional_costs as (
 			select ac.match_id, sum(ac.amount) as total
