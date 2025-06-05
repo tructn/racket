@@ -1,10 +1,13 @@
 import { lazy, Suspense, useState } from "react";
-import { IoQrCodeOutline } from "react-icons/io5";
+import {
+  IoQrCodeOutline,
+  IoWalletOutline,
+  IoTimeOutline,
+} from "react-icons/io5";
 
 import SectionLoading from "@/components/loading/section-loading";
 import Page from "@/components/page";
 import { rem, Tabs } from "@mantine/core";
-import { IconMoneybag, IconTimeline } from "@tabler/icons-react";
 
 type TabType = "outstanding-payments" | "activity-log" | "share-codes";
 
@@ -22,14 +25,14 @@ export default function Reporting() {
         <Tabs.List>
           <Tabs.Tab
             value="outstanding-payments"
-            leftSection={<IconMoneybag style={iconStyle} />}
+            leftSection={<IoWalletOutline style={iconStyle} />}
             onClick={() => setTab("outstanding-payments")}
           >
             Outstanding Payments
           </Tabs.Tab>
           <Tabs.Tab
             value="activity-log"
-            leftSection={<IconTimeline style={iconStyle} />}
+            leftSection={<IoTimeOutline style={iconStyle} />}
             onClick={() => setTab("activity-log")}
           >
             Activities

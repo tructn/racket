@@ -11,12 +11,11 @@ import {
   Badge,
 } from "@mantine/core";
 import { useMutation, useQuery } from "@tanstack/react-query";
-
+import { FiCopy, FiExternalLink, FiTrash2 } from "react-icons/fi";
 import { useApi } from "@/hooks/useApi";
 import { ShareUrlModel } from "./models";
 import DataTableSkeleton from "@/components/loading/skeleton/data-table-skeleton";
 import { QRCodeSVG } from "qrcode.react";
-import { IconTrash, IconExternalLink, IconCopy } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 
 export default function ShareCodes() {
@@ -89,7 +88,7 @@ export default function ShareCodes() {
                               color="blue"
                               onClick={() => copyToClipboard(item.fullUrl)}
                             >
-                              <IconCopy size={16} />
+                              <FiCopy size={16} />
                             </ActionIcon>
                           </Tooltip>
                           <Tooltip label="Open in new tab">
@@ -100,7 +99,7 @@ export default function ShareCodes() {
                               href={item.fullUrl}
                               target="_blank"
                             >
-                              <IconExternalLink size={16} />
+                              <FiExternalLink size={16} />
                             </ActionIcon>
                           </Tooltip>
                         </Group>
@@ -116,7 +115,7 @@ export default function ShareCodes() {
                             await refetch();
                           }}
                         >
-                          <IconTrash size={16} />
+                          <FiTrash2 size={16} />
                         </ActionIcon>
                       </Tooltip>
                     </Table.Td>

@@ -31,7 +31,6 @@ import {
 import { AdditionalCost, MatchSummaryModel, RegistrationModel } from "@/types";
 import AdditionalCostEditor from "./additional-cost-editor";
 import MatchFigure from "./match-figure";
-import { IconCurrencyPound } from "@tabler/icons-react";
 
 interface Prop {
   match: MatchSummaryModel;
@@ -100,7 +99,7 @@ const RegistrationRow = React.memo(
                 onClick={() =>
                   reg.registrationId && onTogglePaid(reg.registrationId)
                 }
-                icon={<IconCurrencyPound />}
+                icon={<FiDollarSign />}
               />
             </Tooltip>
             <Tooltip label="Unregister">

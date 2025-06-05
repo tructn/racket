@@ -20,7 +20,6 @@
     "@mantine/modals": "^7.10.1",
     "@mantine/notifications": "^7.10.1",
     "@mantine/tiptap": "^7.10.1",
-    "@tabler/icons-react": "^3.19.0",
     "@tanstack/react-query": "^5.44.0",
     "@tiptap/extension-link": "^2.4.0",
     "@tiptap/extension-text-align": "^2.4.0",

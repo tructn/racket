@@ -6,6 +6,11 @@ import {
   Skeleton,
   Table,
   TextInput,
+  Paper,
+  Stack,
+  Group,
+  Title,
+  Badge,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -70,74 +75,112 @@ export default function SportCenter() {
   return (
     <>
       <Page title="Sport Center Management">
-        <div>
-          <Button leftSection={<IoAdd />} variant="default" onClick={openModal}>
-            Create Sport Center
-          </Button>
-        </div>
-        <Table striped withRowBorders={false}>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Location</Table.Th>
-              <Table.Th>Cost per section</Table.Th>
-              <Table.Th>Minute per section</Table.Th>
-              <Table.Th
-                align="center"
-                className="flex items-center justify-center"
+        <Stack gap="lg" mt="lg">
+          <Paper withBorder radius="md" p="md">
+            <Group justify="flex-end" mb="md">
+              <Button
+                leftSection={<IoAdd />}
+                variant="default"
+                onClick={openModal}
               >
-                Action
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>
-            {isPending && <Skeleton />}
-            {!isPending &&
-              sportCenters?.map((item) => {
-                return (
-                  <Table.Tr key={item.id}>
-                    <Table.Td>{item.name}</Table.Td>
-                    <Table.Td>{item.location}</Table.Td>
-                    <Table.Td>
-                      {formatter.currency(item.costPerSection)}
-                    </Table.Td>
-                    <Table.Td>
-                      {formatter.minute(item.minutePerSection)}
-                    </Table.Td>
-                    <Table.Td className="flex items-center justify-center gap-2">
-                      <ActionIcon onClick={() => editClick(item)} size="lg">
-                        <IoPencil />
-                      </ActionIcon>
+                Create Sport Center
+              </Button>
+            </Group>
+
+            <Table striped highlightOnHover withRowBorders={false}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Location</Table.Th>
+                  <Table.Th>Cost per section</Table.Th>
+                  <Table.Th>Minute per section</Table.Th>
+                  <Table.Th align="center">Action</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {isPending ? (
+                  <Table.Tr>
+                    <Table.Td colSpan={5}>
+                      <Skeleton height={50} />
                     </Table.Td>
                   </Table.Tr>
-                );
-              })}
-          </Table.Tbody>
-        </Table>
+                ) : (
+                  sportCenters?.map((item) => (
+                    <Table.Tr key={item.id}>
+                      <Table.Td>{item.name}</Table.Td>
+                      <Table.Td>{item.location}</Table.Td>
+                      <Table.Td>
+                        {formatter.currency(item.costPerSection)}
+                      </Table.Td>
+                      <Table.Td>
+                        {formatter.minute(item.minutePerSection)}
+                      </Table.Td>
+                      <Table.Td>
+                        <Group gap="xs" justify="center">
+                          <ActionIcon
+                            variant="light"
+                            color="blue"
+                            onClick={() => editClick(item)}
+                            size="lg"
+                          >
+                            <IoPencil />
+                          </ActionIcon>
+                        </Group>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))
+                )}
+              </Table.Tbody>
+            </Table>
+          </Paper>
+        </Stack>
       </Page>
 
-      <Modal opened={opened} onClose={closeModal} title="Sport Center">
+      <Modal
+        opened={opened}
+        onClose={closeModal}
+        title="Sport Center"
+        size="md"
+      >
         <form
           onSubmit={form.onSubmit((model) => mutation.mutate(model))}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-4"
         >
-          <TextInput label="Name" {...form.getInputProps("name")} />
+          <TextInput
+            label="Name"
+            placeholder="Enter sport center name"
+            {...form.getInputProps("name")}
+          />
 
-          <TextInput label="Location" {...form.getInputProps("location")} />
+          <TextInput
+            label="Location"
+            placeholder="Enter sport center location"
+            {...form.getInputProps("location")}
+          />
 
           <NumberInput
             label="Cost per section"
+            placeholder="Enter cost per section"
+            min={0}
             {...form.getInputProps("costPerSection")}
           />
 
           <NumberInput
             label="Minute per section"
+            placeholder="Enter minutes per section"
+            min={0}
             {...form.getInputProps("minutePerSection")}
           />
 
-          <Button leftSection={<IoSave />} type="submit">
-            Save
-          </Button>
+          <Group justify="flex-end" mt="md">
+            <Button
+              leftSection={<IoSave />}
+              type="submit"
+              loading={mutation.isPending}
+            >
+              Save
+            </Button>
+          </Group>
         </form>
       </Modal>
     </>
