@@ -109,10 +109,19 @@ func (h *MatchHandler) GetUpcomingMatches(c *gin.Context) {
 
 func (h *MatchHandler) Delete(c *gin.Context) {
 	matchId := util.GetRouteString(c, "matchId")
-	if err := h.db.Delete(&domain.Match{}, matchId).Error; err != nil {
+	if err := h.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("match_id = ?", matchId).Delete(&domain.Registration{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Delete(&domain.Match{}, matchId).Error; err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
 	c.Status(http.StatusOK)
 }
 
