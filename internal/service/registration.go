@@ -36,7 +36,8 @@ func (s *RegistrationService) RegisterMatch(playerId uint, matchId uint) error {
 }
 
 func (s *RegistrationService) UnregisterMatch(playerId uint, matchId uint) error {
-	result := s.db.Where("player_id = ? AND match_id = ?", playerId, matchId).
+	result := s.db.
+		Where("player_id = ? AND match_id = ?", playerId, matchId).
 		Delete(&domain.Registration{})
 
 	if result.Error != nil {
@@ -45,6 +46,24 @@ func (s *RegistrationService) UnregisterMatch(playerId uint, matchId uint) error
 
 	if result.RowsAffected == 0 {
 		return fmt.Errorf("no registration found for this match")
+	}
+
+	return nil
+}
+
+func (s *RegistrationService) UpdateTotalPlayerPaidFor(registrationId uint, count uint) error {
+	if count < 1 {
+		count = 1
+	}
+
+	registration := &domain.Registration{}
+	if err := s.db.First(registration, registrationId).Error; err != nil {
+		return err
+	}
+
+	registration.UpdatePlayerPaidForCount(count)
+	if err := s.db.Save(registration).Error; err != nil {
+		return err
 	}
 
 	return nil

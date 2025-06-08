@@ -10,6 +10,7 @@ import (
 	"github.com/tructn/racket/internal/dto"
 	"github.com/tructn/racket/internal/service"
 	"github.com/tructn/racket/pkg/currentuser"
+	"github.com/tructn/racket/pkg/util"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -46,6 +47,7 @@ func (h *RegistrationHandler) UseRouter(router *gin.RouterGroup) {
 		group.DELETE("/:registrationId", h.Unregister)
 		group.POST("/matches/register", h.RegisterMatch)
 		group.POST("/matches/unregister", h.UnregisterMatch)
+		group.PUT("/:registrationId/total-paid-for", h.UpdateTotalPlayerPaidFor)
 	}
 }
 
@@ -274,7 +276,8 @@ func (h *RegistrationHandler) GetAll(c *gin.Context) {
 			m.start, 
 			m.end, 
 			CONCAT(p.first_name, ' ', p.last_name) as player_name,
-			r.is_paid
+			r.is_paid,
+			r.total_player_paid_for,
 		FROM "matches" m 
 		LEFT JOIN "registrations" r ON m.id = r.match_id
 		LEFT JOIN "players" p ON p.id = r.player_id AND p.deleted_at IS NULL
@@ -286,4 +289,25 @@ func (h *RegistrationHandler) GetAll(c *gin.Context) {
 	log.Print(result)
 
 	c.JSON(http.StatusOK, result)
+}
+
+func (h *RegistrationHandler) UpdateTotalPlayerPaidFor(c *gin.Context) {
+	registrationId := util.GetIntRouteParam(c, "registrationId")
+	var dto dto.UpdateTotalPlayerPaidForDto
+	if err := c.BindJSON(&dto); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	if dto.Count < 1 {
+		dto.Count = 1
+	}
+
+	err := h.registrationService.UpdateTotalPlayerPaidFor(registrationId, dto.Count)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }

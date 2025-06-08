@@ -36,6 +36,7 @@ export interface CreateOrUpdateMatchModel {
 
 export interface RegistrationDetailModel {
   registrationId: number;
+  totalPlayerPaidFor: number;
   matchId: number;
   playerId: number;
   playerName: string;
@@ -46,6 +47,7 @@ export interface RegistrationDetailModel {
 export interface RegistrationModel {
   playerId: number;
   matchId: number;
+  totalPlayerPaidFor: number;
   registrationId?: number;
   playerName?: string;
   email?: string;

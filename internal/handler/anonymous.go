@@ -16,20 +16,21 @@ import (
 )
 
 type (
-	grouping struct {
-		PlayerId        uint      `json:"playerId"`
-		PlayerName      string    `json:"playerName"`
-		PlayerEmail     string    `json:"playerEmail"`
-		PlayerTotalCost float64   `json:"playerTotalCost"`
-		Matches         []details `json:"matches"`
+	player struct {
+		PlayerId        uint    `json:"playerId"`
+		PlayerName      string  `json:"playerName"`
+		PlayerEmail     string  `json:"playerEmail"`
+		PlayerTotalCost float64 `json:"playerTotalCost"`
+		Matches         []match `json:"matches"`
 	}
 
-	details struct {
-		Date             time.Time `json:"date"`
-		MatchCost        float64   `json:"matchCost"`
-		MatchPlayerCount uint      `json:"matchPlayerCount"`
-		AdditionalCost   float64   `json:"matchAdditionalCost"`
-		IndividualCost   float64   `json:"individualCost"`
+	match struct {
+		Date               time.Time `json:"date"`
+		MatchCost          float64   `json:"matchCost"`
+		MatchPlayerCount   uint      `json:"matchPlayerCount"`
+		AdditionalCost     float64   `json:"matchAdditionalCost"`
+		IndividualCost     float64   `json:"individualCost"`
+		TotalPlayerPaidFor uint      `json:"totalPlayerPaidFor"`
 	}
 )
 
@@ -58,31 +59,32 @@ func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
 		return
 	}
 
-	groupedByPlayer := lo.GroupBy(data, func(item dto.MatchCostDetailsDto) string {
+	groupedByPlayer := lo.GroupBy(data, func(item dto.AnonymousOutstandingPaymentReportDto) string {
 		return strconv.Itoa(int(item.PlayerId))
 	})
 
-	aggregation := lo.MapValues(groupedByPlayer, func(value []dto.MatchCostDetailsDto, key string) grouping {
+	aggregation := lo.MapValues(groupedByPlayer, func(value []dto.AnonymousOutstandingPaymentReportDto, key string) player {
 		items := groupedByPlayer[key]
-		matches := lo.Map(items, func(item dto.MatchCostDetailsDto, index int) details {
+		matches := lo.Map(items, func(item dto.AnonymousOutstandingPaymentReportDto, index int) match {
 			matchCost := item.MatchCost + item.MatchAdditionalCost
-			individualCost := matchCost / float64(item.MatchPlayerCount)
+			individualCost := float64(item.TotalPlayerPaidFor) * (matchCost / float64(item.MatchPlayerCount))
 
-			return details{
-				Date:             item.MatchDate,
-				MatchCost:        matchCost,
-				AdditionalCost:   item.MatchAdditionalCost,
-				MatchPlayerCount: item.MatchPlayerCount,
-				IndividualCost:   individualCost,
+			return match{
+				Date:               item.MatchDate,
+				MatchCost:          matchCost,
+				TotalPlayerPaidFor: item.TotalPlayerPaidFor,
+				AdditionalCost:     item.MatchAdditionalCost,
+				MatchPlayerCount:   item.MatchPlayerCount,
+				IndividualCost:     individualCost,
 			}
 		})
 
-		return grouping{
+		return player{
 			PlayerId:    items[0].PlayerId,
 			PlayerName:  items[0].PlayerName,
 			PlayerEmail: maskEmail(items[0].PlayerEmail),
 			Matches:     matches,
-			PlayerTotalCost: lo.SumBy(matches, func(m details) float64 {
+			PlayerTotalCost: lo.SumBy(matches, func(m match) float64 {
 				return m.IndividualCost
 			}),
 		}

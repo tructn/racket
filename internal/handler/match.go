@@ -186,7 +186,8 @@ func (h *MatchHandler) GetRegistrationsByMatch(c *gin.Context) {
 		pl.email,
 		re.id AS registration_id,
 		re.match_id,
-		re.is_paid
+		re.is_paid,
+		re.total_player_paid_for
 	FROM "players" pl
 	LEFT JOIN "registrations" re ON pl.id = re.player_id AND re.deleted_at IS NULL AND re.match_id = ?
 	WHERE pl.deleted_at IS NULL

@@ -5,4 +5,5 @@ export interface OutstandingPaymentModel {
     matchCount: number;
     unpaidAmount: number;
     registrationSummary: string;
+    totalPlayerPaidFor: number;
 }

@@ -1,4 +1,12 @@
-import { Alert, Button, Modal, Switch, Skeleton, Tooltip } from "@mantine/core";
+import {
+  Alert,
+  Button,
+  Modal,
+  Switch,
+  Skeleton,
+  Tooltip,
+  NumberInput,
+} from "@mantine/core";
 import { useClipboard, useDisclosure } from "@mantine/hooks";
 import { useMutation } from "@tanstack/react-query";
 import cx from "clsx";
@@ -44,6 +52,7 @@ const RegistrationRow = React.memo(
     onRegister,
     onUnregister,
     onTogglePaid,
+    onUpdateTotalPlayerPaidFor,
     isRegisterLoading,
     isUnregisterLoading,
     isPaidLoading,
@@ -53,20 +62,24 @@ const RegistrationRow = React.memo(
     onRegister: (data: RegistrationModel) => void;
     onUnregister: (id: number) => void;
     onTogglePaid: (id: number) => void;
+    onUpdateTotalPlayerPaidFor: (data: {
+      registrationId: number;
+      count: number;
+    }) => void;
     isRegisterLoading: boolean;
     isUnregisterLoading: boolean;
     isPaidLoading: boolean;
   }) => (
     <div
       className={cx(
-        "group relative flex items-center justify-between gap-4 rounded-lg border border-slate-100 bg-white p-4 transition-all hover:border-slate-200 hover:shadow-md",
+        "group relative flex items-center justify-between gap-4 rounded-lg border border-slate-100 bg-white p-3 transition-all hover:border-slate-200 hover:shadow-md",
         { "bg-emerald-50/30": !!reg.registrationId },
       )}
     >
-      <div className="flex flex-1 items-center gap-4">
+      <div className="flex flex-1 items-center gap-3">
         <div
           className={cx(
-            "flex h-10 w-10 items-center justify-center rounded-full text-lg font-bold text-white transition-all",
+            "flex h-9 w-9 items-center justify-center rounded-full text-base font-bold text-white transition-all",
             reg.registrationId
               ? "bg-emerald-500"
               : "bg-slate-200 text-slate-400",
@@ -76,7 +89,7 @@ const RegistrationRow = React.memo(
         </div>
         <div className="flex flex-col">
           <span
-            className={cx("font-medium text-slate-800", {
+            className={cx("text-sm font-medium text-slate-800", {
               "font-bold": !!reg.registrationId,
             })}
           >
@@ -88,20 +101,47 @@ const RegistrationRow = React.memo(
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-[180px] items-center justify-end gap-2">
         {!!reg.registrationId ? (
           <>
-            <Tooltip label={reg.isPaid ? "Mark as unpaid" : "Mark as paid"}>
-              <ToggleButton
-                activeColor={reg.isPaid ? "green" : "red"}
-                isActive={reg.isPaid}
-                isLoading={isPaidLoading}
-                onClick={() =>
-                  reg.registrationId && onTogglePaid(reg.registrationId)
-                }
-                icon={<FiDollarSign />}
+            <div className="flex items-center gap-1.5">
+              <NumberInput
+                size="xs"
+                min={1}
+                value={reg.totalPlayerPaidFor}
+                // defaultValue={reg.totalPlayerPaidFor}
+                w={50}
+                hideControls
+                placeholder="Players"
+                onChange={(value) => {
+                  if (reg.registrationId && value) {
+                    onUpdateTotalPlayerPaidFor({
+                      registrationId: reg.registrationId,
+                      count: Number(value),
+                    });
+                  }
+                }}
+                styles={{
+                  input: {
+                    textAlign: "center",
+                    height: "28px",
+                    padding: "0 8px",
+                    fontSize: "0.875rem",
+                  },
+                }}
               />
-            </Tooltip>
+              <Tooltip label={reg.isPaid ? "Mark as unpaid" : "Mark as paid"}>
+                <ToggleButton
+                  activeColor={reg.isPaid ? "green" : "red"}
+                  isActive={reg.isPaid}
+                  isLoading={isPaidLoading}
+                  onClick={() =>
+                    reg.registrationId && onTogglePaid(reg.registrationId)
+                  }
+                  icon={<FiDollarSign />}
+                />
+              </Tooltip>
+            </div>
             <Tooltip label="Unregister">
               <ToggleButton
                 isActive={true}
@@ -120,7 +160,13 @@ const RegistrationRow = React.memo(
               isActive={false}
               isLoading={isRegisterLoading}
               activeColor="green"
-              onClick={() => onRegister({ matchId, playerId: reg.playerId })}
+              onClick={() =>
+                onRegister({
+                  matchId,
+                  playerId: reg.playerId,
+                  totalPlayerPaidFor: 1,
+                })
+              }
               icon={<IoHeartCircle />}
             />
           </Tooltip>
@@ -135,7 +181,7 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
   const clipboardRefLoc = useRef<HTMLDivElement>(null!);
   const clipboard = useClipboard({ timeout: 500 });
   const clipboardRef = useRef<HTMLDivElement>(null!);
-  const [showAttendantOnly, setShowAttendantOnly] = useState(false);
+  const [showAttendantOnly, setShowAttendantOnly] = useState(true);
 
   const [
     additionalCostOpened,
@@ -210,6 +256,20 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
       httpService.put(`api/v1/registrations/${registrationId}/unpaid`, {}),
   });
 
+  const updateTotalPlayerPaidForMut = useMutation({
+    onSuccess: reload,
+    mutationFn: ({
+      registrationId,
+      count,
+    }: {
+      registrationId: number;
+      count: number;
+    }) =>
+      httpService.put(`api/v1/registrations/${registrationId}/total-paid-for`, {
+        count,
+      }),
+  });
+
   const handleSaveAdditionalCosts = useCallback(
     async (costs: AdditionalCost[]) => {
       await httpService.put(
@@ -242,6 +302,7 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
             onTogglePaid={(id) =>
               reg.isPaid ? unpaidMut.mutate(id) : paidMut.mutate(id)
             }
+            onUpdateTotalPlayerPaidFor={updateTotalPlayerPaidForMut.mutate}
             isRegisterLoading={regMut.isPending}
             isUnregisterLoading={unregMut.isPending}
             isPaidLoading={unpaidMut.isPending || paidMut.isPending}
@@ -256,6 +317,7 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
       unregMut,
       paidMut,
       unpaidMut,
+      updateTotalPlayerPaidForMut,
     ],
   );
 

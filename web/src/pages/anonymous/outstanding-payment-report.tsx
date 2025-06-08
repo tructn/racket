@@ -12,23 +12,24 @@ import { useSearchParams } from "react-router-dom";
 import Currency from "@/components/currency";
 import { useApi } from "@/hooks/useApi";
 import { normalizeText } from "@/utils";
-import { Skeleton, TextInput } from "@mantine/core";
+import { TextInput } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
 
-type MatchDetails = {
+type PlayerPaymentMatchModel = {
   date: Date;
   matchCost: number;
   additionalCost: number;
   matchPlayerCount: number;
+  totalPlayerPaidFor: number;
   individualCost: number;
 };
 
-type PlayerGrouping = {
+type PlayerPaymentModel = {
   playerId: number;
   playerName: string;
   playerEmail: string;
   playerTotalCost: number;
-  matches: MatchDetails[];
+  matches: PlayerPaymentMatchModel[];
 };
 
 const PlayerLoading = () => (
@@ -46,11 +47,11 @@ export default function OutstandingReport() {
   const [search, setSearch] = useState("");
   const [searchParams] = useSearchParams();
   const shareCode = searchParams.get("share-code");
-  const { isFetching, data, isError } = useQuery<PlayerGrouping[]>({
+  const { isFetching, data, isError } = useQuery<PlayerPaymentModel[]>({
     retry: false,
     queryKey: ["getOutstandingPaymentReport"],
     queryFn: () =>
-      get<PlayerGrouping[]>(
+      get<PlayerPaymentModel[]>(
         `api/v1/anonymous/reports/outstanding-payments?shareCode=${shareCode}`,
       ),
     initialData: [],
@@ -188,6 +189,10 @@ export default function OutstandingReport() {
                         <div className="flex items-center gap-1 text-slate-600">
                           <IoPeople className="text-slate-400" />
                           <span>{match.matchPlayerCount} players</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-slate-600">
+                          <span>•</span>
+                          <span>Paid for {match.totalPlayerPaidFor}</span>
                         </div>
                       </div>
                       <div className="text-slate-600">
