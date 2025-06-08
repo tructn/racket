@@ -51,6 +51,9 @@ docker compose up
 - 🚧 Testing high coverage
 
 ## Demo
+
+![demo](art/iPad-PRO-11-booking.png "Booking")
+
 ![demo](art/iPad-PRO-11-dashboard.png "Dashboard")
 
 ![demo](art/iPad-PRO-11-players.png "Players")
