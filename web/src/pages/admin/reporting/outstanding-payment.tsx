@@ -180,7 +180,6 @@ export default function OutstandingPayment() {
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>Player Name</Table.Th>
-                <Table.Th>Total Player Paid For</Table.Th>
                 <Table.Th>Unpaid Amount</Table.Th>
                 <Table.Th>Match Count</Table.Th>
                 <Table.Th></Table.Th>
@@ -198,9 +197,6 @@ export default function OutstandingPayment() {
                           {item.email}
                         </span>
                       </div>
-                    </Table.Td>
-                    <Table.Td>
-                      <span>{item.totalPlayerPaidFor}</span>
                     </Table.Td>
                     <Table.Td>
                       <div className="flex items-center gap-2">

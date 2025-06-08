@@ -52,7 +52,18 @@ func (h *AnonymousHandler) UseRouter(router *gin.RouterGroup) {
 }
 
 func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
-	//TODO: share code verification
+	shareCode := c.Query("shareCode")
+	if shareCode == "" {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	var shareCodeUrl domain.ShareCode
+	if err := h.db.Where("code = ? AND expired_at > ?", shareCode, time.Now()).First(&shareCodeUrl).Error; err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
 	data, err := h.paymentservice.GetOutstandingPaymentReportForAnonymous()
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

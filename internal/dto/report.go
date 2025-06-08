@@ -9,7 +9,6 @@ type AdminOutstandingPaymentReportDto struct {
 	MatchCount          uint    `json:"matchCount"`
 	UnpaidAmount        float64 `json:"unpaidAmount"`
 	RegistrationSummary string  `json:"registrationSummary"`
-	TotalPlayerPaidFor  uint    `json:"totalPlayerPaidFor"`
 }
 
 type AnonymousOutstandingPaymentReportDto struct {

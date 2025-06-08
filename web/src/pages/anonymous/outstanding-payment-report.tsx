@@ -76,24 +76,43 @@ export default function OutstandingReport() {
 
   if (isError) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-        <iframe
-          src="https://giphy.com/embed/gj0QdZ9FgqGhOBNlFS"
-          width="378"
-          height="480"
-          frameBorder="0"
-          className="giphy-embed"
-          allowFullScreen
-        ></iframe>
-        <p>
-          <a href="https://giphy.com/gifs/lol-laugh-laughing-gj0QdZ9FgqGhOBNlFS">
-            via GIPHY
-          </a>
-        </p>
-        <h3 className="mt-4 text-2xl font-bold text-violet-500">
-          Error Occurred
-        </h3>
-        <p className="mt-2 text-slate-600">Please try refreshing the page</p>
+      <div className="flex min-h-screen flex-col items-center justify-center text-center">
+        <div className="relative w-full max-w-4xl">
+          <iframe
+            src="https://giphy.com/embed/gj0QdZ9FgqGhOBNlFS"
+            width="100%"
+            height="600"
+            frameBorder="0"
+            className="giphy-embed transform rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
+            allowFullScreen
+          ></iframe>
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 transform rounded-full bg-white/80 px-4 py-2 shadow-md">
+            <a
+              href="https://giphy.com/gifs/lol-laugh-laughing-gj0QdZ9FgqGhOBNlFS"
+              className="text-sm text-violet-600 transition-colors hover:text-violet-800"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              via GIPHY
+            </a>
+          </div>
+        </div>
+        <div className="mt-8 space-y-2">
+          <h3 className="text-4xl font-bold text-red-600">
+            Oops! Something went wrong
+          </h3>
+          <p className="text-lg text-red-500">
+            Don't worry, even our system needs a coffee break sometimes!
+            <br />
+            Try refreshing the page or come back later.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 rounded-full bg-red-500 px-6 py-2 text-white shadow-md transition-colors hover:bg-red-600 hover:shadow-lg"
+          >
+            Refresh Page
+          </button>
+        </div>
       </div>
     );
   }

@@ -31,7 +31,9 @@ func (s *PaymentService) GetOutstandingPaymentReportForAdmin() ([]dto.AdminOutst
 			FROM additional_costs ac
 			GROUP BY ac.match_id
 		) acx ON acx.match_id = m.id
-		WHERE m.deleted_at is null
+		WHERE 
+			m.deleted_at is null
+			AND r.deleted_at is null
 		GROUP BY m.id, m.sport_center_id, acx.additional_cost
 	)
 	SELECT
@@ -39,14 +41,16 @@ func (s *PaymentService) GetOutstandingPaymentReportForAdmin() ([]dto.AdminOutst
 		CONCAT(p.first_name,' ', p.last_name) AS player_name,
 		p.email,
 		COUNT(cte.match_id) AS match_count,
-		SUM(cte.individual_cost * r.total_player_paid_for) AS unpaid_amount,
-		r.total_player_paid_for
+		SUM(cte.individual_cost * r.total_player_paid_for) AS unpaid_amount
 	FROM registrations r
 	JOIN cte_match_costs cte ON cte.match_id = r.match_id
 	JOIN sport_centers sc ON cte.sport_center_id = sc.id
 	JOIN players p ON r.player_id = p.id
-	WHERE r.is_paid = false	
-	GROUP BY p.id, r.total_player_paid_for
+	WHERE 
+		r.is_paid = false
+		AND r.deleted_at is null
+		AND p.deleted_at is null
+	GROUP BY p.id
 	ORDER by player_name
 	`
 	result := []dto.AdminOutstandingPaymentReportDto{}
@@ -73,8 +77,13 @@ func (s *PaymentService) GetOutstandingPaymentReportForAnonymous() ([]dto.Anonym
 			from public.registrations r
 			join public.matches m  on r.match_id = m.id
 			left join cte_addtional_costs ac on ac.match_id = m.id
-			where m.deleted_at is null
-			group by m.id, m."cost", m.start, ac.total
+			where m.deleted_at is null 
+				and r.deleted_at is null
+			group by 
+				m.id, 
+				m."cost", 
+				m.start, 
+				ac.total
 		)
 		select 
 			p.id as player_id,
