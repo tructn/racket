@@ -1,21 +1,25 @@
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "@mantine/notifications/styles.css";
+import "@mantine/tiptap/styles.css";
+import "./index.css";
+
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+
 import { Auth0Provider } from "@auth0/auth0-react";
 import {
   createTheme,
   MantineColorsTuple,
   MantineProvider,
 } from "@mantine/core";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
-import "@mantine/notifications/styles.css";
-import "@mantine/tiptap/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
+
 import App from "./App";
-import "./index.css";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +62,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <ModalsProvider>
               <App />
               <Notifications position="top-right" />
+              <Analytics />
             </ModalsProvider>
           </MantineProvider>
         </QueryClientProvider>
