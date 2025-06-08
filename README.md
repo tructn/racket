@@ -12,7 +12,21 @@
 An app for amature badminton player self-organized group, manage players, courts, costs
 
 > [!NOTE]
-🚧🚧🚧 This project for personal hobby and learning purpose 🚧🚧🚧
+### ⚠️ This project for personal hobby & usage
+
+## Demo
+
+![demo](art/iPad-PRO-11-booking.png "Booking")
+
+![demo](art/iPad-PRO-11-dashboard.png "Dashboard")
+
+![demo](art/iPad-PRO-11-players.png "Players")
+
+![demo](art/iPad-PRO-11-matches.png "Matches")
+
+![demo](art/iPad-PRO-11-mark-as-paid.png "Mark as paid")
+
+![demo](art/iPad-PRO-11-sportcenters.png "Sport Centers")
 
 ## Usage
 ### Environment Variables
@@ -49,20 +63,6 @@ docker compose up
 - 🚧 Monzo API Integration
 - 🚧 Support Mobile Devices (iOS, Android)
 - 🚧 Testing high coverage
-
-## Demo
-
-![demo](art/iPad-PRO-11-booking.png "Booking")
-
-![demo](art/iPad-PRO-11-dashboard.png "Dashboard")
-
-![demo](art/iPad-PRO-11-players.png "Players")
-
-![demo](art/iPad-PRO-11-matches.png "Matches")
-
-![demo](art/iPad-PRO-11-mark-as-paid.png "Mark as paid")
-
-![demo](art/iPad-PRO-11-sportcenters.png "Sport Centers")
 
 ## Stack
 - Golang Gin
