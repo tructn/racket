@@ -199,16 +199,20 @@ const MatchListContent: React.FC<Prop> = ({ match }) => {
   // Memoized computations
   const stats = useMemo(() => {
     const totalPlayers =
-      registrations?.filter((r) => !!r.registrationId).length ?? 0;
+      registrations
+        ?.filter((r) => !!r.registrationId)
+        .reduce((acc, r) => acc + r.totalPlayerPaidFor, 0) ?? 0;
     const totalRegistrations = registrations?.length ?? 0;
-
     return {
       percentage: Math.round((totalPlayers / totalRegistrations) * 100),
       paid:
-        registrations?.filter((r) => r.registrationId && !!r.isPaid).length ??
-        0,
+        registrations
+          ?.filter((r) => r.registrationId && !!r.isPaid)
+          .reduce((acc, r) => acc + r.totalPlayerPaidFor, 0) ?? 0,
       unpaid:
-        registrations?.filter((r) => r.registrationId && !r.isPaid).length ?? 0,
+        registrations
+          ?.filter((r) => r.registrationId && !r.isPaid)
+          .reduce((acc, r) => acc + r.totalPlayerPaidFor, 0) ?? 0,
       totalPlayers,
       individualCost:
         totalPlayers === 0

@@ -8,6 +8,8 @@ import {
   Tabs,
   Text,
   Title,
+  Badge,
+  ScrollArea,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { Link, RichTextEditor } from "@mantine/tiptap";
@@ -18,12 +20,21 @@ import {
   IoChatboxOutline,
   IoNotificationsCircle,
   IoSave,
+  IoInformationCircleOutline,
 } from "react-icons/io5";
 import Markdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import httpService from "@/common/httpservice";
 import Page from "@/components/page";
 import { useMesssageTemplateQuery } from "@/hooks/useQueries";
+
+const TEMPLATE_VARIABLES = [
+  { name: "cost", description: "Match cost per section" },
+  { name: "customSection", description: "Custom section information" },
+  { name: "additionalCost", description: "Additional costs for the match" },
+  { name: "individualCost", description: "Cost per individual player" },
+  { name: "totalPlayer", description: "Total number of players" },
+];
 
 export default function Setting() {
   const [template, setTemplate] = useState("");
@@ -35,6 +46,12 @@ export default function Setting() {
   });
 
   const { data: messageTemplate, refetch } = useMesssageTemplateQuery();
+
+  const insertVariable = (variable: string) => {
+    if (editor) {
+      editor.commands.insertContent(`{{${variable}}}`);
+    }
+  };
 
   const saveMessageTemplate = async () => {
     if (!template) {
@@ -99,8 +116,8 @@ export default function Setting() {
                     </div>
                   </Paper>
 
-                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    <Card withBorder shadow="sm">
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <Card withBorder shadow="sm" className="lg:col-span-2">
                       <Text fw={500} mb="md">
                         Edit Template
                       </Text>
@@ -155,16 +172,50 @@ export default function Setting() {
                     </Card>
 
                     <Card withBorder shadow="sm">
-                      <Text fw={500} mb="md">
-                        Preview
-                      </Text>
-                      <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-                        <Markdown rehypePlugins={[rehypeRaw]}>
-                          {template}
-                        </Markdown>
-                      </div>
+                      <Stack>
+                        <Group>
+                          <IoInformationCircleOutline size={20} />
+                          <Text fw={500}>Template Variables</Text>
+                        </Group>
+                        <Text size="sm" c="dimmed">
+                          Click on a variable to insert it into your template
+                        </Text>
+                        <ScrollArea h={300}>
+                          <Stack gap="xs">
+                            {TEMPLATE_VARIABLES.map((variable) => (
+                              <Paper
+                                key={variable.name}
+                                p="xs"
+                                withBorder
+                                className="cursor-pointer hover:bg-gray-50"
+                                onClick={() => insertVariable(variable.name)}
+                              >
+                                <Group justify="space-between">
+                                  <Badge variant="light" color="blue">
+                                    {variable.name}
+                                  </Badge>
+                                </Group>
+                                <Text size="sm" mt={4}>
+                                  {variable.description}
+                                </Text>
+                              </Paper>
+                            ))}
+                          </Stack>
+                        </ScrollArea>
+                      </Stack>
                     </Card>
                   </div>
+
+                  <Card withBorder shadow="sm">
+                    <Text fw={500} mb="md">
+                      Preview
+                    </Text>
+                    <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-4">
+                      <Markdown rehypePlugins={[rehypeRaw]}>
+                        {template}
+                      </Markdown>
+                    </div>
+                  </Card>
 
                   <Group justify="flex-end">
                     <Button
