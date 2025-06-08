@@ -18,7 +18,7 @@ func TestCreateShareCodeWithUrl(t *testing.T) {
 	a := NewShareCodeWithUrl("https://fake.com", mockGen)
 	assert.Equal(t, "https://fake.com", a.Url)
 	assert.Equal(t, "fake-share-code", a.Code)
-	assert.Equal(t, "https://fake.com/v2?share-code=fake-share-code", a.FullUrl)
+	assert.Equal(t, "https://fake.com?share-code=fake-share-code", a.FullUrl)
 	assert.WithinDuration(t, time.Now().UTC().Add(time.Hour*24), a.ExpiredAt, time.Hour, "ExpiredAt should be 24 hours from now")
 }
 
