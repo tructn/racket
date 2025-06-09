@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -285,8 +284,6 @@ func (h *RegistrationHandler) GetAll(c *gin.Context) {
 		WHERE r.deleted_at IS NULL
 		ORDER BY p.first_name ASC
 	`).Scan(&result)
-
-	log.Print(result)
 
 	c.JSON(http.StatusOK, result)
 }

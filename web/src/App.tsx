@@ -53,8 +53,6 @@ function App() {
     }
   }
 
-  console.log("Admin: ", isAdmin);
-
   return (
     <MantineProvider theme={theme}>
       <Routes>

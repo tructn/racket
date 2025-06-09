@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -61,7 +60,6 @@ func GetAuth0Users() ([]Auth0User, error) {
 	users, err := getAuth0Users(AUTH0_DOMAIN, token)
 
 	if err != nil {
-		log.Printf("Error getting users: %v", err)
 		return nil, err
 	}
 
@@ -145,7 +143,6 @@ func getAuth0Users(domain, token string) ([]Auth0User, error) {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Printf("Error: %v", err)
 		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
 	defer res.Body.Close()

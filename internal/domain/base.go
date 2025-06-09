@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"log"
 	"time"
 
 	"gorm.io/gorm"
@@ -20,7 +19,6 @@ type (
 )
 
 func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
-	log.Println("BeforeCreate", tx.Statement.Context)
 	if userId, ok := tx.Statement.Context.Value("user_id").(string); ok {
 		b.CreatedByID = userId
 	}
@@ -28,7 +26,6 @@ func (b *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
 }
 
 func (b *BaseModel) BeforeUpdate(tx *gorm.DB) (err error) {
-	log.Println("BeforeUpdate", tx.Statement.Context)
 	if userId, ok := tx.Statement.Context.Value("user_id").(string); ok {
 		b.UpdatedByID = &userId
 	}

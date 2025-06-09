@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,15 +33,11 @@ func (h *MeHandler) getProfile(c *gin.Context) {
 		return
 	}
 
-	log.Printf("user: %v", user)
-
 	c.JSON(http.StatusOK, user)
 }
 
 func (h *MeHandler) getMyUpcomingMatches(c *gin.Context) {
 	playerId, err := currentuser.GetPlayerId(c, h.db)
-
-	log.Printf("playerId: %v", playerId)
 
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

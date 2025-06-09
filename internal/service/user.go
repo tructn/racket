@@ -1,8 +1,6 @@
 package service
 
 import (
-	"log"
-
 	"github.com/tructn/racket/internal/domain"
 	"github.com/tructn/racket/pkg/auth0"
 	"gorm.io/gorm"
@@ -33,7 +31,6 @@ func (s *UserService) SyncPlayersFromAuth0Users(auth0Users []auth0.Auth0User) er
 				if err := tx.Save(&existingPlayer).Error; err != nil {
 					return err
 				}
-				log.Printf("Player updated: %+v", existingPlayer)
 			} else {
 				// Create new player if not exists
 				player := domain.NewPlayer(
@@ -46,7 +43,6 @@ func (s *UserService) SyncPlayersFromAuth0Users(auth0Users []auth0.Auth0User) er
 				if err := tx.Create(player).Error; err != nil {
 					return err
 				}
-				log.Printf("Player created: %+v", player)
 			}
 
 			return nil

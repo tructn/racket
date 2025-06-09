@@ -2,7 +2,6 @@ package currentuser
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tructn/racket/internal/domain"
@@ -11,8 +10,6 @@ import (
 
 func GetIdpUser(c *gin.Context) (map[string]interface{}, error) {
 	user, exists := c.Get("idp_user")
-
-	log.Printf("user: %v", user)
 
 	if !exists {
 		return nil, fmt.Errorf("user not found in context")
