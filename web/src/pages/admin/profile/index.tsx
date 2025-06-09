@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  Box,
   Button,
   Card,
   Container,
-  Grid,
   TextInput,
   Text,
   Avatar,
   Group,
   Stack,
-  Paper,
+  Title,
   Loader,
   Center,
+  Paper,
 } from "@mantine/core";
 import { useUserService, UserProfile } from "@/services/userService";
 import Page from "@/components/page";
+import {
+  IoPersonOutline,
+  IoMailOutline,
+  IoIdCardOutline,
+} from "react-icons/io5";
 
 const ProfilePage: React.FC = () => {
   const { user: auth0User, isLoading: isAuth0Loading } = useAuth0();
@@ -105,64 +109,75 @@ const ProfilePage: React.FC = () => {
   }
 
   return (
-    <Page title="Profile">
-      <Container size="md" mt="xl">
-        <Grid>
-          {/* Auth0 Profile Information */}
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Paper shadow="sm" p="md" withBorder>
-              <Text size="lg" fw={500} mb="md">
-                Auth0 Profile
-              </Text>
-              <Group mb="md">
+    <Page>
+      <Container size="lg" className="py-8">
+        <Stack gap="xl">
+          <Card shadow="sm" p="lg" withBorder>
+            <Stack gap="xl">
+              <Title order={2}>Profile</Title>
+              <Text c="dimmed">Manage your profile information</Text>
+
+              <Group>
                 <Avatar
                   src={auth0User.picture}
                   alt={auth0User.name}
-                  size="lg"
+                  size="xl"
                   radius="xl"
                 />
                 <Stack gap={0}>
-                  <Text size="sm" fw={500}>
+                  <Text size="lg" fw={500}>
                     {auth0User.name}
                   </Text>
-                  <Text size="xs" c="dimmed">
+                  <Text size="sm" c="dimmed">
                     {auth0User.email}
                   </Text>
                 </Stack>
               </Group>
-              <Text size="xs" c="dimmed">
-                Auth0 User ID: {auth0User.sub}
-              </Text>
-            </Paper>
-          </Grid.Col>
 
-          {/* Local Profile Information */}
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Paper shadow="sm" p="md" withBorder>
-              <Text size="lg" fw={500} mb="md">
-                Local Profile
-              </Text>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-1">
+                <Paper withBorder p="md" className="bg-blue-50">
+                  <Stack gap="xs">
+                    <Group>
+                      <IoIdCardOutline className="text-blue-600" size={20} />
+                      <Text size="sm" fw={500}>
+                        Auth0 User ID
+                      </Text>
+                    </Group>
+                    <Text size="sm" c="dimmed" ml={36}>
+                      {auth0User.sub}
+                    </Text>
+                  </Stack>
+                </Paper>
+              </div>
+
               {isEditing ? (
-                <Stack mt="md">
-                  <TextInput
-                    label="Name"
-                    value={editedName}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setEditedName(e.target.value)
-                    }
-                    disabled={isLoading}
-                  />
-                  <TextInput
-                    label="Profile Picture URL"
-                    value={editedPicture}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setEditedPicture(e.target.value)
-                    }
-                    disabled={isLoading}
-                  />
+                <Stack gap="md">
+                  <Text size="lg" fw={500}>
+                    Edit Profile
+                  </Text>
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <TextInput
+                      label="Name"
+                      value={editedName}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setEditedName(e.target.value)
+                      }
+                      disabled={isLoading}
+                      leftSection={<IoPersonOutline size={16} />}
+                    />
+                    <TextInput
+                      label="Profile Picture URL"
+                      value={editedPicture}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                        setEditedPicture(e.target.value)
+                      }
+                      disabled={isLoading}
+                      leftSection={<IoMailOutline size={16} />}
+                    />
+                  </div>
                   <Group mt="md">
                     <Button onClick={handleSave} loading={isLoading}>
-                      Save
+                      Save Changes
                     </Button>
                     <Button
                       variant="outline"
@@ -174,52 +189,18 @@ const ProfilePage: React.FC = () => {
                   </Group>
                 </Stack>
               ) : (
-                <Stack mt="md">
-                  <Group>
-                    <Avatar
-                      src={profile.picture}
-                      alt={profile.name}
-                      size="lg"
-                      radius="xl"
-                    />
-                    <Stack gap={0}>
-                      <Text size="sm" fw={500}>
-                        {profile.name}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {profile.email}
-                      </Text>
-                    </Stack>
-                  </Group>
-                  <Text size="xs" c="dimmed">
-                    Local User ID: {profile.id}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    IDP User ID: {profile.idpUserId}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    Created: {new Date(profile.createdAt).toLocaleString()}
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    Last Updated: {new Date(profile.updatedAt).toLocaleString()}
-                  </Text>
-                  <Button
-                    onClick={() => setIsEditing(true)}
-                    mt="md"
-                    loading={isLoading}
-                  >
-                    Edit Profile
-                  </Button>
-                </Stack>
+                <Button onClick={() => setIsEditing(true)} loading={isLoading}>
+                  Edit Profile
+                </Button>
               )}
               {error && (
                 <Text c="red" mt="md">
                   {error}
                 </Text>
               )}
-            </Paper>
-          </Grid.Col>
-        </Grid>
+            </Stack>
+          </Card>
+        </Stack>
       </Container>
     </Page>
   );

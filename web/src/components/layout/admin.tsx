@@ -12,15 +12,14 @@ import {
   IoChevronBackCircle,
   IoSettings,
   IoChevronDown,
-  IoStatsChart,
   IoCalendar,
   IoShirt,
   IoPerson,
   IoList,
   IoBusiness,
-  IoApps,
-  IoBaseball,
   IoChevronBackCircleOutline,
+  IoGrid,
+  IoTabletLandscape,
 } from "react-icons/io5";
 import { FaCircleDot } from "react-icons/fa6";
 import { Text } from "@mantine/core";
@@ -122,24 +121,29 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
 };
 
 function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const { user, isAuthenticated, isLoading } = useAuth0();
 
   const menuItems: MenuItem[] = [
     {
       label: "Dashboard",
       path: "/admin/dashboard",
-      icon: <IoApps />,
+      icon: <IoGrid />,
     },
     {
-      label: "Sports",
-      icon: <IoBaseball />,
+      label: "Matches",
+      path: "/admin/matches",
+      icon: <IoCalendar />,
+    },
+    {
+      label: "Reports",
+      path: "/admin/reports",
+      icon: <IoBarChart />,
+    },
+    {
+      label: "Management",
+      icon: <IoTabletLandscape />,
       childItems: [
-        {
-          label: "Matches",
-          path: "/admin/matches",
-          icon: <IoCalendar />,
-        },
         {
           label: "Teams",
           path: "/admin/teams",
@@ -149,17 +153,6 @@ function AdminLayout() {
           label: "Players",
           path: "/admin/players",
           icon: <IoPerson />,
-        },
-      ],
-    },
-    {
-      label: "Management",
-      icon: <IoStatsChart />,
-      childItems: [
-        {
-          label: "Reports",
-          path: "/admin/reports",
-          icon: <IoBarChart />,
         },
         {
           label: "Requests",

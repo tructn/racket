@@ -22,8 +22,21 @@ func NewMeHandler(db *gorm.DB, meService *service.MeService) *MeHandler {
 func (h *MeHandler) UseRouter(router *gin.RouterGroup) {
 	group := router.Group("/me")
 	{
+		group.GET("/profile", h.getProfile)
 		group.GET("/upcoming-matches", h.getMyUpcomingMatches)
 	}
+}
+
+func (h *MeHandler) getProfile(c *gin.Context) {
+	user, err := currentuser.GetIdpUser(c)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	log.Printf("user: %v", user)
+
+	c.JSON(http.StatusOK, user)
 }
 
 func (h *MeHandler) getMyUpcomingMatches(c *gin.Context) {

@@ -18,11 +18,11 @@ export interface UpdateProfileRequest {
 export const useUserService = () => {
     return {
         getCurrentUser: async (): Promise<UserProfile> => {
-            return await httpService.get<UserProfile>('/api/v1/users/me');
+            return await httpService.get<UserProfile>('/api/v1/me/profile');
         },
 
         updateProfile: async (data: UpdateProfileRequest): Promise<UserProfile> => {
-            return await httpService.put<UserProfile>('/api/v1/users/me', data as UserProfile);
+            return await httpService.put<UserProfile>('/api/v1/me/profile', data as UserProfile);
         },
     };
 };
