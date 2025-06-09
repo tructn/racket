@@ -59,7 +59,7 @@ func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
 	}
 
 	var shareCodeUrl domain.ShareCode
-	if err := h.db.Where("code = ? AND expired_at > ?", shareCode, time.Now()).First(&shareCodeUrl).Error; err != nil {
+	if err := h.db.Where("code = ?", shareCode).First(&shareCodeUrl).Error; err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
