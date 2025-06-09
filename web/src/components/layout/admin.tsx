@@ -61,7 +61,7 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
     <div className="flex flex-col">
       <div
         className={cx(
-          "flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
+          "group/nav relative flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
           "hover:bg-blue-600/80 hover:shadow-lg",
           isActive(item.path) && "bg-blue-600 shadow-lg",
           level > 0 && "ml-4",
@@ -103,7 +103,31 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
             )}
           </NavLink>
         )}
+
+        {/* Collapsed Sub-menu Dropdown */}
+        {hasChildren && !showLabel && (
+          <div className="invisible absolute left-full top-0 z-50 ml-2 w-48 rounded-lg border border-blue-600/20 bg-gradient-to-b from-blue-600 to-blue-700 p-2 opacity-0 shadow-xl transition-all duration-200 group-hover/nav:visible group-hover/nav:opacity-100">
+            {item.childItems?.map((child, index) => (
+              <NavLink
+                key={index}
+                to={child.path || "#"}
+                className={({ isActive }) =>
+                  cx(
+                    "flex items-center gap-3 rounded-lg px-4 py-2 text-sm transition-all duration-200",
+                    "hover:bg-blue-500/80",
+                    isActive && "bg-blue-500",
+                  )
+                }
+              >
+                <span className="text-blue-100">{child.icon}</span>
+                <span className="font-medium">{child.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* Expanded Sub-menu */}
       {hasChildren && showLabel && expanded && (
         <div className="relative mt-1 space-y-0.5">
           {item.childItems?.map((child, index) => (
@@ -220,7 +244,7 @@ function AdminLayout() {
             ) : (
               <button
                 onClick={toggleSideNav}
-                className="flex h-12 w-12 items-center justify-center rounded-lg bg-lime-500 p-2 text-xl text-white transition-all duration-300 hover:bg-lime-500/40 hover:shadow-md"
+                className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-600 p-2 text-xl text-white transition-all duration-300 hover:bg-blue-600/40 hover:shadow-md"
               >
                 <IoChevronBackCircleOutline
                   size={20}

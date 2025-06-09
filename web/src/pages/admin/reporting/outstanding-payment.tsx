@@ -167,7 +167,7 @@ export default function OutstandingPayment() {
                   {playersWithHighDebt}
                 </Text>
               </div>
-              <IoStatsChart size={32} className="text-rose-500" />
+              <IoStatsChart size={32} className="text-pink-500" />
             </Group>
           </Paper>
         </Group>

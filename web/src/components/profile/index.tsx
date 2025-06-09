@@ -41,13 +41,10 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
               alt={user?.name || "User"}
               size="md"
               radius="xl"
-              className="border-2 border-lime-400/50"
+              className="border-2 border-blue-500"
               styles={{
-                root: {
-                  backgroundColor: "#84cc16", // lime-500
-                },
                 placeholder: {
-                  color: "#fff",
+                  color: "#000",
                   fontWeight: 500,
                 },
               }}
