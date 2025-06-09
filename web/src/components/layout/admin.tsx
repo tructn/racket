@@ -59,40 +59,66 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
 
   return (
     <div className="flex flex-col">
-      <div
-        className={cx(
-          "group/nav relative flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
-          "hover:bg-blue-600/80 hover:shadow-lg",
-          isActive(item.path) && "bg-blue-600 shadow-lg",
-          level > 0 && "ml-4",
-          !showLabel && "justify-center px-2",
-        )}
-      >
-        {hasChildren ? (
-          <div
-            onClick={handleClick}
-            className="flex w-full cursor-pointer items-center justify-between"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl text-blue-100">{item.icon}</span>
-              {item.label && showLabel && <span>{item.label}</span>}
-            </div>
-            {item.label && showLabel && (
-              <IoChevronDown
-                className={cx(
-                  "text-blue-100 transition-transform duration-300",
-                  expanded && "rotate-180",
-                )}
-              />
-            )}
+      {hasChildren ? (
+        <div
+          onClick={handleClick}
+          className={cx(
+            "group/nav relative flex cursor-pointer items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
+            "hover:bg-blue-600/80 hover:shadow-lg",
+            isActive(item.path) && "bg-blue-600 shadow-lg",
+            level > 0 && "ml-4",
+            !showLabel && "justify-center px-2",
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-xl text-blue-100">{item.icon}</span>
+            {item.label && showLabel && <span>{item.label}</span>}
           </div>
-        ) : (
-          <NavLink
-            to={item.path || "#"}
-            className={({ isActive }) =>
-              cx("flex w-full items-center gap-3", isActive && "text-white")
-            }
-          >
+          {item.label && showLabel && (
+            <IoChevronDown
+              className={cx(
+                "text-blue-100 transition-transform duration-300",
+                expanded && "rotate-180",
+              )}
+            />
+          )}
+
+          {/* Collapsed Sub-menu Dropdown */}
+          {!showLabel && (
+            <div className="invisible absolute left-full top-0 z-50 ml-2 w-48 rounded-lg border border-blue-600/20 bg-gradient-to-b from-blue-600 to-blue-700 p-2 opacity-0 shadow-xl transition-all duration-200 group-hover/nav:visible group-hover/nav:opacity-100">
+              {item.childItems?.map((child, index) => (
+                <NavLink
+                  key={index}
+                  to={child.path || "#"}
+                  className={({ isActive }) =>
+                    cx(
+                      "flex items-center gap-3 rounded-lg px-4 py-2 text-sm transition-all duration-200",
+                      "hover:bg-blue-500/80",
+                      isActive && "bg-blue-500",
+                    )
+                  }
+                >
+                  <span className="text-blue-100">{child.icon}</span>
+                  <span className="font-medium">{child.label}</span>
+                </NavLink>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <NavLink
+          to={item.path || "#"}
+          className={({ isActive }) =>
+            cx(
+              "group/nav relative flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-200",
+              "hover:bg-blue-600/80 hover:shadow-lg",
+              isActive && "bg-blue-600 shadow-lg",
+              level > 0 && "ml-4",
+              !showLabel && "justify-center px-2",
+            )
+          }
+        >
+          <div className="flex items-center gap-3">
             <span
               className={cx("text-blue-100", level > 0 ? "text-lg" : "text-xl")}
             >
@@ -101,31 +127,9 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
             {item.label && showLabel && (
               <span className="font-medium">{item.label}</span>
             )}
-          </NavLink>
-        )}
-
-        {/* Collapsed Sub-menu Dropdown */}
-        {hasChildren && !showLabel && (
-          <div className="invisible absolute left-full top-0 z-50 ml-2 w-48 rounded-lg border border-blue-600/20 bg-gradient-to-b from-blue-600 to-blue-700 p-2 opacity-0 shadow-xl transition-all duration-200 group-hover/nav:visible group-hover/nav:opacity-100">
-            {item.childItems?.map((child, index) => (
-              <NavLink
-                key={index}
-                to={child.path || "#"}
-                className={({ isActive }) =>
-                  cx(
-                    "flex items-center gap-3 rounded-lg px-4 py-2 text-sm transition-all duration-200",
-                    "hover:bg-blue-500/80",
-                    isActive && "bg-blue-500",
-                  )
-                }
-              >
-                <span className="text-blue-100">{child.icon}</span>
-                <span className="font-medium">{child.label}</span>
-              </NavLink>
-            ))}
           </div>
-        )}
-      </div>
+        </NavLink>
+      )}
 
       {/* Expanded Sub-menu */}
       {hasChildren && showLabel && expanded && (
