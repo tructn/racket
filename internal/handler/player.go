@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -42,7 +41,14 @@ func (h *PlayerHandler) Create(c *gin.Context) {
 
 func (h *PlayerHandler) GetAll(c *gin.Context) {
 	var result []domain.Player
-	h.db.Order("first_name ASC").Find(&result)
+	if err := h.db.Model(&domain.Player{}).
+		Preload("Wallets").
+		Order("first_name ASC").
+		Find(&result).Error; err != nil {
+		h.logger.Errorw("Failed to retrieve players", "error", err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	c.JSON(http.StatusOK, result)
 }
 
@@ -106,70 +112,4 @@ func (h *PlayerHandler) MarkOutstandingPaymentsAsPaid(c *gin.Context) {
 		return
 	}
 	c.Status(http.StatusOK)
-}
-
-func (h *PlayerHandler) OpenAccount(c *gin.Context) {
-	playerId := util.GetIntRouteParam(c, "playerId")
-
-	var count int64
-	if err := h.db.
-		Model(&domain.Account{}).
-		Where("player_id = ?", playerId).
-		Count(&count).Error; err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	if count > 0 {
-		c.AbortWithError(http.StatusBadRequest, errors.New("player already has an active account"))
-		return
-	}
-
-	acc := domain.NewAccount(playerId)
-	if err := h.db.Create(acc).Error; err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, acc.ID)
-}
-
-func (h *PlayerHandler) Credit(c *gin.Context) {
-	playerId := util.GetIntRouteParam(c, "playerId")
-	model := dto.TransactionDto{}
-	if err := c.BindJSON(&model); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	acc := domain.Account{}
-	if err := h.db.Where("player_id = ?", playerId).Scan(&acc).Error; err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	acc.Credit(model.Amount, model.Description)
-	h.db.Save(&acc)
-
-	c.JSON(http.StatusOK, acc.ID)
-}
-
-func (h *PlayerHandler) Debit(c *gin.Context) {
-	playerId := util.GetIntRouteParam(c, "playerId")
-	model := dto.TransactionDto{}
-	if err := c.BindJSON(&model); err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	acc := domain.Account{}
-	if err := h.db.Where("player_id = ?", playerId).Scan(&acc).Error; err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-
-	acc.Debit(model.Amount, model.Description)
-	h.db.Save(&acc)
-
-	c.JSON(http.StatusOK, acc.ID)
 }

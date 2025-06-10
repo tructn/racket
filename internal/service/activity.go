@@ -15,14 +15,14 @@ type ActivityService struct {
 	db        *gorm.DB
 	logger    *zap.SugaredLogger
 	matchsvc  *MatchService
-	playersvc *PlayerService
+	playersvc PlayerService
 }
 
 func NewActivityService(
 	db *gorm.DB,
 	logger *zap.SugaredLogger,
 	matchsvc *MatchService,
-	playersvc *PlayerService,
+	playersvc PlayerService,
 ) *ActivityService {
 	return &ActivityService{
 		db:        db,

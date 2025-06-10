@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/tructn/racket/internal/di"
+	"github.com/tructn/racket/internal/feature/wallet"
 	"github.com/tructn/racket/internal/handler"
 	"github.com/tructn/racket/pkg/middleware"
 )
@@ -80,7 +81,6 @@ func main() {
 		api.DELETE("/players/:playerId", handler.Delete)
 		api.PUT("/players/:playerId", handler.Update)
 		api.PUT("/players/:playerId/outstanding-payments/paid", handler.MarkOutstandingPaymentsAsPaid)
-		api.POST("/players/:playerId/accounts", handler.OpenAccount)
 	})
 
 	reg.Invoke(func(handler *handler.SportCenterHandler) {
@@ -111,12 +111,14 @@ func main() {
 		registrationHandler *handler.RegistrationHandler,
 		meHandler *handler.MeHandler,
 		reportHandler *handler.ReportHandler,
+		walletHandler *wallet.WalletHandler,
 	) {
 		registrationHandler.UseRouter(api)
 		teamHandler.UseRouter(api)
 		userHandler.UseRouter(api)
 		meHandler.UseRouter(api)
 		reportHandler.UseRouter(api)
+		walletHandler.UseRouter(api)
 	})
 
 	server := &http.Server{

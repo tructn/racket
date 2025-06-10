@@ -5,6 +5,13 @@ export interface PlayerSummaryModel {
   email?: string;
   createdAt: Date;
   externalUserId?: string;
+  wallets: WalletModel[];
+}
+
+export interface WalletModel {
+  id: number;
+  name: string;
+  balance: number;
 }
 
 export interface UpdatePlayerModel {

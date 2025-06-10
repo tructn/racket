@@ -115,14 +115,6 @@ function MeDashboard() {
     },
   });
 
-  const handleNotInterested = () => {
-    notifications.show({
-      title: "Coming Soon",
-      message: "This feature is coming soon!",
-      color: "blue",
-    });
-  };
-
   if (isClaimsLoading || isMatchesLoading) {
     return <SectionLoading />;
   }
@@ -181,7 +173,7 @@ function MeDashboard() {
             shadow="sm"
             p="md"
             className="h-full cursor-pointer transition-shadow hover:shadow-md"
-            onClick={() => navigate("/coming-soon")}
+            onClick={() => navigate("/me/requests")}
           >
             <div className="flex items-center gap-3">
               <IoGolf className="text-blue-600" size={24} />
@@ -202,7 +194,7 @@ function MeDashboard() {
             shadow="sm"
             p="md"
             className="h-full cursor-pointer transition-shadow hover:shadow-md"
-            onClick={() => navigate("/coming-soon")}
+            onClick={() => navigate("/me/wallet")}
           >
             <div className="flex items-center gap-3">
               <IoWallet className="text-blue-600" size={24} />

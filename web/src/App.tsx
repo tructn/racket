@@ -22,6 +22,7 @@ const Requests = lazy(() => import("@/components/requests"));
 const AdminRequestScreen = lazy(() => import("@/pages/admin/requests"));
 const ReportingScreen = lazy(() => import("@/pages/admin/reporting"));
 const UsersScreen = lazy(() => import("@/pages/admin/users"));
+const WalletScreen = lazy(() => import("@/pages/admin/wallets"));
 const OutstandingPaymentReport = lazy(
   () => import("@/pages/anonymous/outstanding-payment-report"),
 );
@@ -30,6 +31,8 @@ const ProfileScreen = lazy(() => import("@/pages/admin/profile"));
 
 // Me
 const MeDashboard = lazy(() => import("@/pages/me/dashboard"));
+const MeWallet = lazy(() => import("@/pages/me/wallet"));
+const MeRequests = lazy(() => import("@/pages/me/requests"));
 
 const theme = createTheme({
   primaryColor: "blue",
@@ -69,9 +72,12 @@ function App() {
           <Route path="users" element={<UsersScreen />} />
           <Route path="profile" element={<ProfileScreen />} />
           <Route path="settings" element={<SettingsScreen />} />
+          <Route path="wallets" element={<WalletScreen />} />
         </Route>
         <Route path="/me" element={<MeLayout />}>
           <Route index element={<MeDashboard />} />
+          <Route path="wallet" element={<MeWallet />} />
+          <Route path="requests" element={<MeRequests />} />
         </Route>
         <Route path="/anonymous" element={<AnonymousLayout />}>
           <Route index element={<Requests />} />

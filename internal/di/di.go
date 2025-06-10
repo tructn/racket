@@ -2,6 +2,8 @@ package di
 
 import (
 	"github.com/tructn/racket/internal/db"
+	"github.com/tructn/racket/internal/feature/player"
+	"github.com/tructn/racket/internal/feature/wallet"
 	"github.com/tructn/racket/internal/handler"
 	"github.com/tructn/racket/internal/service"
 	"github.com/tructn/racket/pkg/logger"
@@ -33,13 +35,16 @@ func Register() *dig.Container {
 	c.Provide(service.NewSportCenterService)
 	c.Provide(service.NewPaymentService)
 	c.Provide(service.NewMatchService)
-	c.Provide(service.NewPlayerService)
+	c.Provide(player.NewPlayerService)
 	c.Provide(service.NewActivityService)
 	c.Provide(service.NewUserService)
 	c.Provide(service.NewTeamService)
 	c.Provide(service.NewUserService)
 	c.Provide(service.NewRegistrationService)
 	c.Provide(service.NewMeService)
+
+	// Features
+	c.Provide(wallet.NewWalletHandler)
 
 	return c
 }

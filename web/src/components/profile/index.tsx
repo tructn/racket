@@ -44,8 +44,8 @@ const UserProfile: React.FC<UserProfileProp> = ({ showLabel }) => {
               className="border-2 border-blue-500"
               styles={{
                 placeholder: {
-                  color: "#000",
-                  fontWeight: 500,
+                  color: "#fff",
+                  fontWeight: 600,
                 },
               }}
             >

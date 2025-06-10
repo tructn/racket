@@ -1,27 +1,28 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import cx from "clsx";
 import { FC, ReactNode, Suspense, useState } from "react";
-import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
-import AppLoading from "@/components/loading/app-loading";
-import SectionLoading from "@/components/loading/section-loading";
-import LogoutButton from "@/components/auth/logout-button";
-import UserProfile from "@/components/profile";
-
+import { FaCircleDot } from "react-icons/fa6";
 import {
   IoBarChart,
-  IoChevronBackCircle,
-  IoSettings,
-  IoChevronDown,
-  IoCalendar,
-  IoShirt,
-  IoPerson,
-  IoList,
   IoBusiness,
+  IoCalendar,
+  IoChevronBackCircle,
   IoChevronBackCircleOutline,
+  IoChevronDown,
   IoGrid,
+  IoList,
+  IoPerson,
+  IoSettings,
+  IoShirt,
   IoTabletLandscape,
+  IoWallet,
 } from "react-icons/io5";
-import { FaCircleDot } from "react-icons/fa6";
+import { Navigate, NavLink, Outlet, useLocation } from "react-router-dom";
+
+import LogoutButton from "@/components/auth/logout-button";
+import AppLoading from "@/components/loading/app-loading";
+import SectionLoading from "@/components/loading/section-loading";
+import UserProfile from "@/components/profile";
+import { useAuth0 } from "@auth0/auth0-react";
 import { Text } from "@mantine/core";
 
 interface MenuItem {
@@ -181,6 +182,11 @@ function AdminLayout() {
           label: "Players",
           path: "/admin/players",
           icon: <IoPerson />,
+        },
+        {
+          label: "Wallets",
+          path: "/admin/wallets",
+          icon: <IoWallet />,
         },
         {
           label: "Requests",

@@ -13,22 +13,20 @@ import {
   Badge,
   Box,
   LoadingOverlay,
-  Container,
-  Card,
-  Flex,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   IoAdd,
-  IoCalculatorOutline,
   IoPencil,
   IoSave,
   IoTrash,
   IoPerson,
+  IoWallet,
+  IoWalletOutline,
 } from "react-icons/io5";
 import { z } from "zod";
 import formatter from "@/common/formatter";
@@ -44,6 +42,7 @@ const schema = z.object({
 });
 
 function Players() {
+  const queryClient = useQueryClient();
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
@@ -96,21 +95,26 @@ function Players() {
     },
   });
 
-  const openAccountMut = useMutation({
+  const addWalletMut = useMutation({
     mutationFn(model: PlayerSummaryModel) {
-      return httpService.post(`api/v1/players/${model.id}/accounts`, {});
+      return httpService.post("api/v1/wallets", {
+        ownerId: model.id,
+        name: `${model.firstName} ${model.lastName} Wallet`,
+      });
     },
     onSuccess(_data, _variables, _context) {
       notifications.show({
         title: "Success",
-        message: `Account open success`,
+        message: `Wallet added successfully`,
         color: "green",
       });
+      queryClient.invalidateQueries({ queryKey: ["getPlayers"] });
     },
-    onError(err, _) {
+    onError(result: any, _) {
       notifications.show({
         title: "Error",
-        message: "Unable to open account for player",
+        message:
+          result?.response?.data?.error || "Unable to add wallet for player",
         color: "red",
       });
     },
@@ -139,8 +143,8 @@ function Players() {
     });
   };
 
-  const openNewAccount = async (model: PlayerSummaryModel) => {
-    await openAccountMut.mutateAsync(model);
+  const addWallet = async (model: PlayerSummaryModel) => {
+    await addWalletMut.mutateAsync(model);
   };
 
   return (
@@ -168,15 +172,16 @@ function Players() {
           <Table striped highlightOnHover>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th style={{ width: "30%" }}>Player</Table.Th>
-                <Table.Th style={{ width: "25%" }}>Email</Table.Th>
-                <Table.Th style={{ width: "20%" }}>Created At</Table.Th>
-                <Table.Th style={{ width: "15%" }}>SSO</Table.Th>
+                <Table.Th style={{ width: "auto" }}>Player</Table.Th>
+                <Table.Th style={{ width: "15%" }}>Email</Table.Th>
+                <Table.Th style={{ width: "10%" }}>Wallets</Table.Th>
+                <Table.Th style={{ width: "10%" }}>Created At</Table.Th>
+                <Table.Th style={{ width: "10%" }}>SSO</Table.Th>
                 <Table.Th style={{ width: "10%" }}>Actions</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {isPending && <DataTableSkeleton row={3} col={5} />}
+              {isPending && <DataTableSkeleton row={3} col={6} />}
               {!isPending &&
                 players?.map((item) => (
                   <Table.Tr key={item.id}>
@@ -201,6 +206,17 @@ function Players() {
                       </Text>
                     </Table.Td>
                     <Table.Td>
+                      <Group gap="xs">
+                        <Box className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50">
+                          <IoWallet size={18} className="text-pink-500" />
+                        </Box>
+                        <Badge size="sm" variant="light" color="pink">
+                          {item.wallets.length}{" "}
+                          {item.wallets.length === 1 ? "Wallet" : "Wallets"}
+                        </Badge>
+                      </Group>
+                    </Table.Td>
+                    <Table.Td>
                       <Text size="sm">
                         {formatter.formatDate(item.createdAt)}
                       </Text>
@@ -217,16 +233,18 @@ function Players() {
                     </Table.Td>
                     <Table.Td>
                       <Group gap="xs" justify="flex-end">
-                        <Tooltip label="Open New Account">
-                          <ActionIcon
-                            variant="light"
-                            color="blue"
-                            onClick={() => openNewAccount(item)}
-                            size="md"
-                          >
-                            <IoCalculatorOutline size={16} />
-                          </ActionIcon>
-                        </Tooltip>
+                        {!item.wallets ||
+                          (!item.wallets.length && (
+                            <Tooltip label="Add Wallet">
+                              <ActionIcon
+                                color="pink"
+                                onClick={() => addWallet(item)}
+                                size="md"
+                              >
+                                <IoWalletOutline size={16} />
+                              </ActionIcon>
+                            </Tooltip>
+                          ))}
 
                         <Tooltip label="Edit Player">
                           <ActionIcon
