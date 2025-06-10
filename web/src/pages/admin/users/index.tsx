@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import { useState } from "react";
-import { IoRefresh, IoPersonAdd } from "react-icons/io5";
+import { useState, useEffect } from "react";
+import { IoRefresh, IoPersonAdd, IoRadio, IoSync } from "react-icons/io5";
 
 import httpService from "@/common/httpservice";
 import Page from "@/components/page";
@@ -15,9 +15,9 @@ import {
   Title,
   Modal,
   TextInput,
-  Select,
   NumberInput,
   Skeleton,
+  Switch,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -35,7 +35,26 @@ function UsersPage() {
   const queryClient = useQueryClient();
   const [isSyncing, setIsSyncing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [autoSync, setAutoSync] = useState(false);
   const { users, isLoading } = useAuth0Users();
+
+  useEffect(() => {
+    let intervalId: number;
+
+    if (autoSync) {
+      handleSyncUsers();
+
+      intervalId = setInterval(() => {
+        handleSyncUsers();
+      }, 30000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [autoSync]);
 
   const form = useForm<PlayerProfileModel>({
     initialValues: {
@@ -231,6 +250,26 @@ function UsersPage() {
           <Group justify="space-between" mb="md">
             <Title order={3}>User Accounts</Title>
             <Group>
+              <Switch
+                label="Auto Sync"
+                checked={autoSync}
+                onChange={(event) => setAutoSync(event.currentTarget.checked)}
+                disabled={isLoading}
+                size="md"
+                color="blue"
+                thumbIcon={
+                  autoSync ? (
+                    <IoSync
+                      className="animate-spin"
+                      size="0.8rem"
+                      color="white"
+                      stroke="3"
+                    />
+                  ) : (
+                    <IoSync size="0.8rem" color="white" stroke="3" />
+                  )
+                }
+              />
               <Button
                 leftSection={<IoRefresh />}
                 onClick={handleSyncUsers}
