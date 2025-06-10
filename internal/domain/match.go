@@ -116,7 +116,8 @@ func (m *Match) CalcIndividualCost() float64 {
 		return ac.Amount
 	})
 
-	playerCount := len(m.Registrations)
+	allPlayerCount := lo.SumBy(m.Registrations, func(r Registration) float64 { return float64(r.TotalPlayerPaidFor) })
+	playerCount := int(allPlayerCount)
 
 	if playerCount != 0 {
 		return (m.Cost + additionalCost) / float64(playerCount)
