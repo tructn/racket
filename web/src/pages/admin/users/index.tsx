@@ -36,25 +36,9 @@ function UsersPage() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [autoSync, setAutoSync] = useState(false);
+  const [syncInterval, setSyncInterval] = useState(30);
+  const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const { users, isLoading } = useAuth0Users();
-
-  useEffect(() => {
-    let intervalId: number;
-
-    if (autoSync) {
-      handleSyncUsers();
-
-      intervalId = setInterval(() => {
-        handleSyncUsers();
-      }, 30000);
-    }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [autoSync]);
 
   const form = useForm<PlayerProfileModel>({
     initialValues: {
@@ -79,21 +63,30 @@ function UsersPage() {
   });
 
   const syncUsersMutation = useMutation({
-    mutationFn: () => httpService.post("/api/v1/users/auth0/sync", {}),
-    onSuccess: () => {
+    mutationFn: (variables: { isAutoSync: boolean }) =>
+      httpService.post("/api/v1/users/auth0/sync", {}),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      notifications.show({
-        title: "Success",
-        message: "Users synchronized successfully",
-        color: "green",
-      });
+      setLastSyncTime(new Date());
+
+      // Only show notification for manual syncs
+      if (!variables.isAutoSync) {
+        notifications.show({
+          title: "Success",
+          message: "Users synchronized successfully",
+          color: "green",
+        });
+      }
     },
-    onError: (_error) => {
-      notifications.show({
-        title: "Error",
-        message: "Failed to sync users",
-        color: "red",
-      });
+    onError: (error, variables) => {
+      // Only show notification for manual syncs
+      if (!variables.isAutoSync) {
+        notifications.show({
+          title: "Error",
+          message: "Failed to sync users",
+          color: "red",
+        });
+      }
     },
     onSettled: () => {
       setIsSyncing(false);
@@ -125,10 +118,28 @@ function UsersPage() {
     },
   });
 
-  const handleSyncUsers = () => {
+  const handleSyncUsers = (isAutoSync = false) => {
     setIsSyncing(true);
-    syncUsersMutation.mutate();
+    syncUsersMutation.mutate({ isAutoSync });
   };
+
+  useEffect(() => {
+    let intervalId: number;
+
+    if (autoSync) {
+      handleSyncUsers(true);
+
+      intervalId = setInterval(() => {
+        handleSyncUsers(true);
+      }, syncInterval * 1000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [autoSync, syncInterval]);
 
   const handleUpdatePlayerProfile = (user: User) => {
     setSelectedUser(user);
@@ -250,29 +261,45 @@ function UsersPage() {
           <Group justify="space-between" mb="md">
             <Title order={3}>User Accounts</Title>
             <Group>
-              <Switch
-                label="Auto Sync"
-                checked={autoSync}
-                onChange={(event) => setAutoSync(event.currentTarget.checked)}
-                disabled={isLoading}
-                size="md"
-                color="blue"
-                thumbIcon={
-                  autoSync ? (
-                    <IoSync
-                      className="animate-spin"
-                      size="0.8rem"
-                      color="white"
-                      stroke="3"
-                    />
-                  ) : (
-                    <IoSync size="0.8rem" color="white" stroke="3" />
-                  )
-                }
-              />
+              <Group gap="xs">
+                <Switch
+                  label="Auto Sync"
+                  checked={autoSync}
+                  onChange={(event) => setAutoSync(event.currentTarget.checked)}
+                  disabled={isLoading}
+                  size="md"
+                  color="blue"
+                  thumbIcon={
+                    autoSync ? (
+                      <IoSync
+                        className="animate-spin"
+                        size="0.8rem"
+                        color="white"
+                        stroke="3"
+                      />
+                    ) : (
+                      <IoSync size="0.8rem" color="white" stroke="3" />
+                    )
+                  }
+                />
+                <NumberInput
+                  value={syncInterval}
+                  onChange={(value) => setSyncInterval(Number(value))}
+                  min={5}
+                  max={300}
+                  disabled={!autoSync || isLoading}
+                  size="xs"
+                  w={80}
+                />
+                {lastSyncTime && (
+                  <Text size="xs" c="dimmed" style={{ alignSelf: "center" }}>
+                    Last sync: {dayjs(lastSyncTime).format("HH:mm:ss")}
+                  </Text>
+                )}
+              </Group>
               <Button
                 leftSection={<IoRefresh />}
-                onClick={handleSyncUsers}
+                onClick={() => handleSyncUsers(false)}
                 loading={isSyncing}
                 disabled={isLoading}
               >
