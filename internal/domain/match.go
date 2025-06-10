@@ -92,7 +92,8 @@ func (m *Match) AddCost(description string, amount float64) error {
 }
 
 func (m *Match) CalcPlayerCount() int {
-	return len(m.Registrations)
+	sum := lo.SumBy(m.Registrations, func(r Registration) float64 { return float64(r.TotalPlayerPaidFor) })
+	return int(sum)
 }
 
 func (m *Match) Clone() Match {
