@@ -32,7 +32,7 @@ const ProfileScreen = lazy(() => import("@/pages/admin/profile"));
 // Me
 const MeDashboard = lazy(() => import("@/pages/me/dashboard"));
 const MeWallet = lazy(() => import("@/pages/me/wallet"));
-const MeRequests = lazy(() => import("@/pages/me/requests"));
+const MePerformance = lazy(() => import("@/pages/me/performance"));
 
 const theme = createTheme({
   primaryColor: "blue",
@@ -77,7 +77,7 @@ function App() {
         <Route path="/me" element={<MeLayout />}>
           <Route index element={<MeDashboard />} />
           <Route path="wallet" element={<MeWallet />} />
-          <Route path="requests" element={<MeRequests />} />
+          <Route path="performance" element={<MePerformance />} />
         </Route>
         <Route path="/anonymous" element={<AnonymousLayout />}>
           <Route index element={<Requests />} />

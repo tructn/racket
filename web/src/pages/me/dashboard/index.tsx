@@ -173,16 +173,16 @@ function MeDashboard() {
             shadow="sm"
             p="md"
             className="h-full cursor-pointer transition-shadow hover:shadow-md"
-            onClick={() => navigate("/me/requests")}
+            onClick={() => navigate("/me/performance")}
           >
             <div className="flex items-center gap-3">
               <IoGolf className="text-blue-600" size={24} />
               <div>
                 <Text size="lg" fw={500}>
-                  My Requests
+                  My Performance
                 </Text>
                 <Text size="sm" c="dimmed">
-                  Track your pending requests
+                  Track your performance and statistics
                 </Text>
               </div>
             </div>
