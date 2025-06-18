@@ -1,6 +1,6 @@
 <div align="center">
   <img height="130" src="art/logo.svg" alt="LOGO" />
-  <div style="text-center">Built by 🇻🇳 with passion</div>
+  <div style="text-center">Built by <img src="https://raw.githubusercontent.com/stevenrskelton/flag-icon/master/png/16/country-4x3/vn.png"/> with passion</div>
 </div>
 
 [![Go](https://github.com/tructn/racket/actions/workflows/go.yml/badge.svg)](https://github.com/tructn/racket/actions/workflows/go.yml) 
