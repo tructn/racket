@@ -35,8 +35,8 @@ function UsersPage() {
   const queryClient = useQueryClient();
   const [isSyncing, setIsSyncing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [autoSync, setAutoSync] = useState(false);
-  const [syncInterval, setSyncInterval] = useState(30);
+  const [autoSync, setAutoSync] = useState(true);
+  const [syncInterval, setSyncInterval] = useState(180);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const { users, isLoading } = useAuth0Users();
 
