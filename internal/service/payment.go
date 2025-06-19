@@ -98,7 +98,7 @@ func (s *PaymentService) GetOutstandingPaymentReportForAnonymous() ([]dto.Anonym
 		from public.registrations r
 		join public.players p on p.id = r.player_id
 		join cte_player_counts pc on pc.match_id  = r.match_id
-		where r.is_paid = false
+		where r.is_paid = false AND r.deleted_at is null
 	`
 
 	result := []dto.AnonymousOutstandingPaymentReportDto{}
