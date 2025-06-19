@@ -17,7 +17,7 @@ COPY . .
 RUN bun run build
 
 # Stage 2: Serve with Nginx
-FROM nginx:alpine
+FROM nginx:1.28.0-alpine3.21-slim
 
 # Copy the build output to Nginx's default static serving directory
 COPY --from=build /app/dist /usr/share/nginx/html
