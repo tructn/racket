@@ -7,7 +7,7 @@ args_bin = []
 bin = "./tmp/main"
 cmd = "go build -o ./tmp/main ./main.go"
 delay = 1000
-exclude_dir = ["assets", "tmp", "vendor", "testdata", "web", "frontend"]
+exclude_dir = ["assets", "tmp", "vendor", "testdata", "web"]
 exclude_file = []
 exclude_regex = ["_test.go"]
 exclude_unchanged = false
@@ -21,17 +21,17 @@ send_interrupt = false
 stop_on_error = true
 
 [color]
-app = ""
+app = "pink"
 build = "yellow"
 main = "magenta"
 runner = "green"
 watcher = "cyan"
 
 [log]
-time = false
+time = true
 
 [misc]
-clean_on_exit = false
+clean_on_exit = true
 
 [screen]
-clear_on_rebuild = false
+clear_on_rebuild = true
