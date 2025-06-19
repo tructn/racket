@@ -22,7 +22,13 @@ func TestIndividualCost(t *testing.T) {
 			match: Match{
 				Cost:            100,
 				AdditionalCosts: []AdditionalCost{},
-				Registrations:   []Registration{{}, {}, {}}, // 3 players
+				Registrations: []Registration{{
+					TotalPlayerPaidFor: 1,
+				}, {
+					TotalPlayerPaidFor: 1,
+				}, {
+					TotalPlayerPaidFor: 1,
+				}}, // 3 players
 			},
 			expectedCost: 33.333333333333336,
 		},
@@ -34,9 +40,30 @@ func TestIndividualCost(t *testing.T) {
 					{Amount: 50},
 					{Amount: 25},
 				},
-				Registrations: []Registration{{}, {}, {}}, // 3 players
+				Registrations: []Registration{{
+					TotalPlayerPaidFor: 1,
+				}, {
+					TotalPlayerPaidFor: 1,
+				}, {
+					TotalPlayerPaidFor: 1,
+				}}, // 3 players
 			},
 			expectedCost: 58.333333333333336,
+		},
+		{
+			name: "One player paid for multiple players",
+			match: Match{
+				Cost:            100,
+				AdditionalCosts: []AdditionalCost{},
+				Registrations: []Registration{{
+					TotalPlayerPaidFor: 2,
+				}, {
+					TotalPlayerPaidFor: 1,
+				}, {
+					TotalPlayerPaidFor: 1,
+				}}, // 3 players
+			},
+			expectedCost: 25.0,
 		},
 		{
 			name: "With additional costs and no registrations",
