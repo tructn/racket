@@ -101,7 +101,7 @@ export default function OutstandingReport() {
         </div>
         <div className="mt-8 space-y-2">
           <h3 className="text-4xl font-bold text-red-600">
-            🚫 Whoa there, partner!
+            🔒 Access Denied 🔒
           </h3>
           <p className="text-sm text-slate-500">
             That door's locked. Double-check your share code or give the admin a
