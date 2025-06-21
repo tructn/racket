@@ -39,6 +39,25 @@ export const useApi = () => {
     [getAuthHeaders],
   );
 
+  const getWithStatus = useCallback(
+    async <T = any,>(url: string): Promise<{ data: T; status: number }> => {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await client.get(url, { headers });
+        return {
+          data: res.data as T,
+          status: res.status,
+        };
+      } catch (err: any) {
+        return {
+          data: null as T,
+          status: err?.status || 500,
+        };
+      }
+    },
+    [getAuthHeaders],
+  );
+
   const post = useCallback(
     async <T = any,>(url: string, body: T): Promise<any> => {
       const headers = await getAuthHeaders();
@@ -66,5 +85,5 @@ export const useApi = () => {
     [getAuthHeaders],
   );
 
-  return { get, post, put, del };
+  return { get, getWithStatus, post, put, del };
 };

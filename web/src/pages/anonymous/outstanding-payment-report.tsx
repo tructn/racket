@@ -43,19 +43,29 @@ const PlayerLoading = () => (
 );
 
 export default function OutstandingReport() {
-  const { get } = useApi();
+  const { get, getWithStatus } = useApi();
   const [search, setSearch] = useState("");
   const [searchParams] = useSearchParams();
   const shareCode = searchParams.get("share-code");
-  const { isFetching, data, isError } = useQuery<PlayerPaymentModel[]>({
+  const {
+    isFetching,
+    data: paymentRespone,
+    isError,
+  } = useQuery<{
+    data: PlayerPaymentModel[];
+    status: number;
+  }>({
     retry: false,
     queryKey: ["getOutstandingPaymentReport"],
     queryFn: () =>
-      get<PlayerPaymentModel[]>(
+      getWithStatus<PlayerPaymentModel[]>(
         `api/v1/anonymous/reports/outstanding-payments?shareCode=${shareCode}`,
       ),
-    initialData: [],
   });
+
+  const data = useMemo(() => {
+    return paymentRespone?.status === 200 ? paymentRespone.data : [];
+  }, [paymentRespone]);
 
   const filterGroupingData = useMemo(() => {
     if (search) {
@@ -74,6 +84,34 @@ export default function OutstandingReport() {
     setSearch(e.target.value);
   };
 
+  console.log(paymentRespone);
+
+  if (paymentRespone?.status == 401) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center text-center">
+        <div className="relative w-full max-w-4xl">
+          <iframe
+            src="https://giphy.com/embed/gj0QdZ9FgqGhOBNlFS"
+            width="100%"
+            height="600"
+            frameBorder="0"
+            className="giphy-embed transform rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
+            allowFullScreen
+          ></iframe>
+        </div>
+        <div className="mt-8 space-y-2">
+          <h3 className="text-4xl font-bold text-red-600">
+            🚫 Whoa there, partner!
+          </h3>
+          <p className="text-sm text-slate-500">
+            That door's locked. Double-check your share code or give the admin a
+            nudge!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (isError) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center text-center">
@@ -86,32 +124,11 @@ export default function OutstandingReport() {
             className="giphy-embed transform rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
             allowFullScreen
           ></iframe>
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 transform rounded-full bg-white/80 px-4 py-2 shadow-md">
-            <a
-              href="https://giphy.com/gifs/lol-laugh-laughing-gj0QdZ9FgqGhOBNlFS"
-              className="text-sm text-violet-600 transition-colors hover:text-violet-800"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              via GIPHY
-            </a>
-          </div>
         </div>
         <div className="mt-8 space-y-2">
           <h3 className="text-4xl font-bold text-red-600">
             Oops! Something went wrong
           </h3>
-          <p className="text-lg text-red-500">
-            Don't worry, even our system needs a coffee break sometimes!
-            <br />
-            Try refreshing the page or come back later.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-full bg-red-500 px-6 py-2 text-white shadow-md transition-colors hover:bg-red-600 hover:shadow-lg"
-          >
-            Refresh Page
-          </button>
         </div>
       </div>
     );
