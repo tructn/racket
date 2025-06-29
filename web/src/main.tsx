@@ -23,24 +23,24 @@ import App from "./App";
 
 const queryClient = new QueryClient();
 
-const myColor: MantineColorsTuple = [
-  "#eaf1ff",
-  "#d4dffc",
-  "#a7bbf3",
-  "#7896ec",
-  "#5076e5",
-  "#3762e2",
-  "#2857e1",
-  "#1b48c8",
-  "#1240b4",
-  "#00369f",
+const blue: MantineColorsTuple = [
+  "#e6f1ff",
+  "#cddfff",
+  "#9bbbff",
+  "#6595fe",
+  "#3875fc",
+  "#155dfc",
+  "#0457fd",
+  "#0048e2",
+  "#003fcb",
+  "#0036b4",
 ];
 
 const theme = createTheme({
   colors: {
-    myColor,
+    blue,
   },
-  fontFamily: "Inter",
+  fontFamily: "Inclusive Sans",
 });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
