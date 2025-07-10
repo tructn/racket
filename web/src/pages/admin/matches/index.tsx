@@ -1,13 +1,5 @@
 import dayjs from "dayjs";
-import {
-  IoAdd,
-  IoDuplicate,
-  IoPencil,
-  IoSave,
-  IoTrash,
-  IoSearch,
-  IoFilter,
-} from "react-icons/io5";
+import { IoAdd, IoDuplicate, IoPencil, IoSave, IoTrash } from "react-icons/io5";
 import { z } from "zod";
 
 import {
@@ -25,11 +17,11 @@ import {
   Title,
   Badge,
   Grid,
-  Textarea,
   Divider,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { useQuery } from "@tanstack/react-query";
@@ -44,8 +36,8 @@ import DataTableSkeleton from "@/components/loading/skeleton/data-table-skeleton
 
 const schema = z.object({
   matchId: z.number().nullable(),
-  start: z.date({ message: "Start date is required" }),
-  end: z.date({ message: "End date is required" }),
+  start: z.any({ message: "Start date is required" }),
+  end: z.any({ message: "End date is required" }),
   sportCenterId: z.string({ message: "Sport center is required" }),
   court: z.string(),
   customSection: z.number().nullable(),
@@ -74,12 +66,21 @@ function Matches() {
       matchId: null,
       start: dayjs(new Date()).set("hour", 9).set("minute", 0).toDate(),
       end: dayjs(new Date()).set("hour", 11).set("minute", 0).toDate(),
-      // Mantine <Select/> received default value as string
       sportCenterId: "0",
       court: "",
       customSection: null,
     },
-    validate: zodResolver(schema),
+    validate: zodResolver(schema) as any,
+    onValuesChange(values, previous) {
+      console.log(values, previous);
+    },
+    transformValues: (values) => {
+      return {
+        ...values,
+        start: dayjs(values.start).toDate(),
+        end: dayjs(values.end).toDate(),
+      };
+    },
   });
 
   const deleteMatch = (matchId: number) =>
@@ -260,14 +261,15 @@ function Matches() {
         opened={isMatchDrawerOpened}
         onClose={closeMatchDrawer}
         title={
-          <Title order={3}>
+          <Text size="lg" fw={600}>
             {form.values.matchId ? "Edit Match" : "Create Match"}
-          </Title>
+          </Text>
         }
         size="lg"
       >
         <form
           onSubmit={form.onSubmit(async (model) => {
+            console.log(model);
             if (model.matchId) {
               await httpService.put(`api/v1/matches/${model.matchId}`, model);
             } else {
@@ -286,15 +288,17 @@ function Matches() {
               <Grid.Col span={6}>
                 <DateTimePicker
                   label="Start (date/time)"
-                  required
                   {...form.getInputProps("start")}
+                  key={form.key("start")}
+                  name="start"
                 />
               </Grid.Col>
               <Grid.Col span={6}>
                 <DateTimePicker
                   label="End (date/time)"
-                  required
                   {...form.getInputProps("end")}
+                  key={form.key("end")}
+                  name="end"
                 />
               </Grid.Col>
             </Grid>
