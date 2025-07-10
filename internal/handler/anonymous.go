@@ -90,6 +90,10 @@ func (h *AnonymousHandler) getOutstandingPaymentReport(c *gin.Context) {
 			}
 		})
 
+		sort.Slice(matches, func(i, j int) bool {
+			return matches[i].Date.After(matches[j].Date)
+		})
+
 		return player{
 			PlayerId:    items[0].PlayerId,
 			PlayerName:  items[0].PlayerName,
