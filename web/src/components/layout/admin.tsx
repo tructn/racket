@@ -150,7 +150,7 @@ const NavItem: FC<NavItemProps> = ({ item, showLabel = true, level = 0 }) => {
 };
 
 function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
   const { user, isAuthenticated, isLoading } = useAuth0();
 
   const menuItems: MenuItem[] = [

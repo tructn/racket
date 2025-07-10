@@ -1,7 +1,11 @@
 import { lazy } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { MantineProvider, createTheme } from "@mantine/core";
+import {
+  MantineColorsTuple,
+  MantineProvider,
+  createTheme,
+} from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
@@ -34,9 +38,27 @@ const MeDashboard = lazy(() => import("@/pages/me/dashboard"));
 const MeWallet = lazy(() => import("@/pages/me/wallet"));
 const MePerformance = lazy(() => import("@/pages/me/performance"));
 
+const myColor: MantineColorsTuple = [
+  "#e5f3ff",
+  "#cde2ff",
+  "#9ac2ff",
+  "#64a0ff",
+  "#3884fe",
+  "#1d72fe",
+  "#0063ff",
+  "#0058e4",
+  "#004ecd",
+  "#0043b5",
+];
+
 const theme = createTheme({
-  primaryColor: "blue",
+  primaryColor: "myColor",
+  defaultRadius: "md",
   fontFamily: "Inter, sans-serif",
+  fontFamilyMonospace: "JetBrains Mono, monospace",
+  colors: {
+    myColor,
+  },
 });
 
 function App() {

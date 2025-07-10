@@ -17,6 +17,7 @@ import { ShareUrlModel } from "./models";
 import DataTableSkeleton from "@/components/loading/skeleton/data-table-skeleton";
 import { QRCodeSVG } from "qrcode.react";
 import { notifications } from "@mantine/notifications";
+import { Link } from "react-router-dom";
 
 export default function ShareCodes() {
   const { get, del } = useApi();
@@ -79,7 +80,9 @@ export default function ShareCodes() {
                     <Table.Td>
                       <Group gap="xs" align="center">
                         <Text size="sm" fw={500} className="break-all">
-                          {item.fullUrl}
+                          <Link to={item.fullUrl} target="_blank">
+                            {item.fullUrl}
+                          </Link>
                         </Text>
                         <Group gap="xs">
                           <Tooltip label="Copy URL">
@@ -89,17 +92,6 @@ export default function ShareCodes() {
                               onClick={() => copyToClipboard(item.fullUrl)}
                             >
                               <FiCopy size={16} />
-                            </ActionIcon>
-                          </Tooltip>
-                          <Tooltip label="Open in new tab">
-                            <ActionIcon
-                              variant="light"
-                              color="blue"
-                              component="a"
-                              href={item.fullUrl}
-                              target="_blank"
-                            >
-                              <FiExternalLink size={16} />
                             </ActionIcon>
                           </Tooltip>
                         </Group>
